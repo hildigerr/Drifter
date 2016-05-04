@@ -2,7 +2,7 @@
 #The main program that run the game bot
 
 #Python Libraries
-import system, time
+import sys, time
 
 #Our libraries
 import gfx, twitter

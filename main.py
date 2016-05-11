@@ -11,19 +11,20 @@ import sys, time, random
 NOTES : 
 ========================================
 in space:
-goto
+DONE - goto
 drift - no one votes, default action
 head home
 
 in planet :
-harvest - has resources
+DONE - harvest - has resources
 trade - has civ
-fight - has civ
+DONE - fight - has civ
 leave - system
 
 ========================================
 '''
 
+# Classes for an 'object' for the ship and planets.
 class makePlanet (object):
    def __init__(node):
       node.planetNum = -1
@@ -43,6 +44,8 @@ class makeMilFalcon (object):
       node.damageMax = 11
       node.currPlanet = None
 
+# Generate resources on a planet randomly based on the
+# planet type.
 def genPlanetResources (planet):
    index = 1
    resourceList = {}
@@ -67,6 +70,8 @@ def genPlanetResources (planet):
             resourceList.update({currResource:index})
    return resourceList
 
+# Generate a 10x10 matrix with all nodes connected to create the
+# universe. Planets has resources and possible civilization.
 def generateMap ():
    universe =  []
    planetTypeOpt = {0:"Rock", 1:"Watr", 2:"Fire"}
@@ -92,8 +97,10 @@ def generateMap ():
          planet.civ = civOpt[chosenCiv]
          if (chosenCiv == 1):
             planet.civHealth = 55
+            planet.civStatus = "Hostile"
          else:
             planet.civHealth = 70
+            planet.civStatus = "Passive"
          
       universe.append(planet)
 
@@ -108,67 +115,107 @@ def generateMap ():
 
    return (milFalcon, universe)
 
+# Ship goes to the next planet adjacent to the current planet.
 def cmd_goto(gotoPlanet, milFalcon, universe):
    currentPlanet = milFalcon.currPlanet
    adjPlanets = universe[currentPlanet].adjPlanets
 
+   if (universe[currentPlanet].civStatus == "Hostile"):
+      banditAttack (milFalcon, universe)
+
    if (gotoPlanet in adjPlanets):
-      print("Travelling to Planet #", gotoPlanet, "...")
+      print("- Travelling to Planet #", gotoPlanet, "...")
       milFalcon.currPlanet = gotoPlanet
       milFalcon.fuel = milFalcon.fuel - 10
    else:
       print("ERROR : Planet #", gotoPlanet, "is not adjacent.")
+   return 0
 
 def cmd_drift(milFalcon, universe):
    print("TODO : DIRFT COMMAND")
+   return 0
 
+# Harvest resources on the planet, if planet has bandits they
+# have a chance to attack the ship. 70% chance success.
 def cmd_harvest(milFalcon, universe):
    currentPlanet = milFalcon.currPlanet
+
+   if (universe[currentPlanet].civStatus == "Hostile"):
+      banditAttack (milFalcon, universe)
+   
    if (bool(universe[currentPlanet].resources)):
       if (random.randint(0, 99) in range(0, 69)):
-         print("SUCCESSFUL HARVEST!")
+         print("- SUCCESSFUL HARVEST!")
          for key, value in universe[currentPlanet].resources.items():
             if (key not in milFalcon.resources):
                milFalcon.resources.update({key:1})
             else:
                milFalcon.resources.update({key:(milFalcon.resources[key]+1)})
       else:
-         print("UNSUCCESSFUL HARVEST..")
+         print("- UNSUCCESSFUL HARVEST..")
+   else:
+      print("- There are no resources left on this planet.")
          
    universe[currentPlanet].resources = None
-
    milFalcon.fuel = milFalcon.fuel - 5
+   return 0
 
+# Trade with the civilization that the ship is on.
 def cmd_trade(milFalcon, universe):
    currentPlanet = milFalcon.currPlanet
-   print("TODO : TRADE COMMAND")
+   
+   if (universe[currentPlanet].civ == "Trading") :
+      print("\n- Trading Prices\n")
+   else:
+      print("- No civilization to trade with.")
+   return 0
 
+# Fights the civilization on the planet, the civilization status will
+# change to 'Hostile' when attacked.
 def cmd_fight(milFalcon, universe):
    currentPlanet = milFalcon.currPlanet
    civ = universe[currentPlanet].civ
    civHealth = universe[currentPlanet].civHealth
-   print("Bandit Camp :", civHealth,"\n")
    
    if (civ == "Bandit"):
-      userAttack = random.randint(milFalcon.damageMin, milFalcon.damageMax)
-      banditAttack = random.randint(1, 4)
-      milFalcon.health = milFalcon.health - banditAttack
-      universe[currentPlanet].civHealth = universe[currentPlanet].civHealth - userAttack
+      print("Bandit Camp :", civHealth, "[", universe[currentPlanet].civStatus,"]\n")
+   elif (civ == "Trading"):
+      universe[currentPlanet].civStatus = "Hostile"
+      print("Trading Camp :", civHealth, "[", universe[currentPlanet].civStatus,"]\n")
       
-      print(" User attacked for", userAttack, "damage.\n", civ, "dealed", banditAttack,"damage.")
+   userAttack = random.randint(milFalcon.damageMin, milFalcon.damageMax)
+   civAttack = random.randint(1, 4)
+   milFalcon.health = milFalcon.health - civAttack
+   universe[currentPlanet].civHealth = universe[currentPlanet].civHealth - userAttack
+      
+   print("- User attacked for", userAttack, "damage.\n", civ, "dealed", civAttack,"damage.")
 
    if (universe[currentPlanet].civHealth < 0):
       universe[currentPlanet].civ = None
       universe[currentPlanet].civHealth = None
       print("\nCivilization was defeated!")
+      
+   return 0
 
+# Bandits attack ship if they perform an action on a planet with bandits.
+# 70% chance of attacking.
+def banditAttack (milFalcon, universe):
+   if (random.randint(0, 99) in range(0, 69)):
+      civAttack = random.randint(1, 4)
+      milFalcon.health = milFalcon.health - civAttack
+      print("- Bandits dealed", civAttack, "damage.")
+   
+   return 0
+
+# Quit the game.
 def quitGame(milFalcon, universe) :
    sys.exit(0)
 
+# Update the status of the game
 def updateStatus(milFalcon, universe) :
    currentPlanet = milFalcon.currPlanet
    print(
-      "\n================================================================\n"
+      "\n============================== BEGIN ============================\n"
       "Ship Stats :\n",
       "Health :", milFalcon.health, "| Fuel :", milFalcon.fuel, "| Current Planet :", milFalcon.currPlanet,"\n",
       "Resources :", milFalcon.resources,"\n",
@@ -177,9 +224,11 @@ def updateStatus(milFalcon, universe) :
       "Planet Stats :\n",
       "Planet Number : ", universe[currentPlanet].planetNum, "| Planet Type : ", universe[currentPlanet].planetType,"\n",
       "Planet Resources :", universe[currentPlanet].resources,"\n",
-      "Civilization :", universe[currentPlanet].civ, "| Civ's Health :", universe[currentPlanet].civHealth,
-      "\n================================================================\n")
+      "Civilization :", universe[currentPlanet].civ, "[", universe[currentPlanet].civStatus,"] | Civ's Health :", universe[currentPlanet].civHealth,
+      "\n============================== END ==============================\n")
+   return 0
 
+# Run function corresponding to user input.
 def startGame (milFalcon, universe):
    commandList = {"goto":cmd_goto, "drift":cmd_drift,"harvest":cmd_harvest,
                   "trade":cmd_trade, "fight":cmd_fight, "q":quitGame}
@@ -199,16 +248,14 @@ def startGame (milFalcon, universe):
             cmd_goto(int(userInput.split()[1]), milFalcon, universe)
          else:
             commandList[userInput.split()[0]](milFalcon, universe)
-
       updateStatus(milFalcon, universe)
 
    return 0
-      
+
+# Main function to create the map and start the game.
 def main ():
    milFalcon, universe = generateMap()
-
    startGame(milFalcon, universe)
-   
    return 0
 
 

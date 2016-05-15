@@ -37,6 +37,7 @@ DASH_IMG_NAME = "dash-round.png"
 FUEL_GUAGE_START_LOC = (140,570)
 FUEL_GUAGE_OFFSET = 15.0
 FUEL_GUAGE_LINE_LEN = 60
+FUEL_GUAGE_LINE_WID = 2
 
 ############################################################## Helper Functions:
 def load_img(name):
@@ -93,13 +94,30 @@ def scene_gen(game,ship,planet):
         ship: The Ship.
         planet: The Ship's currPlanet.
     '''
+    # Draw Background #
     screen = pygame.display.set_mode(SCREEN_SIZE)
     (splash,s_rect) = load_img("star-field.png")
     screen.blit(splash,s_rect)
+    
+    # Draw Fuel Gauge #
     (splash,s_rect) = load_img(DASH_IMG_NAME)
     screen.blit(splash,s_rect)
-    
-    pygame.draw.line(screen, pygame.Color("red"), FUEL_GUAGE_START_LOC, get_fuel_line_end(ship.fuel), 2)
+    pygame.draw.line(screen, pygame.Color("red"), 
+        FUEL_GUAGE_START_LOC, get_fuel_line_end(ship.fuel), FUEL_GUAGE_LINE_WID)
+        
+    # Draw Current Planet #
+    if ship.currPlanet != None:
+        print "Testing: ", planet.planetType
+        if   planet.planetType == "Rock": (splash,s_rect) = load_img("planet000.png")
+        elif planet.planetType == "Watr": (splash,s_rect) = load_img("planet000.png")
+        elif planet.planetType == "Fire": (splash,s_rect) = load_img("planet000.png")
+        else:                             (splash,s_rect) = load_img("planet000.png")
+        s_rect.center = (0,0)
+        screen.blit(splash,s_rect)
+        if planet.civ != None:
+            (splash,s_rect) = load_img("city-overlay.png")
+            s_rect.center = (0,0)
+            screen.blit(splash,s_rect)
     
 #     if pygame.font:
 #         font = pygame.font.Font(None, 32)
@@ -116,7 +134,7 @@ def scene_gen(game,ship,planet):
 if __name__ == '__main__':
     from main import genPlanetResources
     craft = Ship()
-    planet = Planet()
-    res = genPlanetResources(planet)
-    scene_gen("Testing",craft,planet)
+    craft.currPlanet = Planet()
+    res = genPlanetResources(craft.currPlanet)
+    scene_gen("Testing",craft,craft.currPlanet)
     # while( True ): print "testing"

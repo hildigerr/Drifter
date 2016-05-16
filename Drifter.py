@@ -55,8 +55,8 @@ class CmdLineGame():
                 if attitude != "Hostile":
                     string                        += ", buy, sell"
                     if attitude == "Friendly":
-                        string                    += ", refine" #TODO
-                string                            += ", attack" #TODO
+                        string                    += ", refine"
+                string                            += ", attack"
             string                                += ", harvest, depart"
         elif self.drifter.sys.qt > 0:      string += ", orbit"
         if   len(self.drifter.cargo) > 0:  string += ", jettison"
@@ -103,7 +103,7 @@ class CmdLineGame():
                 continue
                 
             ############################################################## Quit:
-            if cmd == "quit" or cmd = "exit" or cmd = "q":
+            if cmd == "quit" or cmd == "exit" or cmd == "q":
                 self.losegame("\tSELF DESTRUCT SEQUENCE ACTIVATED!")
                 
             ############################################################# Drift:
@@ -128,7 +128,7 @@ class CmdLineGame():
                 try:
                     print ("Entering orbit of planet #{}".format(cmdLine[1]))
                     self.drifter.orbit(int(cmdLine[1]))
-                except IndexError:
+                except (IndexError, ValueError):
                     print ("?\n\tUsage: 'orbit n'") ; continue
                     
             ##################################################### Depart System:
@@ -142,7 +142,7 @@ class CmdLineGame():
                     if cmdLine[2] == "Holy": cmdLine[2] = "Holy Water" #XXX#
                     print ("Jettisoning", cmdLine[1], cmdLine[2])
                     self.drifter.jettison(int(cmdLine[1]),cmdLine[2])
-                except IndexError:
+                except (IndexError, ValueError):
                     print ("?\n\tUsage: 'jettison n item'") ; continue
             
             ####################################################### Buy or Sell:
@@ -152,13 +152,22 @@ class CmdLineGame():
                     if not self.drifter.shop(cmd,int(cmdLine[1]),cmdLine[2]):
                         self.losegame("While trying to make a deal to {} {} {}, you were seized and put to death.".format(cmd,cmdLine[1],cmdLine[2]))
                     else: print ("You {} some {}.".format(cmd,cmdLine[2]))
-                except IndexError:
-                    print ("?\n\tUsage: 'nuy n item'") ; continue
+                except (IndexError, ValueError):
+                    print ("?\n\tUsage: '{} n item'".format(cmd)) ; continue
 
             ############################################################ Attack:
             if cmd == "attack":
                 if not self.drifter.harm(self.drifter.sys.attack()):
                     self.losegame("Your ship was destroyed in battle.")
+
+            ############################################################ Refine:
+            if cmd == "refine":
+                try:
+                    if cmdLine[2] == "Holy": cmdLine[2] = "Holy Water" #XXX#
+                    if not self.drifter.refine(int(cmdLine[1]),cmdLine[2]):
+                        self.losegame("You were caught tresspassing in the refinery, seized, and put to death.")
+                except (IndexError, ValueError):
+                    print ("?\n\tUsage: 'refine n item'") ; continue
 
             ####################################################################
             self.drifter.time += 1

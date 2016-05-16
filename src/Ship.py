@@ -12,6 +12,7 @@ from Planets import System
 
 
 ##################################################################### Constants:
+MAX_PLANETS = 6
 INIT_CARGO_CAP = 100
 
 # Starting Money #
@@ -37,8 +38,7 @@ HEAD_DIST_MAX = 10
 DRIFT_FUEL_GAIN_MIN = 1
 DRIFT_FUEL_GAIN_MAX = 10
 
-MAX_PLANETS = 6
-
+STILL_ALIVE = True
 
 #################################################################### Ship Class:
 class Ship():
@@ -70,7 +70,7 @@ class Ship():
     def depart(self,cost,dist):
         '''Depart the current system. Return TRUE if arrived at Home.'''
         self.fuelerize(cost) ; self.delta -= self.heading * dist 
-        if self.delta <= 0:   return True
+        if self.delta <= 0:              return True
         self.sys = System(MAX_PLANETS) ; return False
     def drift(self):
         '''Depart the System while not only preserving fuel but accumulating it.'''
@@ -90,35 +90,42 @@ class Ship():
         self.sys.orbit(index)
     def scan(self):
         return self.sys.scan()
-    def harvest(self):
-        '''Attempt to acquire resources from planet being orbited.'''
+    def harvest(self,result=None):
+        '''Acquire resources from result param or else planet being orbited.'''
         #TODO: Pass through any Modifiers from ship Modules
-        result = self.sys.harvest()
+        if result == None: result = self.sys.harvest()
         if result != None:
             res_keys = list(result.keys())
             for i in range (len(res_keys)):
                 if res_keys[i] == "Nothing": continue
                 if res_keys[i] == "Damage":
                     if not self.harm(result['Damage']): return False # Died #
+                elif res_keys[i] == "Fuel": self.fuelerize(result['Fuel'])
                 else: self.load(result[res_keys[i]],res_keys[i])
-        return True # Still Alive #
+        return STILL_ALIVE
     def load(self,amt=0,item=None):
-        if item != None and int(amt) > 0:
-            if self.usedcap < self.cap: # Have Room For More #
-                if self.usedcap+amt > self.cap: # But not that much room #
-                    amt = self.cap-self.usedcap
-                self.usedcap += amt
-                if item not in  self.cargo:
-                    if amt > 0: self.cargo[item]  = amt
-                else:           self.cargo[item] += amt
+        '''Load some cargo to into the cargo bay. Returns acutal amount added.'''
+        if item != None and int(amt) > 0 and self.usedcap < self.cap: 
+            # Have Room For More #
+            if self.usedcap+amt > self.cap: # But not that much room #
+                amt = self.cap-self.usedcap
+            self.usedcap += amt
+            if item not in  self.cargo:
+                if amt > 0: self.cargo[item]  = amt
+            else:           self.cargo[item] += amt
+            return amt
+        return 0
     def jettison(self,amt=0,item=None):
-        '''Jettison some cargo to make room for more.'''
+        ''' Jettison some cargo to make room for more. Returns acutal amount removed. '''
         if item != None and int(amt) > 0 and item in self.cargo:
             self.cargo[item] -= amt ; self.usedcap -= amt
             if self.cargo[item] <= 0:
                 if self.cargo[item] < 0: self.usedcap -= self.cargo[item]
                 del self.cargo[item]
+            return amt
+        return 0
     def shop(self,cmd,amt,item):
+        '''Buy and Sell'''
         price = self.sys.buy(item)
         if price > 0: # Item Available #
             if cmd == "buy":
@@ -132,8 +139,14 @@ class Ship():
     def harm(self,amt):
         '''Apply some amt of damage to self. Return True if survived it.'''
         self.health -= amt
-        if self.health <= 0: return False
-        else:                return True    # Still Alive
+        if self.health <= 0: return not STILL_ALIVE
+        else:                return     STILL_ALIVE
+    def refine(self,qt,item):
+        '''Refine a quantity of some resouce item into better stuff.'''
+        if self.sys.pos != None and self.sys.planets[self.sys.pos].resources.civ != None:
+            return self.harvest(self.sys.planets[self.sys.pos].resources.civ.refine(self.jettison(qt,item),item))
+        return STILL_ALIVE
+            
 
 ############################################################## Main for Testing:
 if __name__ == '__main__':

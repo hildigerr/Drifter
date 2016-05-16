@@ -54,6 +54,9 @@ resouceChances = {  0:BARREN_CHANCES,
                     2:WATER_CHANCES,
                     3:FIRE_CHANCES     }
 
+refineConversions = { "Rocks":"Stones","Stones":"Gems",
+                      "Ice":"Water","Water":"Holy Water","Holy Water":"Fuel",
+                      "Lava":"Obsidian","Obsidian":"Gems","Charcoal":"Fuel" }
 
 ## Civilized Planet ##
 ATTITUDE_RAND_MIN =             1 # Minimum Initial Attitude                # 
@@ -111,7 +114,20 @@ class Civilization():
         self.attitude -= random.randint(1,CIV_ANGER_RAND_MAX) * random.randint(1,dam) #TODO Tune
         if self.attitude < 0: self.attitude = 0
         return int(random.randint(CIV_DAM_MIN,CIV_DAM_MAX)*(100-self.attitude)/100)
-        
+    def refine(self,amt,item):
+        result = {}
+        if item in refineConversions:
+            if self.attitude >= self.fiendlyMin:
+                result[refineConversions[item]] = int(amt*2/3)
+            elif self.attitude >= self.enemyMax:
+                result[refineConversions[item]] = int(amt*1/2)
+            else:
+                result[refineConversions[item]] = int(amt*1/3)
+                if random.randint(1,100) > self.attitude:
+                    result["Damage"] = random.randint(CIV_DAM_MIN,CIV_DAM_MAX)
+        else: result[item] = amt
+        return result
+                
 ##################################################################### Resources:
 class Resource():
     '''

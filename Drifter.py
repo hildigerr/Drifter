@@ -146,16 +146,18 @@ class CmdLineGame():
                 except IndexError:
                     print ("?\n\tUsage: 'jettison n item'") ; continue
             
-            ############################################################### Buy:
-            if cmd == "buy":
+            ####################################################### Buy or Sell:
+            if cmd == "buy" or cmd == "sell":
                 try:
                     if cmdLine[2] == "Holy": cmdLine[2] = "Holy Water" #XXX#
-                    print ("Buying", cmdLine[1], cmdLine[2])
-                    if not self.drifter.buy(int(cmdLine[1]),cmdLine[2]):
-                        self.losegame("While trying to make a deal, you were seized and put to death.")
+                    if not self.drifter.shop(cmd,int(cmdLine[1]),cmdLine[2]):
+                        self.losegame("While trying to make a deal to {} {} {}, you were seized and put to death.".format(cmd,cmdLine[1],cmdLine[2]))
+                    else: print ("You {} some {}.".format(cmd,cmdLine[2]))
                 except IndexError:
                     print ("?\n\tUsage: 'nuy n item'") ; continue
-                    
+
+
+
             ####################################################################
             self.drifter.time += 1
             

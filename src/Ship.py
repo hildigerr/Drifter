@@ -100,17 +100,17 @@ class Ship():
                 if res_keys[i] == "Nothing": continue
                 if res_keys[i] == "Damage":
                     if not self.harm(result['Damage']): return False # Died #
-                else:
-                    if self.usedcap < self.cap: # Have Room For More #
-                        if self.usedcap+result[res_keys[i]] > self.cap:
-                            # But not that much room #
-                            result[res_keys[i]] = self.cap-self.usedcap
-                        self.usedcap += result[res_keys[i]]
-                        if res_keys[i] not in self.cargo:
-                            if result[res_keys[i]] > 0:
-                                self.cargo[res_keys[i]]  = result[res_keys[i]]
-                        else:   self.cargo[res_keys[i]] += result[res_keys[i]]
+                else: self.load(result[res_keys[i]],res_keys[i])
         return True # Still Alive #
+    def load(self,amt=0,item=None):
+        if item != None and int(amt) > 0:
+            if self.usedcap < self.cap: # Have Room For More #
+                if self.usedcap+amt > self.cap: # But not that much room #
+                    amt = self.cap-self.usedcap
+                self.usedcap += amt
+                if item not in  self.cargo:
+                    if amt > 0: self.cargo[item]  = amt
+                else:           self.cargo[item] += amt
     def jettison(self,amt=0,item=None):
         '''Jettison some cargo to make room for more.'''
         if item != None and int(amt) > 0 and item in self.cargo:
@@ -118,15 +118,17 @@ class Ship():
             if self.cargo[item] <= 0:
                 if self.cargo[item] < 0: self.usedcap -= self.cargo[item]
                 del self.cargo[item]
-    def buy(self,amt,item):
+    def shop(self,cmd,amt,item):
         price = self.sys.buy(item)
         if price > 0: # Item Available #
-            if (price*amt) > self.credit: amt = int(self.credit / price)
-            self.credit -= price * amt
-            if item not in self.cargo:  self.cargo[item]  = amt
-            else:                       self.cargo[item] += amt
-        if price < 0:  return self.harm(-price) # Under Attack #
-        else:          return True
+            if cmd == "buy":
+                if (price*amt) > self.credit: amt = int(self.credit / price)
+                self.credit -= price * amt ; self.load(amt,item)
+            if cmd == "sell" and item in self.cargo:
+                if amt > self.cargo[item]: amt = self.cargo[item]
+                self.credit += price * amt ; self.jettison(amt,item) 
+        if price < 0: return self.harm(-price) # Under Attack #
+        return True
     def harm(self,amt):
         '''Apply some amt of damage to self. Return True if survived it.'''
         self.health -= amt

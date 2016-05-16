@@ -1,5 +1,5 @@
 #Standard Python libs
-import configparser, os, pickle, sys
+import collections, configparser, os, pickle, sys
 
 #Site-libs
 import tweepy
@@ -110,6 +110,16 @@ def cleanTweet(msg, botName):
         else:
             newMsg = newMsg.strip() + ' ' + i
 
-    newMsg = newMsg.strip()
+    return newMsg.strip()
 
-    return newMsg
+def findTop5Votes(tweets):
+    rawVotes = {}
+    top5Votes = []
+
+    for t in tweets:
+        if t[1] in rawVotes:
+            rawVotes[t[1]] += 1
+        else:
+            rawVotes[t[1]] = 1
+
+    return collections.OrderedDict(sorted(rawVotes.items(), key=lambda t: t[1])).keys()[:5]

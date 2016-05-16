@@ -41,7 +41,7 @@ class makeMilFalcon (object):
 numTurns = 0
 
 rockResourceList = ["Stone", "Rock", "Dirt", "Metal"]
-waterResourceList = ["Water", "Ice", "Holy Water"]
+waterResourceList = ["Water", "Ice", "Steam"]
 fireResourceList = ["Obsidian", "Lava", "Diamond", "Charcoal"]
 
 # Generate resources on a planet randomly based on the
@@ -50,7 +50,7 @@ def genPlanetResources (planet):
    index = 1
    resourceList = {}
    rockRes = {0:"Stone", 1:"Rock", 2:"Dirt", 3:"Metal"}
-   waterRes = {0:"Water", 1:"Ice", 2:"Holy Water"}
+   waterRes = {0:"Water", 1:"Ice", 2:"Steam"}
    fireRes = {0:"Obsidian", 1:"Lava", 2:"Diamond", 3:"Charcoal"}
 
    if (planet.planetType == "Rock"):
@@ -141,9 +141,9 @@ def cmd_harvest (milFalcon, universe):
    currentPlanet = milFalcon.currPlanet
    
    if (bool(universe[currentPlanet].resources)):
+      numTurns = numTurns + 1
       if (random.randint(0, 99) in range(0, 69)):
          print("- SUCCESSFUL HARVEST!")
-         numTurns = numTurns + 1
          for key, value in universe[currentPlanet].resources.items():
             if (key not in milFalcon.resources):
                milFalcon.resources.update({key:1})
@@ -190,9 +190,6 @@ def setSellPrices (milFalcon, universe):
    currentPlanet = milFalcon.currPlanet
    planetType = universe[currentPlanet].planetType
 
-   if (bool(universe[currentPlanet].tradingPrices)):
-      print(" Trading Prices:");
-
    rockItemAmmt = random.randint(0, 3)
    waterItemAmmt = random.randint(0, 3)
    fireItemAmmt = random.randint(0, 3)
@@ -232,7 +229,6 @@ def cmd_sell (milFalcon, universe, sellItem, sellAmmt):
             if (milFalcon.resources.get(sellItem) <= 0):
                milFalcon.resources.pop(sellItem)
             
-            universe[currentPlanet].tradingPrices.pop(sellItem)
             universe[currentPlanet].treasury -= civSoldForPrice
             print("- Trading", sellAmmt, sellItem, "for", civSoldForPrice, "coins.")
             numTurns = numTurns + 1
@@ -244,6 +240,10 @@ def cmd_sell (milFalcon, universe, sellItem, sellAmmt):
       print("- No civilization wants to trade.")
 
    civAttack(milFalcon, universe)
+   return 0
+
+def cmd_buy (milFalcon, universe, butItem, buyAmmt):
+   
    return 0
 
 # Fights the civilization on the planet, the civilization status will
@@ -286,8 +286,7 @@ def civAttack (milFalcon, universe):
       if (random.randint(0, 99) in range(0, 69)):
          civAttack = random.randint(1, 4)
          milFalcon.health = milFalcon.health - civAttack
-         print("-", universe[currentPlanet].civ, "civilization dealt", civAttack, "damage.")
-         
+         print("-", universe[currentPlanet].civ, "civilization dealt", civAttack, "damage.")    
    return 0
 
 # Quit the game.
@@ -309,11 +308,16 @@ def updateStatus (milFalcon, universe) :
       "Planet Stats :\n",
       "Planet Number : ", universe[currentPlanet].planetNum, "| Planet Type : ", universe[currentPlanet].planetType,"\n",
       "Planet Resources :", universe[currentPlanet].resources,"\n",
-      "Civilization :", universe[currentPlanet].civ, "[", universe[currentPlanet].civStatus,"] | Civ's Health :", universe[currentPlanet].civHealth, "| Treasury :", universe[currentPlanet].treasury)
+      "Civilization :", universe[currentPlanet].civ, "[", universe[currentPlanet].civStatus,"] | Civ's Health :",
+      universe[currentPlanet].civHealth, "| Treasury :", universe[currentPlanet].treasury)
 
    if (universe[currentPlanet].civ == "Trading" and universe[currentPlanet].civStatus == "Passive"):
       if (((numTurns % 10) == 0) or (not bool(universe[currentPlanet].tradingPrices))):
          setSellPrices(milFalcon, universe)
+      if (bool(universe[currentPlanet].tradingPrices)):
+         print("\nTrading Prices:")
+         if (milFalcon.fuel < 100):
+            print(" * Gas =", math.ceil((100 - milFalcon.fuel)/3))
       for key, value in universe[currentPlanet].tradingPrices.items():
          print(" *", key, "=", value)
    
@@ -353,6 +357,7 @@ def godMode (milFalcon, universe):
       
    return 0
 
+# Display all the possible commands the user can perform.
 def cmd_help (milFalcon, universe):
    print("LIST OF COMMANDS :\n",
          "help                        : Show list of available commands to perform in-game.\n",
@@ -364,7 +369,7 @@ def cmd_help (milFalcon, universe):
 # Run function corresponding to user input.
 def startGame (milFalcon, universe):
    commandList = {"help":cmd_help, "goto":cmd_goto, "harvest":cmd_harvest,
-                  "sell":cmd_sell, "fight":cmd_fight, "q":quitGame,
+                  "sell":cmd_sell, "fight":cmd_fight, "gas":cmd_buy, "q":quitGame,
                   "ttele":tradeTele, "btele":banditTele, "gm":godMode}
    
    print("Welcome to [INSERT GAME NAME]!")
@@ -388,6 +393,12 @@ def startGame (milFalcon, universe):
                print("- Error : Invalid command for 'sell'")
             else:
                cmd_sell(milFalcon, universe, userInput.split()[1], int(userInput.split()[2]))
+         elif (userInput.split()[0] == "buy"):
+            argc = len(userInput.split())
+            if (argc == 3):
+               cmd_sell(milFalcon, universe, userInput.split()[1], int(userInput.split()[2]))
+            elif (argc == 2 and userInput.split()[1] == "gas"):
+               cmd_sell(milFalcon, universe, userInput.split()[1], -1)
          else:
             commandList[userInput.split()[0]](milFalcon, universe)
       updateStatus(milFalcon, universe)

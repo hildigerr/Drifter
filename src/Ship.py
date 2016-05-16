@@ -38,7 +38,7 @@ class Ship():
     '''
     fuel    -- Percentage of fuel tank full.
     health  -- Percentage of ship hull integrity.
-    cargo   -- 
+    cargo   -- Dictionary of resources.
     delta   -- Distance from home.
     heading -- Toward home or away? (+1 vs -1)
     sys     -- The current system.
@@ -78,8 +78,21 @@ class Ship():
         self.sys.orbit(index)
     def harvest(self):
         #TODO: Pass through any Modifiers
-        self.sys.harvest()
-        
+        result = self.sys.harvest()
+        if result != None:
+            res_len = len(result)
+            res_keys = result.keys()
+            for i in range (0,res_len):
+                if res_keys[i] == "Damage":
+                    if not self.harm(result['Damage']): return False # Died #
+                elif res_keys[i] not in self.cargo:
+                        self.cargo[res_keys[i]]  = result[res_keys[i]]
+                else:   self.cargo[res_keys[i]] += result[res_keys[i]]
+        return True # Still Alive #
+    def harm(self,amt):
+        self.health -= amt
+        if self.health <= 0: return False
+        else:                return True    # Still Alive 
 ############################################################## Main for Testing:
 if __name__ == '__main__':
     USSEnterprise = Ship()

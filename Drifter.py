@@ -31,20 +31,22 @@ class CmdLineGame():
     def commands(self):
         string =             "Available commands are: drift"
         if self.drifter.fuel > 0:        string += ", head home"
-        if self.drifter.sys.pos != None: string += ", harvest"
-        if self.drifter.sys.qt > 0:      string += ", orbit"
+        if self.drifter.sys.pos != None: string += ", harvest, depart"
+        elif self.drifter.sys.qt > 0:      string += ", orbit"
         string += ", and quit."
         print string
     def wingame():
-        print '#' * 80
-        print "YOU WIN!"
-        sys.exit(0)
+        print '#' * 80-9, " YOU WIN!"    ;  sys.exit(0)
+    def losegame():
+        print '#' * 80-11, " YOU LOOSE!" ;  sys.exit(0)
     def status(self):
-        print "T:{}|D:{}|F:{}|H:{}|P:{}".format( self.drifter.time,
+        print "T:{}|D:{}|F:{}|H:{}|P:{}\nCargo:{}".format(
+                                                 self.drifter.time,
                                                  self.drifter.delta,
                                                  self.drifter.fuel,
                                                  self.drifter.health,
-                                                 self.drifter.sys.qt )
+                                                 self.drifter.sys.qt,
+                                                 self.drifter.cargo )
     def main(self):
         self.backstory()
         while True:
@@ -55,8 +57,12 @@ class CmdLineGame():
                 if self.drifter.drift(): self.wingame()
             if cmd == "head":
                 if self.drifter.goHome(): self.wingame()
-            if cmd == "harvest": self.drifter.harvest()
-            if cmd == "orbit": self.drifter.orbit(int(cmdLine.split()[1]))
+            if cmd == "harvest":
+                if not self.drifter.harvest():
+                    print "You have been slain by the local civilization."
+                    self.losegame()
+            if cmd == "orbit":   self.drifter.orbit(int(cmdLine.split()[1]))
+            if cmd == "depart": self.drifter.sys.pos = None
             self.drifter.time += 1
             
             

@@ -1,20 +1,25 @@
 #!/usr/bin/python3
+################################################################################
+#                                                                              #
+# Drifter.py -- The Game Implementations                                       #
+#                                                                              #
+#   Western Washington University -- CSCI 4/597H -- Spring 2016                #
+#                                                                              #
+################################################################################
 
 import sys, random
 
 sys.path.append("src/")
 from src import Ship
 
-################################################################################
-#                                                                              #
-# Ship.py -- The Spaceship                                                     #
-#                                                                              #
-#   Western Washington University -- CSCI 4/597H -- Spring 2016                #
-#                                                                              #
-################################################################################
-
 raw_input = input #python3
 
+
+##################################################################### Constants:
+STASIS_YEARS_MIN = 99
+STASIS_YEARS_MAX = 666
+
+################################################################################
 class CmdLineGame():
     '''Implements a Command Line version of The Game.'''
     def __init__(self,run=True):
@@ -27,10 +32,13 @@ class CmdLineGame():
         string += " was the captain\nbeing decapitated by some flying debris. "
         string += "There was a battle. You don't know if\nthe enemy was destroyed,"
         string += " but obviously your ship is intact. The onboard computer\n"
-        string += "reports that you have been in stasis for {} years. ".format(random.randint(99,666))
+        string += "reports that you have been in stasis for {} years. ".format(
+                              random.randint(STASIS_YEARS_MIN,STASIS_YEARS_MAX))
         string += "The ship has been drifting\nthe entire time. You are lost, "
         string += "but the solar sails are functional.\n\n"
-        string += "You may return to stasis and allow the ship to drift at any time. "
+        if self.drifter.credit < 0:
+            string += "You have an overdue library fine of ${} universal credits.".format(-self.drifter.credit)
+        string += "\n\nYou may return to stasis and allow the ship to drift at any time. "
         string += "Or, if you\nhave fuel, you can head toward home. "
         if self.drifter.sys.qt > 0: string += "Perhaps one of these nearby planets has\n"
         else: string += "If you happen upon a solar system with\nplanets, perhaps you may find "
@@ -41,23 +49,31 @@ class CmdLineGame():
         '''Enumerate available commands into a string.'''
         string =               "Available commands are: drift"
         if   self.drifter.fuel > 0:        string += ", head home"
-        if   self.drifter.sys.pos != None: string += ", harvest, depart"
+        if self.drifter.sys.pos != None:
+            if self.drifter.sys.planets[self.drifter.sys.pos].resources.civ != None:
+                attitude = self.drifter.sys.planets[self.drifter.sys.pos].resources.civ.Attitude()
+                if attitude != "Hostile":
+                    string                        += ", buy, sell, trade" #TODO
+                    if attitude == "Friendly":
+                        string                    += ", refine" #TODO
+                string                            += ", attack" #TODO
+            string                                += ", harvest, depart"
         elif self.drifter.sys.qt > 0:      string += ", orbit"
         if   len(self.drifter.cargo) > 0:  string += ", jettison"
-        #TODO: Add More Commands: buy, sell, trade, fight, flee, ...
         string += ", and quit."
         return string
     def wingame(self):
         #TODO: Calculate Score -- Compare to High Score List
-        print ('#' * (80-9), "YOU WIN!")    ;  sys.exit(0)
-    def losegame(self):
-        print ('#' * (80-11), "YOU LOOSE!") ;  sys.exit(0)
+        print ('#' * (80-9), "YOU WIN!\n")    ;  sys.exit(0)
+    def losegame(self,string):
+        print (string)
+        print ('#' * (80-11), "YOU LOOSE!\n") ;  sys.exit(0)
     def status(self):
         '''Create status string.'''
-        return "[T:{}|D:{}|F:{}|H:{}|P:{}]".format(
-                self.drifter.time, self.drifter.delta,
-                self.drifter.fuel, self.drifter.health,
-                self.drifter.sys.qt               )
+        return "[T:{}|D:{}|F:{}|H:{}|P:{}|${}]".format(
+                self.drifter.time,   self.drifter.delta,
+                self.drifter.fuel,   self.drifter.health,
+                self.drifter.sys.qt, self.drifter.credit)
     def listCargo(self):
         return "Cargo[{}%]:{}".format(
                 int(100*(self.drifter.usedcap/self.drifter.cap)),
@@ -66,21 +82,29 @@ class CmdLineGame():
         ''' Play The Game. '''
         print(self.backstory())
         while True:
-            print (self.commands(),"\n",self.listCargo())
-            cmdLine = raw_input(self.status()+" What will you do? ").split()
-            cmd = cmdLine[0] ; print ('#' * 80)
+            print ("{}\n{}".format(self.commands(),self.listCargo()))
+            try:
+                cmdLine = raw_input(self.status()+" What will you do? ").split()
+                cmd = cmdLine[0] 
+            except EOFError: cmd = "quit"
+            
+            print ("\n" +('#' * 80))
             
             ############################################################## Help:
-            if cmd == "help":
-                print ("\nThe ship status is described as so:\n"
-                      +"\tT:time|D:distance|F:fuel|H:health|P:planets\n"
-                      +"The planet scan is described as so:\n"
-                      +"\t[type]{health}[resource,list]\n")
+            if cmd == "help": #TODO Add command parameter
+                print ("\nThe ship status is described as so:\n\t"
+                      +"[T:time|D:distance|F:fuel|H:health|P:planets|$credits]"
+                      +"\nWhere time is how many turns have elapsed. "
+                      +"Distance is how far from home you\nare. "
+                      +"Planets indicate how many are in the current system. "
+                      +"And credits is the\nbalance of your universal monetary exchange account. "
+                      +"\n\nThe planet scan is described as so:\n\t"
+                      +"[type]{health}[resource,list]\n")
                 continue
                 
             ############################################################## Quit:
             if cmd == "quit":
-                print ("\tSELF DESTRUCT SEQUENCE ACTIVATED!") ; self.losegame()
+                self.losegame("\tSELF DESTRUCT SEQUENCE ACTIVATED!")
                 
             ############################################################# Drift:
             if cmd == "drift":
@@ -97,8 +121,7 @@ class CmdLineGame():
             if cmd == "harvest":
                 print ("Harvesting...")
                 if not self.drifter.harvest():
-                    print ("You have been slain by the local civilization.")
-                    self.losegame()
+                    self.losegame("You have been slain by the local civilization.")
                 
             ###################################################### Orbit Planet:
             if cmd == "orbit":
@@ -122,6 +145,16 @@ class CmdLineGame():
                     self.drifter.jettison(int(cmdLine[1]),cmdLine[2])
                 except IndexError:
                     print ("?\n\tUsage: 'jettison n item'") ; continue
+            
+            ############################################################### Buy:
+            if cmd == "buy":
+                try:
+                    if cmdLine[2] == "Holy": cmdLine[2] = "Holy Water" #XXX#
+                    print ("Buying", cmdLine[1], cmdLine[2])
+                    if not self.drifter.buy(int(cmdLine[1]),cmdLine[2]):
+                        self.losegame("While trying to make a deal, you were seized and put to death.")
+                except IndexError:
+                    print ("?\n\tUsage: 'nuy n item'") ; continue
                     
             ####################################################################
             self.drifter.time += 1

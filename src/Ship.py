@@ -1,8 +1,4 @@
 #!/usr/bin/python
-
-import random
-from Planets import System
-
 ################################################################################
 #                                                                              #
 # Ship.py -- The Spaceship                                                     #
@@ -11,8 +7,16 @@ from Planets import System
 #                                                                              #
 ################################################################################
 
+import random
+from Planets import System
+
+
 ##################################################################### Constants:
 INIT_CARGO_CAP = 100
+
+# Starting Money #
+INIT_CREDIT_MIN = -100 # Or Debt!
+INIT_CREDIT_MAX =  100
 
 # Starting Fuel #
 INIT_FUEL_MIN = 0
@@ -48,6 +52,7 @@ class Ship():
     heading -- Toward home or away? (+1 vs -1)
     sys     -- The current system.
     time    -- Time taken to get home.
+    credit  -- Universal monetery credits for trading with non-hostile civs.
     '''
     def __init__(self):
         self.fuel = random.randint(INIT_FUEL_MIN,INIT_FUEL_MAX)
@@ -56,6 +61,7 @@ class Ship():
         self.health = 100 ; self.time = 0 ; self.heading = 0
         while self.heading == 0: self.heading = random.randint(-1,1)
         self.cargo = {} ; self.cap = INIT_CARGO_CAP ; self.usedcap = 0
+        self.credit = random.randint(INIT_CREDIT_MIN,INIT_CREDIT_MAX)
     def fuelerize(self,qt):
         '''Adjust fuel level by qt.'''
         self.fuel += qt
@@ -90,7 +96,7 @@ class Ship():
         result = self.sys.harvest()
         if result != None:
             res_keys = list(result.keys())
-            for i in range (len(result)):
+            for i in range (len(res_keys)):
                 if res_keys[i] == "Nothing": continue
                 if res_keys[i] == "Damage":
                     if not self.harm(result['Damage']): return False # Died #
@@ -112,6 +118,15 @@ class Ship():
             if self.cargo[item] <= 0:
                 if self.cargo[item] < 0: self.usedcap -= self.cargo[item]
                 del self.cargo[item]
+    def buy(self,amt,item):
+        price = self.sys.buy(item)
+        if price > 0: # Item Available #
+            if (price*amt) > self.credit: amt = int(self.credit / price)
+            self.credit -= price * amt
+            if item not in self.cargo:  self.cargo[item]  = amt
+            else:                       self.cargo[item] += amt
+        if price < 0:  return self.harm(-price) # Under Attack #
+        else:          return True
     def harm(self,amt):
         '''Apply some amt of damage to self. Return True if survived it.'''
         self.health -= amt

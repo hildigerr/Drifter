@@ -1,7 +1,4 @@
 #!/usr/bin/python
-
-import random
-
 ################################################################################
 #                                                                              #
 # Cargo.py -- Resources, Modules, Comodities, etc.                             #
@@ -10,14 +7,17 @@ import random
 #                                                                              #
 ################################################################################
 
-##################################################################### Constants:
-DEFAULT_CIV_CHANCE = 50
+import random
 
-## Types ##
+
+##################################################################### Constants:
+DEFAULT_CIV_SPAWN_CHANCE = 50
+
+## Planet Types ##
 planetTypeQt = 3
 planetType = { 0:"Barren", 1:"Rocky", 2:"Water", 3:"Fire" }
 
-## Planet ##
+## XXX Planet ##
 # _RESOURCE_LIST = []
 # _CHANCES = (harvest_chance_poor, harvest_chance_avg,
 #             harvest_poor_min, harvest_poor_max,
@@ -44,36 +44,7 @@ WATER_CHANCES = DEFAULT_CHANCES #TODO
 FIRE_RESOUCE_LIST = ["Charcoal","Lava","Obsidian","Gems"]
 FIRE_CHANCES = DEFAULT_CHANCES  #TODO
 
-## Civilized Planet ##
-ATTITUDE_RAND_MIN = 1
-ATTITUDE_RAND_MAX = 100
-ATTITUDE_FRIEND_MIN_DEFAULT = 50
-ATTITUDE_ENEMY_MAX_DEFAULT = 25
-CIV_HARVEST_ANGER_RAND_MAX = 15
-CIV_DAM_MIN = 10
-CIV_DAM_MAX = 33
 
-################################################################## Civilization:
-class Civilization():
-    '''
-    attitude   -- The civilizations attitude toward player as a percentage.
-    fiendlyMin -- Minimum attitude for civilization to remain friendly.
-    enemyMax   -- Civilization will be hostile until attitude reaches this max.
-    '''
-    def __init__(self,type,fri=ATTITUDE_FRIEND_MIN_DEFAULT,foe=ATTITUDE_ENEMY_MAX_DEFAULT):
-        self.fiendlyMin = fri ; self.enemyMax = foe
-        self.attitude = random.randint(ATTITUDE_RAND_MIN,ATTITUDE_RAND_MAX)
-        #TODO: Random Price Adjustments:
-        #self.price = [] ; (n,res,qt) = self.type
-        #for i in range (1,qt+1): self.price.append(random.randint(-5,5))
-    def Attitude(self,op=0):
-        ''' Returns attitude string, and/or optionally modifies attitude.'''
-        self.attitude += op
-        if   self.attitude >= self.fiendlyMin:  return "Friendly"
-        elif self.attitude >= self.enemyMax:    return "Neutral"
-        else:                                   return "Hostile"
-
-##################################################################### Resources:
 resourceType = {    0:BARREN_RESOUCE_LIST,
                     1:ROCKY_RESOUCE_LIST,
                     2:WATER_RESOUCE_LIST,
@@ -82,6 +53,58 @@ resouceChances = {  0:BARREN_CHANCES,
                     1:ROCKY_CHANCES,
                     2:WATER_CHANCES,
                     3:FIRE_CHANCES     }
+
+
+## Civilized Planet ##
+ATTITUDE_RAND_MIN =             1 # Minimum Initial Attitude                # 
+ATTITUDE_RAND_MAX =           100 # Maximum Initial Attitude                # 
+ATTITUDE_FRIEND_MIN_DEFAULT =  50 # Defaulf Min Attitude to be Friendly     # 
+ATTITUDE_ENEMY_MAX_DEFAULT =   25 # Default Max Attitude to be Hostile      # 
+ATTITUDE_PRICE_ADJ_MIN =        1 # Minimum price adjustment from Attitude  # 
+ATTITUDE_PRICE_ADJ_MAX =       10 # Maximum price adjustment from Attitude  # 
+RND_PRICE_ADJ_MIN =           -10 # Minimum Random price adjustment         # 
+RND_PRICE_ADJ_MAX =            10 # Maximum Random price adjustment         # 
+PRICE_LOCAL_MIN =               1 # Minimum base price for local resources  # 
+PRICE_LOCAL_MAX =              10 # Maximum base price for local resources  # 
+PRICE_FOREIGN_MIN =            10 # Minimum base price for remote resources # 
+PRICE_FOREIGN_MAX =            20 # Maximum base price for remote resources # 
+CIV_ANGER_RAND_MAX =           15 # Maximum attitude loss when being rude   #
+CIV_HAPPY_RAND_MAX =           10 # Maximum attitude gain when being polite #
+CIV_DAM_MIN =                  10 # Minimum damage done by civ defenses     # 
+CIV_DAM_MAX =                  33 # Maximum damage done by civ defenses     # 
+
+################################################################## Civilization:
+class Civilization():
+    '''
+    attitude   -- The civilizations attitude toward player as a percentage.
+    fiendlyMin -- Minimum attitude for civilization to remain friendly.
+    enemyMax   -- Civilization will be hostile until attitude reaches this max.
+    ty         -- Host planet type index.
+    '''
+    def __init__(self,ty,fri=ATTITUDE_FRIEND_MIN_DEFAULT,foe=ATTITUDE_ENEMY_MAX_DEFAULT):
+        self.fiendlyMin = fri ; self.enemyMax = foe ; self.ty = ty
+        self.attitude = random.randint(ATTITUDE_RAND_MIN,ATTITUDE_RAND_MAX)
+        self.price = {}
+        for i in range (len(resourceType[self.ty])):
+            self.price[resourceType[self.ty][i]] = random.randint(PRICE_LOCAL_MIN,PRICE_LOCAL_MAX)
+    def Attitude(self,op=0):
+        ''' Returns attitude string, and/or optionally modifies attitude.'''
+        self.attitude += op
+        if   self.attitude >= self.fiendlyMin:  return "Friendly"
+        elif self.attitude >= self.enemyMax:    return "Neutral"
+        else:                                   return "Hostile"
+    def updatePrices(self):
+        keys = list(self.price.keys())
+        for i in range (len(keys)):
+            adj = 0
+            if keys[i] not in resourceType[self.ty]:
+                adj += random.randint(RND_PRICE_ADJ_MIN,RND_PRICE_ADJ_MAX)
+            if random.randint(0,100) < self.civ.attitude:
+                  adj -= random.randint(ATTITUDE_PRICE_ADJ_MIN,ATTITUDE_PRICE_ADJ_MAX)
+            else: adj += random.randint(ATTITUDE_PRICE_ADJ_MIN,ATTITUDE_PRICE_ADJ_MAX)
+            self.price[keys[i]] += adj
+    
+##################################################################### Resources:
 class Resource():
     '''
     type    -- Type of resources available on this planet.
@@ -97,11 +120,11 @@ class Resource():
         harvest_good_min    -- Minimum quantity recieved from good harvest.
         harvest_good_max    -- Maximum quantity recieved from good harvest.
     '''
-    def __init__(self,civ_chance=DEFAULT_CIV_CHANCE):
+    def __init__(self,civ_chance=DEFAULT_CIV_SPAWN_CHANCE):
         r = random.randint(0,planetTypeQt)
         self.res  = resourceType[r] ; self.type = planetType[r]
         if random.randint(1,100) in range (1, civ_chance):
-                self.civ = Civilization(r)
+                self.civ = Civilization(r) #TODO: Use fri,foe params
         else:   self.civ = None
         (self.harvest_chance_poor,self.harvest_chance_avg,
          self.harvest_poor_min,self.harvest_poor_max,
@@ -111,7 +134,7 @@ class Resource():
         '''Returns {'resource':quantity}. Assumes planet has verified success.'''
         result = {}
         if self.civ != None:
-            if self.civ.Attitude(-random.randint(0,CIV_HARVEST_ANGER_RAND_MAX)) == "Hostile":
+            if self.civ.Attitude(-random.randint(0,CIV_ANGER_RAND_MAX)) == "Hostile":
                 result['Damage'] = random.randint(CIV_DAM_MIN,CIV_DAM_MAX) #TODO: apply modifiers
         chance = random.randint(0,100) #TODO: Get More Resources at a time?
         if chance <= self.harvest_chance_poor:
@@ -120,3 +143,16 @@ class Resource():
             result[self.res[random.randint(0,len(self.res)-1)]] = random.randint(self.harvest_avg_min,self.harvest_avg_max) + bonus
         else: result[max(self.res)] = random.randint(self.harvest_good_min,self.harvest_good_max) + bonus
         return result
+    def buy(self,item):
+        '''Returns the price per item, 0 if item is unavialable, or damage.'''
+        if self.civ == None: return 0
+        if self.civ.Attitude() == "Hostile":
+            if random.randint(0,100) > self.civ.attitude:
+                if random.randint(0,100) < self.civ.attitude:
+                    self.civ.attitude += random.randint(0,CIV_HAPPY_RAND_MAX)
+                else:
+                    value = random.randint(0,CIV_ANGER_RAND_MAX)
+                    self.civ.attitude -= value
+                    return value
+        return self.civ.price.get(item,0)
+        

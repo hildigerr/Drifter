@@ -32,10 +32,11 @@ class Planet():
             if (adj + random.randint(1,100)) > self.baseChance:
                 return self.resources.harvest(bonus)
         return None
-        
-    #def sell(self,resource):
-    #def trade(self,want,have):
-    
+    def attack(self):
+        (damPlanet,damShip) = self.resources.attack()
+        self.health -= damPlanet
+        #TODO Planet harm
+        return damShip
 
         
 ################################################################## System Class:
@@ -68,6 +69,9 @@ class System():
     def buy(self,item):
         if self.pos == None: return 0 #TODO: Trade with other ships
         return self.planets[self.pos].resources.buy(item)
+    def attack(self): #TODO: have Modifiers
+        if self.pos == None: return 0 #TODO: Fight with other ships
+        return self.planets[self.pos].attack()
 
 ############################################################## Main for Testing:
 if __name__ == '__main__':

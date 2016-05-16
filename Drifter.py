@@ -53,7 +53,7 @@ class CmdLineGame():
             if self.drifter.sys.planets[self.drifter.sys.pos].resources.civ != None:
                 attitude = self.drifter.sys.planets[self.drifter.sys.pos].resources.civ.Attitude()
                 if attitude != "Hostile":
-                    string                        += ", buy, sell, trade" #TODO
+                    string                        += ", buy, sell"
                     if attitude == "Friendly":
                         string                    += ", refine" #TODO
                 string                            += ", attack" #TODO
@@ -82,7 +82,7 @@ class CmdLineGame():
         ''' Play The Game. '''
         print(self.backstory())
         while True:
-            print ("{}\n{}".format(self.commands(),self.listCargo()))
+            print ("{}\n{}\nScan:{}".format(self.commands(),self.listCargo(),self.drifter.scan()))
             try:
                 cmdLine = raw_input(self.status()+" What will you do? ").split()
                 cmd = cmdLine[0] 
@@ -103,11 +103,11 @@ class CmdLineGame():
                 continue
                 
             ############################################################## Quit:
-            if cmd == "quit":
+            if cmd == "quit" or cmd = "exit" or cmd = "q":
                 self.losegame("\tSELF DESTRUCT SEQUENCE ACTIVATED!")
                 
             ############################################################# Drift:
-            if cmd == "drift":
+            if cmd == "drift": #TODO Drifting while under attack is dangerous.
                 print ("You allow the space craft to drift...")
                 if self.drifter.drift(): self.wingame()
                 
@@ -128,7 +128,6 @@ class CmdLineGame():
                 try:
                     print ("Entering orbit of planet #{}".format(cmdLine[1]))
                     self.drifter.orbit(int(cmdLine[1]))
-                    print ("Scan:",self.drifter.scan())
                 except IndexError:
                     print ("?\n\tUsage: 'orbit n'") ; continue
                     
@@ -156,7 +155,10 @@ class CmdLineGame():
                 except IndexError:
                     print ("?\n\tUsage: 'nuy n item'") ; continue
 
-
+            ############################################################ Attack:
+            if cmd == "attack":
+                if not self.drifter.harm(self.drifter.sys.attack()):
+                    self.losegame("Your ship was destroyed in battle.")
 
             ####################################################################
             self.drifter.time += 1

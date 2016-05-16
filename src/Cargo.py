@@ -73,6 +73,9 @@ CIV_HAPPY_RAND_MAX =           10 # Maximum attitude gain when being polite #
 CIV_DAM_MIN =                  10 # Minimum damage done by civ defenses     # 
 CIV_DAM_MAX =                  33 # Maximum damage done by civ defenses     # 
 
+PLAYER_BASE_DAM_MIN =           3 # Base Minimum damage done by player      #
+PLAYER_BASE_DAM_MAX =          12 # Base Maximum damage done by player      #
+
 ################################################################## Civilization:
 class Civilization():
     '''
@@ -87,13 +90,14 @@ class Civilization():
         self.price = {}
         for i in range (len(resourceType[self.ty])):
             self.price[resourceType[self.ty][i]] = random.randint(PRICE_LOCAL_MIN,PRICE_LOCAL_MAX)
+        #TODO: Add remote resources for trade with higher prices by default
     def Attitude(self,op=0):
         ''' Returns attitude string, and/or optionally modifies attitude.'''
         self.attitude += op
         if   self.attitude >= self.fiendlyMin:  return "Friendly"
         elif self.attitude >= self.enemyMax:    return "Neutral"
         else:                                   return "Hostile"
-    def updatePrices(self):
+    def updatePrices(self): #TODO: Do this sometimes
         keys = list(self.price.keys())
         for i in range (len(keys)):
             adj = 0
@@ -103,7 +107,11 @@ class Civilization():
                   adj -= random.randint(ATTITUDE_PRICE_ADJ_MIN,ATTITUDE_PRICE_ADJ_MAX)
             else: adj += random.randint(ATTITUDE_PRICE_ADJ_MIN,ATTITUDE_PRICE_ADJ_MAX)
             self.price[keys[i]] += adj
-    
+    def attack(self,dam):
+        self.attitude -= random.randint(1,CIV_ANGER_RAND_MAX) * random.randint(1,dam) #TODO Tune
+        if self.attitude < 0: self.attitude = 0
+        return int(random.randint(CIV_DAM_MIN,CIV_DAM_MAX)*(100-self.attitude)/100)
+        
 ##################################################################### Resources:
 class Resource():
     '''
@@ -155,4 +163,7 @@ class Resource():
                     self.civ.attitude -= value
                     return value
         return self.civ.price.get(item,0)
-        
+    def attack(self,low=PLAYER_BASE_DAM_MIN,high=PLAYER_BASE_DAM_MAX):
+        damRecv = 0 ; damDone = random.randint(low,high)
+        if self.civ != None: damRecv += self.civ.attack(damDone)
+        return (damDone,damRecv)

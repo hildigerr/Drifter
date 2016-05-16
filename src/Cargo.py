@@ -23,8 +23,8 @@ planetType = { 0:"Barren", 1:"Rocky", 2:"Water", 3:"Fire" }
 #             harvest_poor_min, harvest_poor_max,
 #             harvest_avg_min,  harvest_avg_max,
 #             harvest_good_min, harvest_good_max)
-DEFAULT_CHANCES = (25, 90, 0, 20, 10, 33, 10, 25)
-''' 25% chance only getting (0-20) of least valuable resouce.
+DEFAULT_CHANCES = (25, 90, 1, 20, 10, 33, 10, 25)
+''' 25% chance only getting (1-20) of least valuable resouce.
     90% chance getting (10-33) of a random resource.
     10% chance getting (10-25) of most valuable resource. '''
 
@@ -55,6 +55,11 @@ CIV_DAM_MAX = 33
 
 ################################################################## Civilization:
 class Civilization():
+    '''
+    attitude   -- The civilizations attitude toward player as a percentage.
+    fiendlyMin -- Minimum attitude for civilization to remain friendly.
+    enemyMax   -- Civilization will be hostile until attitude reaches this max.
+    '''
     def __init__(self,type,fri=ATTITUDE_FRIEND_MIN_DEFAULT,foe=ATTITUDE_ENEMY_MAX_DEFAULT):
         self.fiendlyMin = fri ; self.enemyMax = foe
         self.attitude = random.randint(ATTITUDE_RAND_MIN,ATTITUDE_RAND_MAX)
@@ -62,6 +67,7 @@ class Civilization():
         #self.price = [] ; (n,res,qt) = self.type
         #for i in range (1,qt+1): self.price.append(random.randint(-5,5))
     def Attitude(self,op=0):
+        ''' Returns attitude string, and/or optionally modifies attitude.'''
         self.attitude += op
         if   self.attitude >= self.fiendlyMin:  return "Friendly"
         elif self.attitude >= self.enemyMax:    return "Neutral"
@@ -78,8 +84,18 @@ resouceChances = {  0:BARREN_CHANCES,
                     3:FIRE_CHANCES     }
 class Resource():
     '''
-    type        -- Type of resources available on this planet.
-                        ( "Name", {...,N:("Resource",worth)}, N )
+    type    -- Type of resources available on this planet.
+    res     -- List of natural resources available on this planet.
+    civ     -- The planet's civilization, if any.
+    Private:
+        harvest_chance_poor -- Chance of getting only poorest quality item.
+        harvest_chance_avg  -- Chance of getting random item.
+        harvest_poor_min    -- Minimum quantity recieved from poor harvest.
+        harvest_poor_max    -- Maximum quantity recieved from poor harvest.
+        harvest_avg_min     -- Minimum quantity recieved from random harvest.
+        harvest_avg_max     -- Maximum quantity recieved from random harvest.
+        harvest_good_min    -- Minimum quantity recieved from good harvest.
+        harvest_good_max    -- Maximum quantity recieved from good harvest.
     '''
     def __init__(self,civ_chance=DEFAULT_CIV_CHANCE):
         r = random.randint(0,planetTypeQt)

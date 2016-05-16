@@ -28,7 +28,7 @@ class Planet():
         self.health = random.randint(MIN_HEALTH,100)
         self.baseChance = random.randint(0,MAX_BASE_CHANCE)
     def harvest(self,adj = 0, bonus = 0):
-        if self.health > 0:
+        if self.health > 0: #TODO: Possibly harm planet's health
             if (adj + random.randint(1,100)) > self.baseChance:
                 return self.resources.harvest(bonus)
         return None
@@ -41,6 +41,11 @@ class Planet():
         
 ################################################################## System Class:
 class System():
+    '''
+    qt -- Quantity of planets in this system.
+    planets -- List of planets in this system.
+    pos -- Index of which planet is being orbited? or None
+    '''
     def __init__(self,maxQt,civ_chance = DEFAULT_CIV_CHANCE):
         self.qt = random.randint(0,maxQt)
         self.planets = []
@@ -48,6 +53,17 @@ class System():
         self.pos = None
     def orbit(self,idx):
         if(( idx >= 0 )and( idx < self.qt )): self.pos = idx
+    def scan(self):
+        string = ""
+        if self.pos != None:
+            string += '['
+            if self.planets[self.pos].resources.civ != None:
+                string += "Civilized " + self.planets[self.pos].resources.civ.Attitude() + ' '
+            string +=       self.planets[self.pos].resources.type
+            string += ']'
+            string += '{' + str(self.planets[self.pos].health)        + '}'
+            string +=       str(self.planets[self.pos].resources.res)
+        return string
     def harvest(self,adj=0,bonus=0):
         if self.pos != None: return self.planets[self.pos].harvest(adj,bonus)
         else: return None #TODO: Solar scoop? gain fuel without leaving system.

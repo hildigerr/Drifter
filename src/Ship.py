@@ -12,6 +12,8 @@ from Planets import System
 ################################################################################
 
 ##################################################################### Constants:
+INIT_CARGO_CAP = 100
+
 # Starting Fuel #
 INIT_FUEL_MIN = 0
 INIT_FUEL_MAX = 100
@@ -33,12 +35,15 @@ DRIFT_FUEL_GAIN_MAX = 10
 
 MAX_PLANETS = 6
 
+
 #################################################################### Ship Class:
 class Ship():
     '''
     fuel    -- Percentage of fuel tank full.
     health  -- Percentage of ship hull integrity.
     cargo   -- Dictionary of resources.
+    cap     -- Cargo capacity.
+    usedcap -- Cargo capacity in use.
     delta   -- Distance from home.
     heading -- Toward home or away? (+1 vs -1)
     sys     -- The current system.
@@ -50,7 +55,7 @@ class Ship():
         self.sys = System(MAX_PLANETS)
         self.health = 100 ; self.time = 0 ; self.heading = 0
         while self.heading == 0: self.heading = random.randint(-1,1)
-        self.cargo = {}
+        self.cargo = {} ; self.cap = INIT_CARGO_CAP ; self.usedcap = 0
     def fuelerize(self,qt):
         '''Adjust fuel level by qt.'''
         self.fuel += qt
@@ -70,14 +75,18 @@ class Ship():
         while self.heading == 0: self.heading = random.randint(-1,1)
         return tval
     def goHome(self):
+        '''Depart the system, using fuel to go home.'''
         if self.fuel > 0:
             self.heading = 1
             return self.depart(-self.fuel,self.fuel*random.randint(HEAD_DIST_MIN,HEAD_DIST_MAX))
         return false
     def orbit(self,index):
         self.sys.orbit(index)
+    def scan(self):
+        return self.sys.scan()
     def harvest(self):
-        #TODO: Pass through any Modifiers
+        '''Attempt to acquire resources from planet being orbited.'''
+        #TODO: Pass through any Modifiers from ship Modules
         result = self.sys.harvest()
         if result != None:
             res_keys = list(result.keys())
@@ -85,19 +94,26 @@ class Ship():
                 if res_keys[i] == "Nothing": continue
                 if res_keys[i] == "Damage":
                     if not self.harm(result['Damage']): return False # Died #
-                elif res_keys[i] not in self.cargo:
-                    if result[res_keys[i]] > 0:
-                        self.cargo[res_keys[i]]  = result[res_keys[i]]
-                else:   self.cargo[res_keys[i]] += result[res_keys[i]]
+                else:
+                    if self.usedcap < self.cap: # Have Room For More #
+                        if self.usedcap+result[res_keys[i]] > self.cap:
+                            # But not that much room #
+                            result[res_keys[i]] = self.cap-self.usedcap
+                        self.usedcap += result[res_keys[i]]
+                        if res_keys[i] not in self.cargo:
+                            if result[res_keys[i]] > 0:
+                                self.cargo[res_keys[i]]  = result[res_keys[i]]
+                        else:   self.cargo[res_keys[i]] += result[res_keys[i]]
         return True # Still Alive #
     def jettison(self,amt=0,item=None):
-        if item != None: #and
-            if int(amt) > 0: #and
-                if item in self.cargo:
-                    print ("...")
-                    self.cargo[item] -= amt
-                    if self.cargo[item] <= 0: del self.cargo[item]
+        '''Jettison some cargo to make room for more.'''
+        if item != None and int(amt) > 0 and item in self.cargo:
+            self.cargo[item] -= amt ; self.usedcap -= amt
+            if self.cargo[item] <= 0:
+                if self.cargo[item] < 0: self.usedcap -= self.cargo[item]
+                del self.cargo[item]
     def harm(self,amt):
+        '''Apply some amt of damage to self. Return True if survived it.'''
         self.health -= amt
         if self.health <= 0: return False
         else:                return True    # Still Alive

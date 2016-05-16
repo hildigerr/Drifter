@@ -80,22 +80,31 @@ class Ship():
         #TODO: Pass through any Modifiers
         result = self.sys.harvest()
         if result != None:
-            res_len = len(result)
-            res_keys = result.keys()
-            for i in range (0,res_len):
+            res_keys = list(result.keys())
+            for i in range (len(result)):
+                if res_keys[i] == "Nothing": continue
                 if res_keys[i] == "Damage":
                     if not self.harm(result['Damage']): return False # Died #
                 elif res_keys[i] not in self.cargo:
+                    if result[res_keys[i]] > 0:
                         self.cargo[res_keys[i]]  = result[res_keys[i]]
                 else:   self.cargo[res_keys[i]] += result[res_keys[i]]
         return True # Still Alive #
+    def jettison(self,amt=0,item=None):
+        if item != None: #and
+            if int(amt) > 0: #and
+                if item in self.cargo:
+                    print ("...")
+                    self.cargo[item] -= amt
+                    if self.cargo[item] <= 0: del self.cargo[item]
     def harm(self,amt):
         self.health -= amt
         if self.health <= 0: return False
-        else:                return True    # Still Alive 
+        else:                return True    # Still Alive
+
 ############################################################## Main for Testing:
 if __name__ == '__main__':
     USSEnterprise = Ship()
-    print "Ship:\n\tDistance Home:\t{} Light Years\n\tHull Integrity:\t{}%\n\tFuel:\t{}%".format( 
-        USSEnterprise.delta, USSEnterprise.health, USSEnterprise.fuel )
+    print ("Ship:\n\tDistance Home:\t{} Light Years\n\tHull Integrity:\t{}%\n\tFuel:\t{}%".format( 
+        USSEnterprise.delta, USSEnterprise.health, USSEnterprise.fuel ))
 

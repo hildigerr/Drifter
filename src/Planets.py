@@ -56,12 +56,13 @@ class System():
     def scan(self):
         string = ""
         if self.pos != None:
-            string += '['
+            string += "[{}/{} ".format(self.pos+1,self.qt)
             if self.planets[self.pos].resources.civ != None:
                 string += "Civilized " + self.planets[self.pos].resources.civ.Attitude() + ' '
             string +=       self.planets[self.pos].resources.type     + ']'
             string += '{' + str(self.planets[self.pos].health)        + '}'
             string +=       str(self.planets[self.pos].resources.res)
+        else: string += "[0/{}]".format(self.qt)
         return string
     def harvest(self,adj=0,bonus=0):
         if self.pos != None: return self.planets[self.pos].harvest(adj,bonus)

@@ -86,10 +86,6 @@ class Ship():
             self.heading = 1
             return self.depart(-self.fuel,self.fuel*random.randint(HEAD_DIST_MIN,HEAD_DIST_MAX))
         return false
-    def orbit(self,index):
-        self.sys.orbit(index)
-    def scan(self):
-        return self.sys.scan()
     def harvest(self,result=None):
         '''Acquire resources from result param or else planet being orbited.'''
         #TODO: Pass through any Modifiers from ship Modules

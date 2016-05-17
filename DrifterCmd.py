@@ -51,8 +51,8 @@ class CmdLineGame():
         string =               "Available commands are: drift"
         if   self.drifter.fuel > 0:        string += ", head home"
         if self.drifter.sys.pos != None:
-            if self.drifter.sys.planets[self.drifter.sys.pos].resources.civ != None:
-                attitude = self.drifter.sys.planets[self.drifter.sys.pos].resources.civ.Attitude()
+            if self.drifter.sys.planets[self.drifter.sys.pos].resource.civ != None:
+                attitude = self.drifter.sys.planets[self.drifter.sys.pos].resource.civ.Attitude()
                 if attitude != "Hostile":
                     string                        += ", buy, sell"
                     if attitude == "Friendly":

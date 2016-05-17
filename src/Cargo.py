@@ -177,16 +177,19 @@ class Resource():
         harvest_good_min    -- Minimum quantity recieved from good harvest.
         harvest_good_max    -- Maximum quantity recieved from good harvest.
     '''
-    def __init__(self,civ_chance=DEFAULT_CIV_SPAWN_CHANCE):
-        r = random.randint(0,planetTypeQt)
-        self.res  = resourceType[r] ; self.type = planetType[r]
+    def __init__(self,kind,civ_chance=DEFAULT_CIV_SPAWN_CHANCE):
+        ''' 
+            kind        -- planetType, or None for random.
+            civ_chance  -- Chance for planet to be inhabited by people.
+        '''
+        self.res  = resourceType[kind] ; self.type = planetType[kind]
         if random.randint(1,100) in range (1, civ_chance):
-                self.civ = Civilization(r) #TODO: Use fri,foe params
+                self.civ = Civilization(kind) #TODO: Use fri,foe params
         else:   self.civ = None
         (self.harvest_chance_poor,self.harvest_chance_avg,
          self.harvest_poor_min,self.harvest_poor_max,
          self.harvest_avg_min,self.harvest_avg_max,
-         self.harvest_good_min,self.harvest_good_max) = resouceChances[r]
+         self.harvest_good_min,self.harvest_good_max) = resouceChances[kind]
     def harvest(self,bonus=0):
         '''Returns {'resource':quantity}. Assumes planet has verified success.'''
         result = {}

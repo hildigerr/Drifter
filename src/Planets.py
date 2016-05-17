@@ -19,21 +19,21 @@ MIN_HEALTH = 25
 ################################################################## Planet Class:
 class Planet():
     '''
-    resources   -- Civilization and Resources on Planet.
+    resource   -- Civilization and Resources on Planet.
     health      -- Remaining population, or resources, if any.
     baseChance  -- Base chance for gathering, fighting, etc.
     '''
-    def __init__(self,civ_chance = DEFAULT_CIV_SPAWN_CHANCE):
-        self.resources = Resource(civ_chance)
+    def __init__(self,kind,civ_chance = DEFAULT_CIV_SPAWN_CHANCE):
+        self.resource = Resource(kind,civ_chance)
         self.health = random.randint(MIN_HEALTH,100)
         self.baseChance = random.randint(0,MAX_BASE_CHANCE)
     def harvest(self,adj = 0, bonus = 0):
         if self.health > 0: #TODO: Possibly harm planet's health?
             if (adj + random.randint(1,100)) > self.baseChance:
-                return self.resources.harvest(bonus)
+                return self.resource.harvest(bonus)
         return None
     def attack(self):
-        (damPlanet,damShip) = self.resources.attack()
+        (damPlanet,damShip) = self.resource.attack()
         self.health -= damPlanet
         #TODO Planet harm : over harvest = remove civ or change to barren
         return damShip
@@ -49,7 +49,8 @@ class System():
     def __init__(self,maxQt,civ_chance = DEFAULT_CIV_SPAWN_CHANCE):
         self.qt = random.randint(0,maxQt)
         self.planets = []
-        for i in range (0, self.qt): self.planets.append(Planet(civ_chance))
+        for i in range (0, self.qt): self.planets.append(
+                           Planet( random.randint(0,planetTypeQt), civ_chance) )
         self.pos = None
     def orbit(self,idx):
         if(( idx >= 0 )and( idx < self.qt )): self.pos = idx
@@ -57,13 +58,13 @@ class System():
         string = ""
         if self.pos != None:
             string += "[{}/{} ".format(self.pos+1,self.qt)
-            if self.planets[self.pos].resources.civ != None:
-                string += "Civilized " + self.planets[self.pos].resources.civ.Attitude() + ' '
-            string +=       self.planets[self.pos].resources.type     + ']'
+            if self.planets[self.pos].resource.civ != None:
+                string += "Civilized " + self.planets[self.pos].resource.civ.Attitude() + ' '
+            string +=       self.planets[self.pos].resource.type     + ']'
             string += '{' + str(self.planets[self.pos].health)        + '}'
-            if self.planets[self.pos].resources.civ != None:
-                string += '{' + str(self.planets[self.pos].resources.civ.attitude) + '}'
-            string +=       str(self.planets[self.pos].resources.res)
+            if self.planets[self.pos].resource.civ != None:
+                string += '{' + str(self.planets[self.pos].resource.civ.attitude) + '}'
+            string +=       str(self.planets[self.pos].resource.res)
         else: string += "[0/{}]".format(self.qt)
         return string
     def harvest(self,adj=0,bonus=0):
@@ -71,7 +72,7 @@ class System():
         else: return None #TODO: Solar scoop? gain fuel without leaving system.
     def buy(self,item):
         if self.pos == None: return 0 #TODO: Trade with other ships
-        return self.planets[self.pos].resources.buy(item)
+        return self.planets[self.pos].resource.buy(item)
     def attack(self): #TODO: have Modifiers
         if self.pos == None: return 0 #TODO: Fight with other ships
         return self.planets[self.pos].attack()

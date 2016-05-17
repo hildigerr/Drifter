@@ -38,9 +38,9 @@ def load_img(name):
         img = pygame.image.load(name)
         if img.get_alpha() is None: img = img.convert()
         else: img = img.convert_alpha()
-    except pygame.error, message:
-        print "ERROR: Unable to load image:", name
-        raise SystemExit, message
+    except (pygame.error, message):
+        print ("ERROR: Unable to load image:", name)
+        raise (SystemExit, message)
     return img, img.get_rect()
 
 def save_img(me,name):
@@ -72,33 +72,37 @@ def get_fuel_line_end(qt):
     return tuple(map(op.add, FUEL_GUAGE_START_LOC, (x,y)))
 
 ################################################################# Main Function:
-def scene_gen(game,player):
+def scene_gen(game,player,screen):
     '''
     Function: scene_gen -- Generate's Scene Image
     Parameters:
         game: Name of current game. Used to organize saved images.
         player: The Ship.
+        screen: The Screen Display.
     '''
     # Draw Background #
-    screen = pygame.display.set_mode(SCREEN_SIZE)
     (splash,s_rect) = load_img("star-field.png")
     screen.blit(splash,s_rect)
     
-    # Draw Fuel Gauge #
+    # Draw the Dashboard #
     (splash,s_rect) = load_img(DASH_IMG_NAME)
     screen.blit(splash,s_rect)
+    
+    # Draw Fuel Gauge Indicator #
     pygame.draw.line(screen, pygame.Color("red"), 
         FUEL_GUAGE_START_LOC, get_fuel_line_end(player.fuel), FUEL_GUAGE_LINE_WID)
-        
+    
+    
+    
     # Draw Current Planet #
     if player.sys.pos != None:
         planet = player.sys.planets[player.sys.pos]
         kind   = planetType[planet.resource.type]
-        print "Testing: ", kind
-        if   kind == "Rock": (splash,s_rect) = load_img("planet000.png")
-        elif kind == "Watr": (splash,s_rect) = load_img("planet000.png")
-        elif kind == "Fire": (splash,s_rect) = load_img("planet000.png")
-        else:                (splash,s_rect) = load_img("planet000.png")
+        print ("Testing: ", kind)
+        if   kind == "Rocky": (splash,s_rect) = load_img("planet000.png")
+        elif kind == "Water": (splash,s_rect) = load_img("planet000.png")
+        elif kind == "Fire":  (splash,s_rect) = load_img("planet000.png")
+        else:                 (splash,s_rect) = load_img("planet000.png")# "Barren"
         s_rect.center = (0,0)
         screen.blit(splash,s_rect)
         if planet.resource.civ != None:
@@ -106,18 +110,21 @@ def scene_gen(game,player):
             s_rect.center = (0,0)
             screen.blit(splash,s_rect)
     
-#     if pygame.font:
-#         font = pygame.font.Font(None, 32)
-#         font.set_bold(True)
-#     else:
-#         print "ERROR: Pygame: Unable to load font."
-#         pygame.quit()
-#         sys.exit(1)
-    
-    # pygame.display.flip()
+    # Render Textual Output #
+    pygame.font.init()
+    if pygame.font:
+        font = pygame.font.Font(None, 32)
+        font.set_bold(True)
+    else:
+        print ("ERROR: Pygame: Unable to load font.")
+        pygame.quit()
+        sys.exit(1)
+
     save_img(screen,game)
+    return screen
 
 ############################################################## Main for Testing:
 if __name__ == '__main__':
-  scene_gen( "Testing", Ship.Ship() )
-
+    scene_gen( "Testing", Ship.Ship(), pygame.display.set_mode(SCREEN_SIZE) )    
+    # pygame.display.flip()
+    pygame.quit()

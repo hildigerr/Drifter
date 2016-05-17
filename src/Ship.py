@@ -142,6 +142,13 @@ class Ship():
         if self.sys.pos != None and self.sys.planets[self.sys.pos].resources.civ != None:
             return self.harvest(self.sys.planets[self.sys.pos].resources.civ.refine(self.jettison(qt,item),item))
         return STILL_ALIVE
+    def gamble(self,bet=0):
+        '''Try to randomly gain credits with some risk of loss and even death'''
+        '''Allow gambling debt to accumulate.'''
+        if self.sys.pos != None and self.sys.planets[self.sys.pos].resources.civ != None:
+            (win,damage) = self.sys.planets[self.sys.pos].resources.civ.gamble(bet,self.credit)
+            self.credit += win ; return self.harm(damage)
+        return STILL_ALIVE
             
 
 ############################################################## Main for Testing:

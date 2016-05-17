@@ -63,19 +63,24 @@ ATTITUDE_RAND_MIN =             1 # Minimum Initial Attitude                #
 ATTITUDE_RAND_MAX =           100 # Maximum Initial Attitude                # 
 ATTITUDE_FRIEND_MIN_DEFAULT =  50 # Defaulf Min Attitude to be Friendly     # 
 ATTITUDE_ENEMY_MAX_DEFAULT =   25 # Default Max Attitude to be Hostile      # 
+ATTITUDE_ANGER_RAND_MAX =      15 # Maximum attitude loss when being rude   #
+ATTITUDE_HAPPY_RAND_MAX =      10 # Maximum attitude gain when being polite #
 ATTITUDE_PRICE_ADJ_MIN =        1 # Minimum price adjustment from Attitude  # 
 ATTITUDE_PRICE_ADJ_MAX =       10 # Maximum price adjustment from Attitude  # 
-RND_PRICE_ADJ_MIN =           -10 # Minimum Random price adjustment         # 
-RND_PRICE_ADJ_MAX =            10 # Maximum Random price adjustment         # 
+
+GAMBLING_BASE_CHANCE =         33 # Base percent chance of winning          #
+GAMBLING_PAYOUT_MAX =           3 # Maximum payout multiplier applied       #
+GAMBLING_DEBT_CAP =        100000 # Maximum debt before being banned        #
+
+PRICE_ADJ_RND_MIN =           -10 # Minimum Random price adjustment         # 
+PRICE_ADJ_RND_MAX =            10 # Maximum Random price adjustment         # 
 PRICE_LOCAL_MIN =               1 # Minimum base price for local resources  # 
 PRICE_LOCAL_MAX =              10 # Maximum base price for local resources  # 
 PRICE_FOREIGN_MIN =            10 # Minimum base price for remote resources # 
-PRICE_FOREIGN_MAX =            20 # Maximum base price for remote resources # 
-CIV_ANGER_RAND_MAX =           15 # Maximum attitude loss when being rude   #
-CIV_HAPPY_RAND_MAX =           10 # Maximum attitude gain when being polite #
+PRICE_FOREIGN_MAX =            20 # Maximum base price for remote resources #
+
 CIV_DAM_MIN =                  10 # Minimum damage done by civ defenses     # 
 CIV_DAM_MAX =                  33 # Maximum damage done by civ defenses     # 
-
 PLAYER_BASE_DAM_MIN =           3 # Base Minimum damage done by player      #
 PLAYER_BASE_DAM_MAX =          12 # Base Maximum damage done by player      #
 
@@ -93,25 +98,26 @@ class Civilization():
         self.price = {}
         for i in range (len(resourceType[self.ty])):
             self.price[resourceType[self.ty][i]] = random.randint(PRICE_LOCAL_MIN,PRICE_LOCAL_MAX)
-        #TODO: Add remote resources for trade with higher prices by default
+        #TODO: Add remote resources for trade, with higher prices by default
     def Attitude(self,op=0):
         ''' Returns attitude string, and/or optionally modifies attitude.'''
         self.attitude += op
         if   self.attitude >= self.fiendlyMin:  return "Friendly"
         elif self.attitude >= self.enemyMax:    return "Neutral"
         else:                                   return "Hostile"
-    def updatePrices(self): #TODO: Do this sometimes
+    def updatePrices(self): #TODO: Currently unused
         keys = list(self.price.keys())
         for i in range (len(keys)):
             adj = 0
             if keys[i] not in resourceType[self.ty]:
-                adj += random.randint(RND_PRICE_ADJ_MIN,RND_PRICE_ADJ_MAX)
+                adj += random.randint(PRICE_ADJ_RND_MIN,PRICE_ADJ_RND_MAX)
             if random.randint(0,100) < self.civ.attitude:
                   adj -= random.randint(ATTITUDE_PRICE_ADJ_MIN,ATTITUDE_PRICE_ADJ_MAX)
             else: adj += random.randint(ATTITUDE_PRICE_ADJ_MIN,ATTITUDE_PRICE_ADJ_MAX)
             self.price[keys[i]] += adj
+        #TODO: Remove or Add random foreign resources for trade
     def attack(self,dam):
-        self.attitude -= random.randint(1,CIV_ANGER_RAND_MAX) * random.randint(1,dam) #TODO Tune
+        self.attitude -= random.randint(1,ATTITUDE_ANGER_RAND_MAX) * random.randint(1,dam) #TODO Tune
         if self.attitude < 0: self.attitude = 0
         return int(random.randint(CIV_DAM_MIN,CIV_DAM_MAX)*(100-self.attitude)/100)
     def refine(self,amt,item):
@@ -127,6 +133,33 @@ class Civilization():
                     result["Damage"] = random.randint(CIV_DAM_MIN,CIV_DAM_MAX)
         else: result[item] = amt
         return result
+    def gamble(self,bet=0,debt=0):
+        '''
+        Bad attitude makes it harder to win.
+        Losing may increase attitude toward you, winning decrease it.
+        Losing is "safe" in that you wont be attacked for it.
+        Passing in negative bet is suicidal on enemy planet.
+        Being in debt while gambling is more dangerous, and if you reach the
+            cap it is inefectual except for generating damage and ire.
+        ''' #TODO: Effects should be indirectly scaled by bet amt
+            #      Otherwise, a player could restore attitude fast with
+            #      many small bets. We want it to be restored but not too fast.
+        win = dam = 0
+        if bet > 0:
+            win = random.randint(0,100)
+            if win < int((GAMBLING_BASE_CHANCE+self.attitude)/200):
+                win = bet * random.randint(0,GAMBLING_PAYOUT_MAX)
+            else: win = -bet
+            if win <= 0:
+                  self.attitude += random.randint(0,ATTITUDE_HAPPY_RAND_MAX)
+            else:
+                self.attitude -= random.randint(0,ATTITUDE_ANGER_RAND_MAX)
+        else: self.attitude -= random.randint(0,ATTITUDE_ANGER_RAND_MAX) # Cheater! #
+        if self.attitude <= self.enemyMax and win > 0: dam += self.attack(0)
+        if debt <= -GAMBLING_DEBT_CAP:
+            self.attitude -= random.randint(0,ATTITUDE_ANGER_RAND_MAX)
+            win = 0 ; dam += self.attack(0)
+        return (win,dam)
                 
 ##################################################################### Resources:
 class Resource():
@@ -158,8 +191,8 @@ class Resource():
         '''Returns {'resource':quantity}. Assumes planet has verified success.'''
         result = {}
         if self.civ != None:
-            if self.civ.Attitude(-random.randint(0,CIV_ANGER_RAND_MAX)) == "Hostile":
-                result['Damage'] = random.randint(CIV_DAM_MIN,CIV_DAM_MAX) #TODO: apply modifiers
+            if self.civ.Attitude(-random.randint(0,ATTITUDE_ANGER_RAND_MAX)) == "Hostile":
+                result['Damage'] = random.randint(CIV_DAM_MIN,CIV_DAM_MAX) #TODO: apply modifiers from ship modules
         chance = random.randint(0,100) #TODO: Get More Resources at a time?
         if chance <= self.harvest_chance_poor:
             result[min(self.res)] = random.randint(self.harvest_poor_min,self.harvest_poor_max) + bonus
@@ -173,9 +206,9 @@ class Resource():
         if self.civ.Attitude() == "Hostile":
             if random.randint(0,100) > self.civ.attitude:
                 if random.randint(0,100) < self.civ.attitude:
-                    self.civ.attitude += random.randint(0,CIV_HAPPY_RAND_MAX)
+                    self.civ.attitude += random.randint(0,ATTITUDE_HAPPY_RAND_MAX)
                 else:
-                    value = random.randint(0,CIV_ANGER_RAND_MAX)
+                    value = random.randint(0,ATTITUDE_ANGER_RAND_MAX)
                     self.civ.attitude -= value
                     return value
         return self.civ.price.get(item,0)

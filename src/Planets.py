@@ -28,14 +28,14 @@ class Planet():
         self.health = random.randint(MIN_HEALTH,100)
         self.baseChance = random.randint(0,MAX_BASE_CHANCE)
     def harvest(self,adj = 0, bonus = 0):
-        if self.health > 0: #TODO: Possibly harm planet's health
+        if self.health > 0: #TODO: Possibly harm planet's health?
             if (adj + random.randint(1,100)) > self.baseChance:
                 return self.resources.harvest(bonus)
         return None
     def attack(self):
         (damPlanet,damShip) = self.resources.attack()
         self.health -= damPlanet
-        #TODO Planet harm
+        #TODO Planet harm : over harvest = remove civ or change to barren
         return damShip
 
         
@@ -61,6 +61,8 @@ class System():
                 string += "Civilized " + self.planets[self.pos].resources.civ.Attitude() + ' '
             string +=       self.planets[self.pos].resources.type     + ']'
             string += '{' + str(self.planets[self.pos].health)        + '}'
+            if self.planets[self.pos].resources.civ != None:
+                string += '{' + str(self.planets[self.pos].resources.civ.attitude) + '}'
             string +=       str(self.planets[self.pos].resources.res)
         else: string += "[0/{}]".format(self.qt)
         return string

@@ -56,7 +56,7 @@ class CmdLineGame():
                 if attitude != "Hostile":
                     string                        += ", buy, sell"
                     if attitude == "Friendly":
-                        string                    += ", refine"
+                        string                    += ", refine, gamble"
                 string                            += ", attack"
             string                                += ", harvest, depart"
         elif self.drifter.sys.qt > 0:      string += ", orbit"
@@ -65,10 +65,10 @@ class CmdLineGame():
         return string
     def wingame(self):
         #TODO: Calculate Score -- Compare to High Score List
-        print ('#' * (80-9), "YOU WIN!\n")    ;  sys.exit(0)
+        print ('#' * (80-9) + " YOU WIN!\n")    ;  sys.exit(0)
     def losegame(self,string):
         print (string)
-        print ('#' * (80-11), "YOU LOOSE!\n") ;  sys.exit(0)
+        print ('#' * (80-10) + " YOU LOSE!\n")    ;  sys.exit(0)
     def status(self):
         '''Create status string.'''
         return "[T:{}|D:{}|F:{}|H:{}|${}]".format(
@@ -141,7 +141,7 @@ class CmdLineGame():
                     print ("?\n\tUsage: 'orbit n'") ; continue
                     
             ##################################################### Depart System:
-            if cmd == "depart":
+            if cmd == "depart": #XXX Not Necessary XXX#
                 print ("You leave the {} planet.".format(self.drifter.sys.pos+1))
                 self.drifter.sys.pos = None
                 
@@ -172,7 +172,7 @@ class CmdLineGame():
                     self.losegame("Your ship was destroyed in battle.")
 
             ############################################################ Refine:
-            if cmd == "refine":
+            if cmd == "refine": #TODO: Planet charges for this service?
                 try:
                     cmdLine[2] = self.holyWaterHack(cmdLine[2])
                     if not self.drifter.refine(int(cmdLine[1]),cmdLine[2]):
@@ -180,6 +180,15 @@ class CmdLineGame():
                             +  "the refinery, seized, and put to death.")
                 except (IndexError, ValueError):
                     print ("?\n\tUsage: 'refine n item'") ; continue
+
+            ############################################################ Gamble:
+            if cmd == "gamble":
+                try:
+                    if not self.drifter.gamble(int(cmdLine[1])):
+                        self.losegame("Another gambler accused you of cheating."
+                            + ", you have been seized and put to death.")
+                except (IndexError, ValueError):
+                    print ("?\n\tUsage: 'gamble bet'") ; continue
 
             ####################################################################
             self.drifter.time += 1

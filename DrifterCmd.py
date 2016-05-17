@@ -1,15 +1,13 @@
 #!/usr/bin/python3
 ################################################################################
 #                                                                              #
-# Drifter.py -- The Twitter Game Implementation                                #
+# DrifterCmd.py -- The Command Line Game Implementation                        #
 #                                                                              #
 #   Western Washington University -- CSCI 4/597H -- Spring 2016                #
 #                                                                              #
 ################################################################################
 
-import datetime, random, sys, time
-
-import twitter
+import random, sys, time
 
 sys.path.append("src/")
 from src import Ship
@@ -22,13 +20,32 @@ STASIS_YEARS_MIN = 99
 STASIS_YEARS_MAX = 666
 
 ################################################################################
-class TwitterGame():
-    '''Implements a Twitter version of The Game.'''
+class CmdLineGame():
+    '''Implements a Command Line version of The Game.'''
     def __init__(self,run=True):
         self.drifter = Ship.Ship()
-        self.twitter = twitter.Twitter('zmcbot')
-
         if run: self.main()
+    def backstory(self):
+        '''Return the backstory string.'''
+        string = ('#' * 80) + "\n" #TODO: Add more randomized flavour.
+        string += "The last thing you remember before awaking from chryostasis,"
+        string += " is the captain\nbeing decapitated by some flying debris. "
+        string += "There was a battle. You don't know if\nthe enemy was destroyed,"
+        string += " but obviously your ship is intact. The onboard computer\n"
+        string += "reports that you have been in stasis for {} years. ".format(
+                              random.randint(STASIS_YEARS_MIN,STASIS_YEARS_MAX))
+        string += "The ship has been drifting\nthe entire time.\n\n"
+        string += "You are {} light years from home, ".format(self.drifter.delta)
+        string += "but the solar sails are functional.\n"
+        if self.drifter.credit < 0:
+            string += "You have an overdue library fine of ${} universal credits.".format(-self.drifter.credit)
+        string += "\nYou may return to stasis and allow the ship to drift at any time. "
+        string += "Or, if you\nhave fuel, you can head toward home. "
+        if self.drifter.sys.qt > 0: string += "Perhaps one of these nearby planets has\n"
+        else: string += "If you happen upon a solar system with\nplanets, perhaps you may find "
+        string += "something interesting.\n"
+        string += "\nIf you are still confused type 'help' at the prompt.\n"
+        return string
     def commands(self):
         '''Enumerate available commands into a string.'''
         string =               "Available commands are: drift"
@@ -68,34 +85,36 @@ class TwitterGame():
         else:                return  string
     def main(self):
         ''' Play The Game. '''
+        print(self.backstory())
         while True:
             print ("{}\n{}\nScan:{}".format( self.commands(),
                                              self.listCargo(),
                                              self.drifter.sys.scan() ))
-
-            x = 2
-            print("Sleeping for %d minutes...\n" % x)
-            time.sleep(x * 60)
-
-            print("I have awoken! Time to read the tweetmails!\n")
-
-            tweets = self.twitter.getTweets()
-            #TODO: Save these tweets to a database
-
-            top5 = self.twitter.findTop5Votes(tweets)
-
-            #TODO: Do something with the top5... Like print them!
-            print("Top 5 tweeted commands:\n", top5)
-
-            #Run the top voted command!
-
-            if len(top5) > 0:
-                cmdLine = top5[0][0].split()
-                cmd = cmdLine[0]
-            else:
-                cmdLine = ('drift',)
-                cmd = 'drift'
-
+            try:
+                cmdLine = raw_input(self.status()+" What will you do? ").split()
+                cmd = cmdLine[0] 
+            except EOFError: cmd = "quit"
+            
+            print ("\n" +('#' * 80))
+            
+            ############################################################## Help:
+            if cmd == "help": #TODO Add command parameter
+                print ("The ship status is described as so:\n\t"
+                      +"[T:time|D:distance|F:fuel|H:health|$credits]"
+                      +"\nWhere time is how many turns have elapsed. "
+                      +"Distance is how far from home you\nare. "
+                      +"Planets indicate how many are in the current system. "
+                      +"And credits is the\nbalance of your universal monetary exchange account. "
+                      +"\n\nThe planet scan is described as so:\n\t"
+                      +"[i/n type]{health}[resource,list]"
+                      +"\nWhere i is the number of the planet "
+                      +"and n is quantity of planets in the system.\n")
+                continue
+                
+            ############################################################## Quit:
+            if cmd == "quit" or cmd == "exit" or cmd == "q":
+                self.losegame("\tSELF DESTRUCT SEQUENCE ACTIVATED!")
+                
             ############################################################# Drift:
             if cmd == "drift": #TODO Drifting while under attack is dangerous.
                 print ("You allow the space craft to drift...")
@@ -153,7 +172,7 @@ class TwitterGame():
                     self.losegame("Your ship was destroyed in battle.")
 
             ############################################################ Refine:
-            if cmd == "refine":
+            if cmd == "refine": #TODO: Planet charges for this service?
                 try:
                     cmdLine[2] = self.holyWaterHack(cmdLine[2])
                     if not self.drifter.refine(int(cmdLine[1]),cmdLine[2]):
@@ -175,4 +194,4 @@ class TwitterGame():
             self.drifter.time += 1
 
 ########################################################################## MAIN:
-if __name__ == '__main__': TwitterGame()
+if __name__ == '__main__': CmdLineGame()

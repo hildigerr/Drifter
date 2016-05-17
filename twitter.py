@@ -77,7 +77,7 @@ class Twitter(object):
 
         
         for t in tweets:
-            newTweets.append([t, cleanTweet(tweets[t][0], self.botName), tweets[t][1], tweets[t][2]])
+            newTweets.append([t, self.cleanTweet(tweets[t][0]), tweets[t][1], tweets[t][2]])
 
         #Don't lose the lastTweetId!
         self.saveState()
@@ -91,35 +91,35 @@ class Twitter(object):
     def sendTweet(self, msg):
         return True
 
-def cleanTweet(msg, botName):
-    #Remove whitespace around msg
-    msg.strip()
-    
-    #Remove the botname
-    msg.replace(botName, '')
+    def cleanTweet(self, msg):
+        #Remove whitespace around msg
+        msg.strip()
 
-    #Remove hashtags
-    newMsg = ''
-    for i in msg.split():
-        if i[:1] == '@':
-            pass
-        elif i[:1] == '#':
-            pass
-        elif i.find('://') > -1:
-            pass
-        else:
-            newMsg = newMsg.strip() + ' ' + i
+        #Remove the botname
+        msg.replace(self.botName, '')
 
-    return newMsg.strip()
+        #Remove hashtags
+        newMsg = ''
+        for i in msg.split():
+            if i[:1] == '@':
+                pass
+            elif i[:1] == '#':
+                pass
+            elif i.find('://') > -1:
+                pass
+            else:
+                newMsg = newMsg.strip() + ' ' + i
 
-def findTop5Votes(tweets):
-    rawVotes = {}
-    top5Votes = []
+        return newMsg.strip()
 
-    for t in tweets:
-        if t[1] in rawVotes:
-            rawVotes[t[1]] += 1
-        else:
-            rawVotes[t[1]] = 1
+    def findTop5Votes(self, tweets):
+        rawVotes = {}
+        top5Votes = []
 
-    return collections.OrderedDict(sorted(rawVotes.items(), key=lambda t: t[1])).keys()[:5]
+        for t in tweets:
+            if t[1] in rawVotes:
+                rawVotes[t[1]] += 1
+            else:
+                rawVotes[t[1]] = 1
+
+        return sorted(rawVotes.items(), key=lambda t: t[1])[:5]

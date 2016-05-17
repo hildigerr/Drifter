@@ -12,6 +12,8 @@ import os, sys, time, math, pygame
 
 import Ship
 
+from Cargo import planetType
+
 ##################################################################### Constants:
 RAD = 0.0174533 # One Degree Radian
 
@@ -97,12 +99,11 @@ def scene_gen(game,player,screen):
     # Draw Current Planet #
     if player.sys.pos != None:
         planet = player.sys.planets[player.sys.pos]
-        kind   = planetType[planet.resource.type]
-        print ("Testing: ", kind)
+        kind   = planet.resource.type
         if   kind == "Rocky": (splash,s_rect) = load_img("planet000.png")
-        elif kind == "Water": (splash,s_rect) = load_img("planet000.png")
-        elif kind == "Fire":  (splash,s_rect) = load_img("planet000.png")
-        else:                 (splash,s_rect) = load_img("planet000.png")# "Barren"
+        elif kind == "Water": (splash,s_rect) = load_img("planet001.png")
+        elif kind == "Fire":  (splash,s_rect) = load_img("planet002.png")
+        else:                 (splash,s_rect) = load_img("planet003.png")# "Barren"
         s_rect.center = (0,0)
         screen.blit(splash,s_rect)
         if planet.resource.civ != None:
@@ -120,7 +121,7 @@ def scene_gen(game,player,screen):
         pygame.quit()
         sys.exit(1)
 
-    save_img(screen,game)
+    #save_img(screen,game)
     return screen
 
 ############################################################## Main for Testing:

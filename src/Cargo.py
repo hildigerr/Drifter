@@ -99,6 +99,7 @@ class Civilization():
         for i in range (len(resourceType[self.ty])):
             self.price[resourceType[self.ty][i]] = random.randint(PRICE_LOCAL_MIN,PRICE_LOCAL_MAX)
         #TODO: Add remote resources for trade, with higher prices by default
+        #      Everyone should buy/sell Gems.
     def Attitude(self,op=0):
         ''' Returns attitude string, and/or optionally modifies attitude.'''
         self.attitude += op

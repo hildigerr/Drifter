@@ -57,21 +57,35 @@ class GuiGame():
             for event in pygame.event.get():
                 if event.type == pygame.QUIT: return
                 if event.type == pygame.KEYDOWN:
-                    if event.key == CMD_QUIT: return
-                    if event.key == CMD_HEAD_HOME:
+                    cmd = event.key
+
+                    ###################################################### Quit:
+                    if cmd == CMD_QUIT: return
+
+                    ##################################################### Drift:
+                    if cmd == CMD_DRIFT:
+                        print ("You allow the space craft to drift...")
+                        if self.drifter.drift(): pass #self.wingame()
+
+                    ################################################# Head Home:
+                    if cmd == CMD_HEAD_HOME:
                         print ("You set the ship autopilot to head home...")
                         print ("You are awakened from chryostasis when the fuel runs out.")
                         if self.drifter.goHome(): pass #self.wingame()
-                    elif event.key == CMD_DRIFT:
-                        print ("You allow the space craft to drift...")
-                        if self.drifter.drift(): pass #self.wingame()
-                    elif event.key == CMD_ORBIT_1: self.orbit(1)
-                    elif event.key == CMD_ORBIT_2: self.orbit(2)
-                    elif event.key == CMD_ORBIT_3: self.orbit(3)
-                    elif event.key == CMD_ORBIT_4: self.orbit(4)
-                    elif event.key == CMD_ORBIT_5: self.orbit(5)
-                    elif event.key == CMD_ORBIT_6: self.orbit(6)
-                    elif event.key == CMD_DEPART:  self.orbit(0)
+
+                    ############################################## Orbit Planet:
+                    if cmd == CMD_ORBIT_1: self.orbit(1)
+                    if cmd == CMD_ORBIT_2: self.orbit(2)
+                    if cmd == CMD_ORBIT_3: self.orbit(3)
+                    if cmd == CMD_ORBIT_4: self.orbit(4)
+                    if cmd == CMD_ORBIT_5: self.orbit(5)
+                    if cmd == CMD_ORBIT_6: self.orbit(6)
+
+                    ############################################# Depart System:
+                    if cmd == CMD_DEPART:  self.orbit(0)
+                    
+                ################################################################
+                self.drifter.time += 1
                 self.render()
         pygame.quit()
 

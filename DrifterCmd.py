@@ -38,7 +38,7 @@ class CmdLineGame():
         string += "You are {} light years from home, ".format(self.drifter.delta)
         string += "but the solar sails are functional.\n"
         if self.drifter.credit < 0:
-            string += "You have an overdue library fine of ${} universal credits.".format(-self.drifter.credit)
+            string += "You have an overdue library fine of ${} universal credits.\n".format(-self.drifter.credit)
         string += "\nYou may return to stasis and allow the ship to drift at any time. "
         string += "Or, if you\nhave fuel, you can head toward home. "
         if self.drifter.sys.qt > 0: string += "Perhaps one of these nearby planets has\n"
@@ -170,6 +170,10 @@ class CmdLineGame():
             if cmd == "attack":
                 if not self.drifter.harm(self.drifter.sys.attack()):
                     self.losegame("Your ship was destroyed in battle.")
+                    
+            ############################################################ Repair:
+            #TODO: Use metal at friendly planet. 
+            #      Not 1:1, and probably not random either. Tunable.
 
             ############################################################ Refine:
             if cmd == "refine": #TODO: Planet charges for this service?

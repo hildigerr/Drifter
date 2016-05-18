@@ -55,6 +55,7 @@ class GuiGame():
     def main(self):
         self.render()
         while True:
+            something_happened = False
             for event in pygame.event.get():
                 if event.type == pygame.QUIT: return
                 if event.type == pygame.KEYDOWN:
@@ -65,40 +66,41 @@ class GuiGame():
 
                     ##################################################### Drift:
                     if cmd == CMD_DRIFT:
+                        something_happened = True
                         print ("You allow the space craft to drift...")
                         if self.drifter.drift(): pass #self.wingame()
 
                     ################################################# Head Home:
                     if cmd == CMD_HEAD_HOME:
+                        something_happened = True
                         print ("You set the ship autopilot to head home...")
                         print ("You are awakened from chryostasis when the fuel runs out.")
                         if self.drifter.goHome(): pass #self.wingame()
 
                     ############################################## Orbit Planet:
-                    if cmd == CMD_ORBIT_1: self.orbit(1)
-                    if cmd == CMD_ORBIT_2: self.orbit(2)
-                    if cmd == CMD_ORBIT_3: self.orbit(3)
-                    if cmd == CMD_ORBIT_4: self.orbit(4)
-                    if cmd == CMD_ORBIT_5: self.orbit(5)
-                    if cmd == CMD_ORBIT_6: self.orbit(6)
+                    if cmd == CMD_ORBIT_1: self.orbit(1) ; something_happened = True
+                    if cmd == CMD_ORBIT_2: self.orbit(2) ; something_happened = True
+                    if cmd == CMD_ORBIT_3: self.orbit(3) ; something_happened = True
+                    if cmd == CMD_ORBIT_4: self.orbit(4) ; something_happened = True
+                    if cmd == CMD_ORBIT_5: self.orbit(5) ; something_happened = True
+                    if cmd == CMD_ORBIT_6: self.orbit(6) ; something_happened = True
 
                     ############################################# Depart System:
-                    if cmd == CMD_DEPART:  self.orbit(0)
+                    if cmd == CMD_DEPART:  self.orbit(0) ; something_happened = True
                     
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     (x,y) = event.pos
                     
                     ################################################### Harvest:
                     if x <= CMD_HARVEST_X and y <= CMD_HARVEST_Y:
+                        something_happened = True
                         print ("Harvesting...")
                         if not self.drifter.harvest():
                             pass #self.losegame("You have been slain by the local civilization.")
-                        
-                  
-                else: continue # Dont't Count Random Events as Turns  
+
                 ################################################################
-                self.drifter.time += 1
-                self.render()
+                if something_happened:
+                    self.drifter.time += 1 ; self.render()
         pygame.quit()
 
 

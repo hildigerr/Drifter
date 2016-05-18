@@ -16,8 +16,8 @@ MAX_PLANETS = 6
 INIT_CARGO_CAP = 100
 
 # Starting Money #
-INIT_CREDIT_MIN = -100 # Or Debt!
-INIT_CREDIT_MAX =  100
+INIT_CREDIT_MIN = 0 # Or Debt!
+INIT_CREDIT_MAX = 100
 
 # Starting Fuel #
 INIT_FUEL_MIN = 0

@@ -23,9 +23,11 @@ SCREEN_SIZE = (WIDTH_FULL, HEIGHT_FULL) = (800,600)
 ## Round Dashboard ##
 DASH_IMG_NAME = "dash-round.png"
 FUEL_GUAGE_START_LOC = (140,570)
-FUEL_GUAGE_OFFSET = 15.0
-FUEL_GUAGE_LINE_LEN = 60
-FUEL_GUAGE_LINE_WID = 2
+FUEL_GUAGE_OFFSET    = 15.0
+FUEL_GUAGE_LINE_LEN  = 60
+FUEL_GUAGE_LINE_WID  = 2
+DASH_DELTA_TOP_RIGHT  = (466,362) # TOP_LEFT-->(351,362)
+
 
 ############################################################## Helper Functions:
 def load_img(name):
@@ -95,6 +97,21 @@ def scene_gen(game,player,screen):
         FUEL_GUAGE_START_LOC, get_fuel_line_end(player.fuel), FUEL_GUAGE_LINE_WID)
     
     
+    ## Render Textual Output ##
+    pygame.font.init()
+    if pygame.font:
+        font = pygame.font.SysFont("monospace",15)
+        font.set_bold(True)
+    else:
+        print ("ERROR: Pygame: Unable to load font.")
+        pygame.quit()
+        sys.exit(1)
+    
+    # Display Distance From Home #
+    textBox = font.render(str(player.delta),1,pygame.Color("green"))
+    t_rect = textBox.get_rect()
+    t_rect.topright = DASH_DELTA_TOP_RIGHT
+    screen.blit(textBox,t_rect)
     
     # Draw Current Planet #
     if player.sys.pos != None:
@@ -110,18 +127,8 @@ def scene_gen(game,player,screen):
             (splash,s_rect) = load_img("city-overlay.png")
             s_rect.center = (0,0)
             screen.blit(splash,s_rect)
-    
-    # Render Textual Output #
-    pygame.font.init()
-    if pygame.font:
-        font = pygame.font.Font(None, 32)
-        font.set_bold(True)
-    else:
-        print ("ERROR: Pygame: Unable to load font.")
-        pygame.quit()
-        sys.exit(1)
 
-    #save_img(screen,game)
+    #save_img(screen,game)#TODO Do save the img when testing is done!
     return screen
 
 ############################################################## Main for Testing:

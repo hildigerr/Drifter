@@ -43,11 +43,10 @@ class GuiGame():
     def __init__(self,name="Testing",run=True):
         self.name    = name
         self.drifter = Ship.Ship()
-        self.screen  = pygame.display.set_mode(Graphics.SCREEN_SIZE)
+        self.gfx     = Graphics.Graphics(self.name,self.drifter)
         if run: self.main()
     def render(self):
-        self.screen = Graphics.scene_gen(self.name,self.drifter,self.screen)
-        pygame.display.flip()
+        self.gfx.scene_gen() ; pygame.display.flip()
     def orbit(self,ix):
         if ix < 1:  self.drifter.sys.pos = None
         else:       self.drifter.sys.orbit(ix)

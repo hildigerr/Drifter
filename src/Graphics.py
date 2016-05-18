@@ -23,11 +23,11 @@ SCREEN_SIZE = (WIDTH_FULL, HEIGHT_FULL) = (800,600)
 ## Round Dashboard ##
 DASH_IMG_NAME = "dash-round.png"
 FUEL_GUAGE_START_LOC = (140,570)
-FUEL_GUAGE_OFFSET    = 15.0
-FUEL_GUAGE_LINE_LEN  = 60
-FUEL_GUAGE_LINE_WID  = 2
-DASH_DELTA_TOP_RIGHT  = (466,362) # TOP_LEFT-->(351,362)
-
+FUEL_GUAGE_OFFSET    =  15.0
+FUEL_GUAGE_LINE_LEN  =  60
+FUEL_GUAGE_LINE_WID  =  2
+DASH_DELTA_TOP_RIGHT = (466,362) # TOP_LEFT-->(351,362)
+SHIELD_STATUS_CENTER = (575,435)
 
 ############################################################## Helper Functions:
 def load_img(name):
@@ -75,61 +75,86 @@ def get_fuel_line_end(qt):
     x = -FUEL_GUAGE_LINE_LEN * math.cos(-omega)
     return tuple(map(op.add, FUEL_GUAGE_START_LOC, (x,y)))
 
-################################################################# Main Function:
-def scene_gen(game,player,screen):
-    '''
-    Function: scene_gen -- Generate's Scene Image
-    Parameters:
-        game: Name of current game. Used to organize saved images.
-        player: The Ship.
-        screen: The Screen Display.
-    '''
-    # Draw Background #
-    (splash,s_rect) = load_img("star-field.png")
-    screen.blit(splash,s_rect)
-    
-    # Draw the Dashboard #
-    (splash,s_rect) = load_img(DASH_IMG_NAME)
-    screen.blit(splash,s_rect)
-    
-    # Draw Fuel Gauge Indicator #
-    pygame.draw.line(screen, pygame.Color("red"), 
-        FUEL_GUAGE_START_LOC, get_fuel_line_end(player.fuel), FUEL_GUAGE_LINE_WID)
-    
-    
-    ## Render Textual Output ##
-    pygame.font.init()
-    if pygame.font:
-        font = pygame.font.SysFont("monospace",15)
-        font.set_bold(True)
-    else:
-        print ("ERROR: Pygame: Unable to load font.")
-        pygame.quit()
-        sys.exit(1)
-    
-    # Display Distance From Home #
-    textBox = font.render(str(player.delta),1,pygame.Color("green"))
-    t_rect = textBox.get_rect()
-    t_rect.topright = DASH_DELTA_TOP_RIGHT
-    screen.blit(textBox,t_rect)
-    
-    # Draw Current Planet #
-    if player.sys.pos != None:
-        planet = player.sys.planets[player.sys.pos]
-        kind   = planet.resource.type
-        if   kind == "Rocky": (splash,s_rect) = load_img("planet000.png")
-        elif kind == "Water": (splash,s_rect) = load_img("planet001.png")
-        elif kind == "Fire":  (splash,s_rect) = load_img("planet002.png")
-        else:                 (splash,s_rect) = load_img("planet003.png")# "Barren"
-        s_rect.center = (0,0)
-        screen.blit(splash,s_rect)
-        if planet.resource.civ != None:
-            (splash,s_rect) = load_img("city-overlay.png")
-            s_rect.center = (0,0)
-            screen.blit(splash,s_rect)
+##################################################################### PlanetImg:
+#TODO
+#class PlanetImg():
+#    def __init__(self):
 
-    #save_img(screen,game)#TODO Do save the img when testing is done!
-    return screen
+############################################################### ShieldIndicator:
+class ShieldIndicator():
+    def __init__(self):                                 #  STATUS  # 
+        self.images = [load_img("shield-red.png"),      #  0 - 29  #
+                       load_img("shield-orange.png"),   # 30 - 49  #
+                       load_img("shield-yellow.png"),   # 50 - 69  #
+                       load_img("shield-green.png"),    # 70 - 89  #
+                       load_img("shield-blue.png")]     # 90 - 100 #
+    def get(self,status):
+        if status < 30: return self.images[0]           # RED      #
+        if status < 50: return self.images[1]           # ORANGE   #
+        if status < 70: return self.images[2]           # YELLOW   #
+        if status < 90: return self.images[3]           # GREEN    #
+        else:           return self.images[4]           # BLUE     #
+
+################################################################ Graphics Class:
+class Graphics():
+    '''
+    name:   Name of current game. Used to organize saved images.
+    player: The Ship.
+    '''
+    def __init__(self,name,player):
+        self.screen = pygame.display.set_mode(SCREEN_SIZE)
+        self.name = name ; self.player = player
+        self.sh = ShieldIndicator()
+        pygame.font.init()
+        if pygame.font:
+            self.font = pygame.font.SysFont("monospace",15)
+            self.font.set_bold(True)
+        else:
+            print ("ERROR: Pygame: Unable to load font.")
+            pygame.quit()
+            sys.exit(1)
+        (self.bg,self.bg_rect) = load_img("star-field.png")
+        (self.db,self.db_rect) = load_img(DASH_IMG_NAME)
+    def scene_gen(self):
+        '''Generate's Scene Image '''
+        self.screen.blit(self.bg,self.bg_rect) # Draw Background    #
+        self.screen.blit(self.db,self.db_rect) # Draw the Dashboard #
+        
+        # Draw Fuel Gauge Indicator #
+        pygame.draw.line(self.screen, pygame.Color("red"), 
+            FUEL_GUAGE_START_LOC, get_fuel_line_end(self.player.fuel), FUEL_GUAGE_LINE_WID)
+    
+        # Draw Shield Status Indicator #
+        (splash, splash_rect) = self.sh.get(self.player.health)
+        splash_rect.center = SHIELD_STATUS_CENTER
+        self.screen.blit(splash,splash_rect)
+        #TODO: Write str(self.player.health) over image.
+    
+        # Display Distance From Home #
+        txt = self.font.render(str(self.player.delta),1,pygame.Color("green"))
+        txt_rect = txt.get_rect()
+        txt_rect.topright = DASH_DELTA_TOP_RIGHT
+        self.screen.blit(txt,txt_rect)
+    
+        # Draw Current Planet #
+        #TODO: Have muliple planet images of each kind and randomize selection.
+        #      Must be persistant for a specific planet.
+        #TODO: Rotate the spheres randomly to simulate time passing in orbit.
+        if self.player.sys.pos != None:
+            planet = self.player.sys.planets[self.player.sys.pos]
+            kind   = planet.resource.type
+            if   kind == "Rocky": (splash,s_rect) = load_img("planet000.png")
+            elif kind == "Water": (splash,s_rect) = load_img("planet001.png")
+            elif kind == "Fire":  (splash,s_rect) = load_img("planet002.png")
+            else:                 (splash,s_rect) = load_img("planet003.png")# "Barren"
+            s_rect.center = (0,0)
+            self.screen.blit(splash,s_rect)
+            if planet.resource.civ != None:
+                (splash,s_rect) = load_img("city-overlay.png")
+                s_rect.center = (0,0)
+                self.screen.blit(splash,s_rect)
+
+        #save_img(self.screen,self.name)#TODO Do save the img when testing is done!
 
 ############################################################## Main for Testing:
 if __name__ == '__main__':

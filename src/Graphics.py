@@ -43,6 +43,7 @@ def load_img(name):
         if img.get_alpha() is None: img = img.convert()
         else: img = img.convert_alpha()
     except (pygame.error, message):
+        #TODO: NameError: global name 'message' is not defined
         print ("ERROR: Unable to load image:", name)
         raise (SystemExit, message)
     return img, img.get_rect()
@@ -75,10 +76,21 @@ def get_fuel_line_end(qt):
     x = -FUEL_GUAGE_LINE_LEN * math.cos(-omega)
     return tuple(map(op.add, FUEL_GUAGE_START_LOC, (x,y)))
 
-##################################################################### PlanetImg:
+##################################################################### PlanetSys:
 #TODO
-#class PlanetImg():
-#    def __init__(self):
+class PlanetSys():
+    #TODO: Have muliple planet images of each kind and randomize selection.
+    #TODO: Rotate the spheres randomly to simulate time passing in orbit.
+    def __init__(self):
+        self.planetImg = {}
+        self.planetImg["Rocky" ] = load_img("planet000.png")
+        self.planetImg["Water" ] = load_img("planet001.png")
+        self.planetImg["Fire"  ] = load_img("planet002.png")
+        self.planetImg["Barren"] = load_img("planet003.png")
+        self.stockSolarSystemImg = load_img("star-chart-6.png" )
+        self.solarSystemImg = None
+    def gen_sys(self):
+        pass #TODO
 
 ############################################################### ShieldIndicator:
 class ShieldIndicator():
@@ -105,6 +117,7 @@ class Graphics():
         self.screen = pygame.display.set_mode(SCREEN_SIZE)
         self.name = name ; self.player = player
         self.sh = ShieldIndicator()
+        self.sys = PlanetSys()
         pygame.font.init()
         if pygame.font:
             self.font = pygame.font.SysFont("monospace",15)
@@ -115,7 +128,7 @@ class Graphics():
             sys.exit(1)
         (self.bg,self.bg_rect) = load_img("star-field.png")
         (self.db,self.db_rect) = load_img(DASH_IMG_NAME)
-    def scene_gen(self):
+    def scene_gen(self,sol_sys=None):
         '''Generate's Scene Image '''
         self.screen.blit(self.bg,self.bg_rect) # Draw Background    #
         self.screen.blit(self.db,self.db_rect) # Draw the Dashboard #
@@ -137,16 +150,10 @@ class Graphics():
         self.screen.blit(txt,txt_rect)
     
         # Draw Current Planet #
-        #TODO: Have muliple planet images of each kind and randomize selection.
-        #      Must be persistant for a specific planet.
-        #TODO: Rotate the spheres randomly to simulate time passing in orbit.
         if self.player.sys.pos != None:
             planet = self.player.sys.planets[self.player.sys.pos]
             kind   = planet.resource.type
-            if   kind == "Rocky": (splash,s_rect) = load_img("planet000.png")
-            elif kind == "Water": (splash,s_rect) = load_img("planet001.png")
-            elif kind == "Fire":  (splash,s_rect) = load_img("planet002.png")
-            else:                 (splash,s_rect) = load_img("planet003.png")# "Barren"
+            (splash,s_rect) = self.sys.planetImg.get(kind,"Barren")
             s_rect.center = (0,0)
             self.screen.blit(splash,s_rect)
             if planet.resource.civ != None:

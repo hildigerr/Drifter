@@ -22,22 +22,24 @@ STASIS_YEARS_MAX = 666
 CMD_QUIT       = pygame.K_q
 CMD_HEAD_HOME  = pygame.K_z
 CMD_DRIFT      = pygame.K_x
+CMD_DEPART     = pygame.K_0
+CMD_ORBIT_1    = pygame.K_1
+CMD_ORBIT_2    = pygame.K_2
+CMD_ORBIT_3    = pygame.K_3
+CMD_ORBIT_4    = pygame.K_4
+CMD_ORBIT_5    = pygame.K_5
+CMD_ORBIT_6    = pygame.K_6
+CMD_HARVEST_X  = 240           # Click on rectangular region within Planet.
+CMD_HARVEST_Y  = 275
+#CMD_JETTISON  = pygame.K_j
 #CMD_BUY       = pygame.K_b
 #CMD_SELL      = pygame.K_s
 #CMD_REFINE    = pygame.K_r
 #CMD_GAMBLE    = pygame.K_g
 #CMD_ATTACK    = pygame.K_a
-#CMD_HARVEST   = pygame.K_h
-CMD_DEPART    = pygame.K_0
-CMD_ORBIT_1   = pygame.K_1
-CMD_ORBIT_2   = pygame.K_2
-CMD_ORBIT_3   = pygame.K_3
-CMD_ORBIT_4   = pygame.K_4
-CMD_ORBIT_5   = pygame.K_5
-CMD_ORBIT_6   = pygame.K_6
-#CMD_JETTISON  = pygame.K_j
 
 ################################################################################
+#TODO: print --> self.print : write to ship's console. Also create ships console
 class GuiGame():
     '''Implements a Graphical version of The Game.'''
     def __init__(self,name="Testing",run=True):
@@ -48,8 +50,8 @@ class GuiGame():
     def render(self):
         self.gfx.scene_gen() ; pygame.display.flip()
     def orbit(self,ix):
-        if ix < 1:  self.drifter.sys.pos = None
-        else:       self.drifter.sys.orbit(ix)
+        if ix < 1 or ix >= self.drifter.sys.qt: self.drifter.sys.pos = None
+        else:                                   self.drifter.sys.orbit(ix)
     def main(self):
         self.render()
         while True:
@@ -83,6 +85,17 @@ class GuiGame():
                     ############################################# Depart System:
                     if cmd == CMD_DEPART:  self.orbit(0)
                     
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    (x,y) = event.pos
+                    
+                    ################################################### Harvest:
+                    if x <= CMD_HARVEST_X and y <= CMD_HARVEST_Y:
+                        print ("Harvesting...")
+                        if not self.drifter.harvest():
+                            pass #self.losegame("You have been slain by the local civilization.")
+                        
+                  
+                else: continue # Dont't Count Random Events as Turns  
                 ################################################################
                 self.drifter.time += 1
                 self.render()

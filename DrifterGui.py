@@ -46,9 +46,10 @@ class GuiGame():
         self.name    = name
         self.drifter = Ship.Ship()
         self.gfx     = Graphics.Graphics(self.name,self.drifter)
+        self.starChart = None
         if run: self.main()
     def render(self):
-        self.gfx.scene_gen() ; pygame.display.flip()
+        self.gfx.scene_gen(self.starChart) ; pygame.display.flip()
     def orbit(self,ix):
         if ix < 1 or ix >= self.drifter.sys.qt: self.drifter.sys.pos = None
         else:                                   self.drifter.sys.orbit(ix)
@@ -66,13 +67,13 @@ class GuiGame():
 
                     ##################################################### Drift:
                     if cmd == CMD_DRIFT:
-                        something_happened = True
+                        something_happened = True ; self.starChart = None
                         print ("You allow the space craft to drift...")
                         if self.drifter.drift(): pass #self.wingame()
 
                     ################################################# Head Home:
                     if cmd == CMD_HEAD_HOME:
-                        something_happened = True
+                        something_happened = True ; self.starChart = None
                         print ("You set the ship autopilot to head home...")
                         print ("You are awakened from chryostasis when the fuel runs out.")
                         if self.drifter.goHome(): pass #self.wingame()

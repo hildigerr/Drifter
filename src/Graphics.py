@@ -46,7 +46,7 @@ def load_img(name):
         #TODO: NameError: global name 'message' is not defined
         print ("ERROR: Unable to load image:", name)
         raise (SystemExit, message)
-    return img, img.get_rect()
+    return img, img.get_rect() #TODO? just return img and do get_rect as needed
 
 def save_img(me,name):
     '''
@@ -87,10 +87,13 @@ class PlanetSys():
         self.planetImg["Water" ] = load_img("planet001.png")
         self.planetImg["Fire"  ] = load_img("planet002.png")
         self.planetImg["Barren"] = load_img("planet003.png")
-        self.stockSolarSystemImg = load_img("star-chart-6.png" )
+        self.stockSolarSystemImg = load_img("star-chart-6.png" )[0]
+        #TODO: May look better to remake star-chart with sun centered at 0,0 
         self.solarSystemImg = None
-    def gen_sys(self):
-        pass #TODO
+    def gen_sys(self,sysInfo):
+        self.solarSystemImg = self.stockSolarSystemImg.copy()
+        #TODO: Draw planets.
+        return self.solarSystemImg
 
 ############################################################### ShieldIndicator:
 class ShieldIndicator():
@@ -128,9 +131,13 @@ class Graphics():
             sys.exit(1)
         (self.bg,self.bg_rect) = load_img("star-field.png")
         (self.db,self.db_rect) = load_img(DASH_IMG_NAME)
-    def scene_gen(self,sol_sys=None):
+    def scene_gen(self,sol_sys):
         '''Generate's Scene Image '''
-        self.screen.blit(self.bg,self.bg_rect) # Draw Background    #
+        # Draw Background #
+        if self.player.sys.pos == None:
+              if sol_sys == None: sol_sys = self.sys.gen_sys(self.player.sys)
+              self.screen.blit(self.sys.solarSystemImg,self.sys.solarSystemImg.get_rect())
+        else: self.screen.blit(self.bg,self.bg_rect)
         self.screen.blit(self.db,self.db_rect) # Draw the Dashboard #
         
         # Draw Fuel Gauge Indicator #
@@ -162,6 +169,7 @@ class Graphics():
                 self.screen.blit(splash,s_rect)
 
         #save_img(self.screen,self.name)#TODO Do save the img when testing is done!
+		return sol_sys
 
 ############################################################## Main for Testing:
 if __name__ == '__main__':

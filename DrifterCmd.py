@@ -61,7 +61,7 @@ class CmdLineGame():
             string                                += ", harvest, depart"
         elif self.drifter.sys.qt > 0:      string += ", orbit"
         if   len(self.drifter.cargo) > 0:  string += ", jettison"
-        string += ", and quit."
+        string += ", and quit.\n"
         return string
     def wingame(self):
         #TODO: Calculate Score -- Compare to High Score List
@@ -92,8 +92,8 @@ class CmdLineGame():
                                              self.drifter.sys.scan() ))
             try:
                 cmdLine = raw_input(self.status()+" What will you do? ").split()
-                cmd = cmdLine[0] 
-            except EOFError: cmd = "quit"
+                cmd = cmdLine[0]
+            except (EOFError) : continue #cmd = "quit"
             
             print ("\n" +('#' * 80))
             

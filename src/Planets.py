@@ -19,7 +19,7 @@ MIN_HEALTH = 25
 ################################################################## Planet Class:
 class Planet():
     '''
-    resource   -- Civilization and Resources on Planet.
+    resource    -- Civilization and Resources on Planet.
     health      -- Remaining population, or resources, if any.
     baseChance  -- Base chance for gathering, fighting, etc.
     '''
@@ -35,7 +35,6 @@ class Planet():
     def attack(self):
         (damPlanet,damShip) = self.resource.attack()
         self.health -= damPlanet
-        #TODO Planet harm : over harvest = remove civ or change to barren
         return damShip
 
         
@@ -47,7 +46,7 @@ class System():
     pos -- Index of which planet is being orbited? or None
     '''
     def __init__(self,maxQt,civ_chance = DEFAULT_CIV_SPAWN_CHANCE):
-        self.qt = random.randint(0,maxQt)
+        self.qt = random.randint(0, maxQt)
         self.planets = []
         for i in range (0, self.qt): self.planets.append(
                            Planet( random.randint(0,planetTypeQt), civ_chance) )
@@ -68,7 +67,13 @@ class System():
         else: string += "[0/{}]".format(self.qt)
         return string
     def harvest(self,adj=0,bonus=0):
-        if self.pos != None: return self.planets[self.pos].harvest(adj,bonus)
+        if self.pos != None:
+            self.planets[self.pos].health -= random.randint(1, 6)       
+            if (self.planets[self.pos].health <= 0):
+                self.planets[self.pos] = Planet(0, DEFAULT_CIV_SPAWN_CHANCE);
+
+            return self.planets[self.pos].harvest(adj,bonus)
+        
         else: return None #TODO: Solar scoop? gain fuel without leaving system.
     def buy(self,item):
         if self.pos == None: return 0 #TODO: Trade with other ships

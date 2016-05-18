@@ -1,6 +1,6 @@
-make: main.py
+make: Drifter.py
 	clear
-	python3 main.py
+	python Drifter.py
 
 clean:
-	$(RM) *# , *~
+	$(RM) *.~ *#

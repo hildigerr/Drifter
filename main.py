@@ -49,23 +49,20 @@ fireResourceList = ["Obsidian", "Lava", "Diamond", "Charcoal"]
 def genPlanetResources (planet):
    index = 1
    resourceList = {}
-   rockRes = {0:"Stone", 1:"Rock", 2:"Dirt", 3:"Metal"}
-   waterRes = {0:"Water", 1:"Ice", 2:"Steam"}
-   fireRes = {0:"Obsidian", 1:"Lava", 2:"Diamond", 3:"Charcoal"}
 
    if (planet.planetType == "Rock"):
       for i in range (0, 3):
-         currResource = rockRes[random.randint(0, 3)]
+         currResource = rockResourceList[random.randint(0, 3)]
          if (currResource not in resourceList):
             resourceList.update({currResource:index})
    elif (planet.planetType == "Watr"):
       for i in range (0, 3):
-         currResource = waterRes[random.randint(0, 2)]
+         currResource = waterResourceList[random.randint(0, 2)]
          if (currResource not in resourceList):
             resourceList.update({currResource:index})
    elif (planet.planetType == "Fire"):
       for i in range (0, 3):
-         currResource = fireRes[random.randint(0, 3)]
+         currResource = fireResourceList[random.randint(0, 3)]
          if (currResource not in resourceList):
             resourceList.update({currResource:index})
    return resourceList
@@ -243,6 +240,7 @@ def cmd_sell (milFalcon, universe, sellItem, sellAmmt):
    return 0
 
 def cmd_buy (milFalcon, universe, butItem, buyAmmt):
+   
    
    return 0
 

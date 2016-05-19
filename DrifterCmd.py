@@ -32,8 +32,8 @@ class CmdLineGame():
         if run: self.main()
     def backstory(self):
         '''Return the backstory string.'''
-        string = ('#' * 80) + "\n" #TODO: Add more randomized flavour.
-        string += "The last thing you remember before awaking from chryostasis,"
+        #TODO: Add more randomized flavour.
+        string  = "The last thing you remember before awaking from chryostasis,"
         string += " is the captain\nbeing decapitated by some flying debris. "
         string += "There was a battle. You don't know if\nthe enemy was destroyed,"
         string += " but obviously your ship is intact. The onboard computer\n"
@@ -89,7 +89,7 @@ class CmdLineGame():
         else:                return  string
     def main(self):
         ''' Play The Game. '''
-        print(self.backstory())
+        print(('#' * 80) + "\n" + self.backstory())
         while True:
             print ("{}\n{}\nScan:{}".format( self.commands(),
                                              self.listCargo(),
@@ -130,7 +130,7 @@ class CmdLineGame():
             ######################################################### Head Home:
             if cmd == "head":
                 if self.drifter.goHome(): return self.wingame()
-                return ("The ship autopilot is set to head home..." + "\n"
+                return ("The ship autopilot is set to head home..." + "\n\n"
                     "You are awakened from chryostasis when the fuel runs out.",GAME_ACTION)
                 
             ########################################################### Harvest:

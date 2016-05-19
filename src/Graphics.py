@@ -28,9 +28,13 @@ FUEL_GUAGE_START_LOC = (140,570)
 FUEL_GUAGE_OFFSET    =  15.0
 FUEL_GUAGE_LINE_LEN  =  60
 FUEL_GUAGE_LINE_WID  =  2
-DASH_DELTA_TOP_RIGHT = (466,362) # TOP_LEFT-->(351,362)
 SHIELD_STATUS_CENTER = (633,465)
+DASH_DELTA_TOP_RIGHT = (466,362) # TOP_LEFT-->(351,362)
 DASH_CREDIT_TOP_LEFT = (624,571)
+DASH_FONT_SIZE       =  15
+TERM_TOP_LEFT        = (216,408)
+TERM_FONT_SIZE       =  10
+TERM_CHAR_WIDTH      =  61
 
 ## Star Chart Properties ##
 CHART_RING_INNER_LOC_X =  311
@@ -85,6 +89,10 @@ def get_fuel_line_end(qt):
     x = -FUEL_GUAGE_LINE_LEN * math.cos(-omega)
     return tuple(map(op.add, FUEL_GUAGE_START_LOC, (x,y)))
 
+def chunkstring(string, length):
+    '''http://stackoverflow.com/questions/18854620/whats-the-best-way-to-split-a-string-into-fixed-length-chunks-and-work-with-the'''
+    return (string[0+i:length+i] for i in range(0, len(string), length))
+
 ##################################################################### PlanetSys:
 class PlanetSys():
     #TODO: Have muliple planet images of each kind and randomize selection.
@@ -133,15 +141,18 @@ class Graphics():
     name:   Name of current game. Used to organize saved images.
     player: The Ship.
     '''
-    def __init__(self,name,player):
+    def __init__(self,name,player,backstory=None):
         self.screen = pygame.display.set_mode(SCREEN_SIZE)
         self.name = name ; self.player = player
         self.sh = ShieldIndicator()
         self.sys = PlanetSys()
+        self.txt = backstory
         pygame.font.init()
         if pygame.font:
-            self.font = pygame.font.SysFont("monospace",15)
+            self.font = pygame.font.SysFont("monospace",DASH_FONT_SIZE)
             self.font.set_bold(True)
+            self.term = pygame.font.SysFont("monospace",TERM_FONT_SIZE)
+            # self.term.set_bold(True)
         else:
             print ("ERROR: Pygame: Unable to load font.")
             pygame.quit()
@@ -185,6 +196,20 @@ class Graphics():
         txt_rect = txt.get_rect()
         txt_rect.topleft = DASH_CREDIT_TOP_LEFT
         self.screen.blit(txt,txt_rect)
+    
+        # Display Text on Ship Console #
+        if self.txt != None:
+            print self.txt
+            i = 0 ; size = self.term.get_linesize()
+            for line in self.txt.split("\n\n"):
+                for txt in chunkstring(line,TERM_CHAR_WIDTH):
+                    txt = txt.replace('\n',' ').lstrip()
+                    txt = self.term.render(txt,1,pygame.Color("grey"))
+                    txt_rect.topleft = TERM_TOP_LEFT
+                    txt_rect.top += i * size
+                    self.screen.blit(txt,txt_rect)
+                    i += 1
+                i += 1
     
         # Draw Current Planet #
         if self.player.sys.pos != None:

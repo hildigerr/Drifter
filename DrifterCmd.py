@@ -19,6 +19,10 @@ raw_input = input #python3
 STASIS_YEARS_MIN = 99
 STASIS_YEARS_MAX = 666
 
+GAME_ACTION    = -1   # The Command Has Been Executed
+GAME_CONTINUE  =  0   # The Requested Command Was Invalid
+GAME_TERMINATE =  1   # The Game Is Completed
+
 ################################################################################
 class CmdLineGame():
     '''Implements a Command Line version of The Game.'''
@@ -65,10 +69,9 @@ class CmdLineGame():
         return string
     def wingame(self):
         #TODO: Calculate Score -- Compare to High Score List
-        print ('#' * (80-9) + " YOU WIN!\n")    ;  sys.exit(0)
+        return ('#' * (80-9) + " YOU WIN!\n",GAME_TERMINATE)
     def losegame(self,string):
-        print (string)
-        print ('#' * (80-10) + " YOU LOSE!\n")  ;  sys.exit(0)
+        return (string + "\n" + '#' * (80-10) + " YOU LOSE!\n",GAME_TERMINATE)
     def status(self):
         '''Create status string.'''
         return "[T:{}|D:{}|F:{}|H:{}|${}]".format(
@@ -93,11 +96,13 @@ class CmdLineGame():
             try:
                 cmdLine = raw_input(self.status()+" What will you do? ").split()
                 cmd = cmdLine[0]
-            except (EOFError) : continue #cmd = "quit"
-            print ("\n" + ('#' * 80) + "\n" + self.do(cmd,cmdLine) )
-            self.drifter.time += 1 #TODO: don't take a turn if cmd is rejected.
+            except (EOFError) : cmd = "quit" # CTRL-D Quits
+            (output,status) = self.do(cmd,cmdLine)
+            print ("\n" + ('#' * 80) + "\n" + output)
+            if status == GAME_TERMINATE: sys.exit(0) 
+            if status != GAME_CONTINUE:  self.drifter.time += 1
     def do(self,cmd,cmdLine):
-            '''Perform a cmd and Return Result String, if not done.'''
+            '''Perform a cmd and Return Result String and status.'''
             ############################################################## Help:
             if cmd == "help": #TODO Add command parameter
                 return ("The ship status is described as so:\n\t"
@@ -109,52 +114,53 @@ class CmdLineGame():
                       +"\n\nThe planet scan is described as so:\n\t"
                       +"[i/n type]{health}[resource,list]"
                       +"\nWhere i is the number of the planet "
-                      +"and n is quantity of planets in the system.\n")
+                      +"and n is quantity of planets in the system.\n", 
+                      GAME_CONTINUE)
                 
             ############################################################## Quit:
             if cmd == "quit" or cmd == "exit" or cmd == "q":
-                self.losegame("\tSELF DESTRUCT SEQUENCE ACTIVATED!")
-                
+                return self.losegame("\tSELF DESTRUCT SEQUENCE ACTIVATED!")
+                                
             ############################################################# Drift:
             if cmd == "drift": #TODO Drifting while under attack is dangerous.
-                if self.drifter.drift(): self.wingame()
-                return "The space craft is allowed to drift into another solar system..."
+                if self.drifter.drift(): return self.wingame()
+                return ("The space craft is allowed to drift into another solar system...",GAME_ACTION)
                 
             ######################################################### Head Home:
             if cmd == "head":
-                if self.drifter.goHome(): self.wingame()
+                if self.drifter.goHome(): return self.wingame()
                 return ("The ship autopilot is set to head home..." + "\n"
-                    "You awaken from chryostasis when the fuel runs out.")
+                    "You are awakened from chryostasis when the fuel runs out.",GAME_ACTION)
                 
             ########################################################### Harvest:
             if cmd == "harvest":
                 (alive,result) = self.drifter.harvest()
                 if not alive: self.losegame("The local population rise against you and destroy the ship.")
-                else: return "Harvesting...\nFound: {}".format(result)
+                else: return ("Harvesting...\nFound: {}".format(result),GAME_ACTION)
                 
             ###################################################### Orbit Planet:
             if cmd == "orbit":
                 try:
                     self.drifter.sys.orbit(int(cmdLine[1])-1)
-                    return ("Entering orbit of planet #{}".format(cmdLine[1]))
+                    return ("Entering orbit of planet #{}".format(cmdLine[1]),GAME_ACTION)
                 except (IndexError, ValueError):
-                    return ("?\n\tUsage: 'orbit n'")
+                    return ("?\n\tUsage: 'orbit n'",GAME_CONTINUE)
                     
             ##################################################### Depart System:
-            if cmd == "depart": #XXX Not Necessary XXX#
+            if cmd == "depart": #XXX Not Necessary && Costs Travel Time XXX#
                 old = self.drifter.sys.pos
                 if old != None: old+=1
                 self.drifter.sys.pos = None
-                return ("You leave the {} planet.".format(old))
+                return ("You leave the {} planet.".format(old),GAME_ACTION)
                 
             #################################################### Jettison Cargo:
             if cmd == "jettison":
                 try:
                     cmdLine[2] = self.holyWaterHack(cmdLine[2])
                     cmdLine[1] = self.drifter.jettison(int(cmdLine[1]),cmdLine[2])
-                    return ("Jettisoning {} {}".format(cmdLine[1], cmdLine[2]))
+                    return ("Jettisoning {} {}".format(cmdLine[1], cmdLine[2]),GAME_ACTION)
                 except (IndexError, ValueError):
-                    return ("?\n\tUsage: 'jettison n item'")
+                    return ("?\n\tUsage: 'jettison n item'",GAME_CONTINUE)
             
             ####################################################### Buy or Sell:
             if cmd == "buy" or cmd == "sell":
@@ -165,16 +171,17 @@ class CmdLineGame():
                         self.losegame("While trying to make a deal to {} {} {}".
                              format(cmd,cmdLine[1],cmdLine[2])
                             +", you were seized and put to death.")
-                    else: return ("You {} {} {}.".format(cmd,cmdLine[1],cmdLine[2]))
+                    else: return ("You {} {} {}.".format(cmd,cmdLine[1],cmdLine[2]),GAME_ACTION)
                 except (IndexError, ValueError):
-                    return ("?\n\tUsage: '{} n item'".format(cmd))
+                    return ("?\n\tUsage: '{} n item'".format(cmd),GAME_CONTINUE)
 
             ############################################################ Attack:
             if cmd == "attack":
                 (damDone,damSustained) = self.drifter.sys.attack()
                 if not self.drifter.harm(damDone):
                     self.losegame("Your ship was destroyed in battle.")
-                else: return "You attack for {} damage, while sustaining {} damage.".format(damDone,damSustained)
+                return ("You attack for {} damage, while sustaining {} damage.".
+                        format(damDone,damSustained),GAME_ACTION)
                     
             ############################################################ Repair:
             #TODO: Use metal at friendly planet. 
@@ -187,9 +194,9 @@ class CmdLineGame():
                     (alive,result) = self.drifter.refine(int(cmdLine[1]),cmdLine[2])
                     if not alive: self.losegame("You were caught tresspassing in "
                             +  "the refinery, seized, and put to death.")
-                    return "Refining {} {}...\nResult: {}".format(cmdLine[1],cmdLine[2],result)
+                    return ("Refining {} {}...\nResult: {}".format(cmdLine[1],cmdLine[2],result),GAME_ACTION)
                 except (IndexError, ValueError):
-                    return ("?\n\tUsage: 'refine n item'")
+                    return ("?\n\tUsage: 'refine n item'",GAME_CONTINUE)
 
             ############################################################ Gamble:
             if cmd == "gamble":
@@ -200,25 +207,28 @@ class CmdLineGame():
                     if not alive:
                         self.losegame("Another gambler accused you of cheating."
                             + " You have been seized and put to death.")
-                    if result == None: return "You make a bet with yourself and win!"
-                    if result < 0: return damage+"You gamble away {} credits!".format(-result)
-                    else:          return damage+"You make a bet for {} and win {}".format(cmdLine[1],result)  
+                    if result == None: return ("You make a bet with yourself and win!",GAME_ACTION)
+                    if result < 0: return (damage+"You gamble away {} credits!".format(-result),GAME_ACTION)
+                    else:          return (damage+"You make a bet for {} and win {}".format(cmdLine[1],result),GAME_ACTION)
                 except (IndexError, ValueError):
-                    return ("?\n\tUsage: 'gamble bet'")
+                    return ("?\n\tUsage: 'gamble bet'",GAME_CONTINUE)
 
             ############################################################# Craft:
             if cmd == "craft":
                 try:
                     self.drifter.craft(int(cmdLine[1]),cmdLine[2])
+                    return ("The result is ???",GAME_ACTION)#TODO
                 except (IndexError, ValueError):
-                    return ("?\n\tUsage: 'craft n item'")
+                    return ("?\n\tUsage: 'craft n item'",GAME_CONTINUE)
 
             ############################################################### God:
             if cmd == "gm":
                 self.drifter.gm()
+                return("You unlock the secrets of the universe!",GAME_CONTINUE)
 
             ####################################################################
-            return "\"{}\" is an invalid command.".format(cmd) # self.do("drift",None)
+            return ("\"{}\" is an invalid command.".format(cmd),GAME_CONTINUE)
+            #Or: self.do("drift",None)
 
 ########################################################################## MAIN:
 if __name__ == '__main__': CmdLineGame()

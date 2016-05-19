@@ -35,7 +35,7 @@ class Planet():
     def attack(self):
         (damPlanet,damShip) = self.resource.attack()
         self.health -= damPlanet
-        return damShip
+        return (damPlanet,damShip)
 
         
 ################################################################## System Class:
@@ -79,7 +79,7 @@ class System():
         if self.pos == None: return 0 #TODO: Trade with other ships
         return self.planets[self.pos].resource.buy(item)
     def attack(self): #TODO: have Modifiers
-        if self.pos == None: return 0 #TODO: Fight with other ships
+        if self.pos == None: return (0,0) #TODO: Fight with other ships
         return self.planets[self.pos].attack()
 
 ############################################################## Main for Testing:

@@ -89,6 +89,7 @@ class Ship():
         return False
     def harvest(self,result=None):
         '''Acquire resources from result param or else planet being orbited.'''
+        '''Returns (STILL_ALIVE?,result)'''
         #TODO: Pass through any Modifiers from ship Modules
         if result == None: result = self.sys.harvest()
         if result != None:
@@ -99,7 +100,7 @@ class Ship():
                     if not self.harm(result['Damage']): return False # Died #
                 elif res_keys[i] == "Fuel": self.fuelerize(result['Fuel'])
                 else: self.load(result[res_keys[i]],res_keys[i])
-        return STILL_ALIVE
+        return (STILL_ALIVE,result)
     def load(self,amt=0,item=None):
         '''Load some cargo to into the cargo bay. Returns acutal amount added.'''
         if item != None and int(amt) > 0 and self.usedcap < self.cap: 
@@ -131,8 +132,8 @@ class Ship():
             if cmd == "sell" and item in self.cargo:
                 if amt > self.cargo[item]: amt = self.cargo[item]
                 self.credit += price * amt ; self.jettison(amt,item) 
-        if price < 0: return self.harm(-price) # Under Attack #
-        return True
+        if price < 0: return (self.harm(-price),amt) # Under Attack #
+        return (True,amt)
     def harm(self,amt):
         '''Apply some amt of damage to self. Return True if survived it.'''
         self.health -= amt
@@ -146,10 +147,11 @@ class Ship():
     def gamble(self,bet=0):
         '''Try to randomly gain credits with some risk of loss and even death'''
         '''Allow gambling debt to accumulate.'''
+        '''Returns (STILL_ALIVE?,winnings,damage)'''
         if self.sys.pos != None and self.sys.planets[self.sys.pos].resource.civ != None:
             (win,damage) = self.sys.planets[self.sys.pos].resource.civ.gamble(bet,self.credit)
-            self.credit += win ; return self.harm(damage)
-        return STILL_ALIVE
+            self.credit += win ; return (self.harm(damage),win,damage)
+        return (STILL_ALIVE,None,0)
     def craft(self,amt=0,item=None):
         '''Craft the items ship's cargo resources.'''
         if item != None and int(amt) > 0 and item in CRAFT_LIST:

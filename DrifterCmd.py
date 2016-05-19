@@ -68,7 +68,7 @@ class CmdLineGame():
         print ('#' * (80-9) + " YOU WIN!\n")    ;  sys.exit(0)
     def losegame(self,string):
         print (string)
-        print ('#' * (80-10) + " YOU LOSE!\n")    ;  sys.exit(0)
+        print ('#' * (80-10) + " YOU LOSE!\n")  ;  sys.exit(0)
     def status(self):
         '''Create status string.'''
         return "[T:{}|D:{}|F:{}|H:{}|${}]".format(
@@ -118,19 +118,19 @@ class CmdLineGame():
             ############################################################# Drift:
             if cmd == "drift": #TODO Drifting while under attack is dangerous.
                 if self.drifter.drift(): self.wingame()
-                return ("You allow the space craft to drift...")
+                return "The space craft is allowed to drift into another solar system..."
                 
             ######################################################### Head Home:
             if cmd == "head":
                 if self.drifter.goHome(): self.wingame()
-                return ("You set the ship autopilot to head home..." + "\n"
-                    "You are awakened from chryostasis when the fuel runs out.")
+                return ("The ship autopilot is set to head home..." + "\n"
+                    "You awaken from chryostasis when the fuel runs out.")
                 
             ########################################################### Harvest:
             if cmd == "harvest":
-                if not self.drifter.harvest():
-                    return self.losegame("You have been slain by the local civilization.")
-                else: return ("Harvesting...")
+                (alive,result) = self.drifter.harvest()
+                if not alive: self.losegame("The local population rise against you and destroy the ship.")
+                else: return "Harvesting...\nFound: {}".format(result)
                 
             ###################################################### Orbit Planet:
             if cmd == "orbit":
@@ -142,14 +142,16 @@ class CmdLineGame():
                     
             ##################################################### Depart System:
             if cmd == "depart": #XXX Not Necessary XXX#
+                old = self.drifter.sys.pos
+                if old != None: old+=1
                 self.drifter.sys.pos = None
-                return ("You leave the {} planet.".format(self.drifter.sys.pos+1))
+                return ("You leave the {} planet.".format(old))
                 
             #################################################### Jettison Cargo:
             if cmd == "jettison":
                 try:
                     cmdLine[2] = self.holyWaterHack(cmdLine[2])
-                    self.drifter.jettison(int(cmdLine[1]),cmdLine[2])
+                    cmdLine[1] = self.drifter.jettison(int(cmdLine[1]),cmdLine[2])
                     return ("Jettisoning {} {}".format(cmdLine[1], cmdLine[2]))
                 except (IndexError, ValueError):
                     return ("?\n\tUsage: 'jettison n item'")
@@ -158,19 +160,21 @@ class CmdLineGame():
             if cmd == "buy" or cmd == "sell":
                 try:
                     cmdLine[2] = self.holyWaterHack(cmdLine[2])
-                    if not self.drifter.shop(cmd,int(cmdLine[1]),cmdLine[2]):
+                    (alive,cmdLine[1]) = self.drifter.shop(cmd,int(cmdLine[1]),cmdLine[2])
+                    if not alive:
                         self.losegame("While trying to make a deal to {} {} {}".
                              format(cmd,cmdLine[1],cmdLine[2])
                             +", you were seized and put to death.")
-                    else: return ("You {} some {}.".format(cmd,cmdLine[2]))
+                    else: return ("You {} {} {}.".format(cmd,cmdLine[1],cmdLine[2]))
                 except (IndexError, ValueError):
                     return ("?\n\tUsage: '{} n item'".format(cmd))
 
             ############################################################ Attack:
             if cmd == "attack":
-                if not self.drifter.harm(self.drifter.sys.attack()):
+                (damDone,damSustained) = self.drifter.sys.attack()
+                if not self.drifter.harm(damDone):
                     self.losegame("Your ship was destroyed in battle.")
-                else: return "You attack!"
+                else: return "You attack for {} damage, while sustaining {} damage.".format(damDone,damSustained)
                     
             ############################################################ Repair:
             #TODO: Use metal at friendly planet. 
@@ -180,19 +184,25 @@ class CmdLineGame():
             if cmd == "refine": #TODO: Planet charges for this service?
                 try:
                     cmdLine[2] = self.holyWaterHack(cmdLine[2])
-                    if not self.drifter.refine(int(cmdLine[1]),cmdLine[2]):
-                        self.losegame("You were caught tresspassing in "
+                    (alive,result) = self.drifter.refine(int(cmdLine[1]),cmdLine[2])
+                    if not alive: self.losegame("You were caught tresspassing in "
                             +  "the refinery, seized, and put to death.")
+                    return "Refining {} {}...\nResult: {}".format(cmdLine[1],cmdLine[2],result)
                 except (IndexError, ValueError):
                     return ("?\n\tUsage: 'refine n item'")
-                return "Refining..."
 
             ############################################################ Gamble:
             if cmd == "gamble":
                 try:
-                    if not self.drifter.gamble(int(cmdLine[1])):
+                    (alive,result,dam) = self.drifter.gamble(int(cmdLine[1]))
+                    if dam > 0: damage = "Another gambler accused you of cheating and attacks for {} damage!".format(dam)
+                    else:       damage = ""
+                    if not alive:
                         self.losegame("Another gambler accused you of cheating."
-                            + ", you have been seized and put to death.")
+                            + " You have been seized and put to death.")
+                    if result == None: return "You make a bet with yourself and win!"
+                    if result < 0: return damage+"You gamble away {} credits!".format(-result)
+                    else:          return damage+"You make a bet for {} and win {}".format(cmdLine[1],result)  
                 except (IndexError, ValueError):
                     return ("?\n\tUsage: 'gamble bet'")
 
@@ -208,7 +218,7 @@ class CmdLineGame():
                 self.drifter.gm()
 
             ####################################################################
-           
+            return "\"{}\" is an invalid command.".format(cmd) # self.do("drift",None)
 
 ########################################################################## MAIN:
 if __name__ == '__main__': CmdLineGame()

@@ -45,7 +45,7 @@ class GuiGame():
         self.name    = name
         self.drifter = Ship.Ship()
         self.command = CmdLineGame(False,self.drifter)
-        self.gfx     = Graphics.Graphics(self.name,self.drifter,self.command.backstory())
+        self.gfx     = Graphics.Graphics(self.name,self.drifter,self.command.backstory()+"\n\n"+self.command.commands())
         self.starChart = None
         if run: self.main() ; pygame.quit()
     def render(self):
@@ -92,7 +92,11 @@ class GuiGame():
                         (result,status) = self.command.do(["harvest"])
 
                 ################################################################
-                if result != None:           self.gfx.txt = result ; self.render()
+                if result != None:
+                    self.gfx.txt = ( result
+                                   + "\n\n" + self.command.listCargo()
+                                   + "\n\n" + self.command.commands() )
+                    self.render()
                 if status == GAME_TERMINATE: return
                 if status != GAME_CONTINUE:  self.drifter.time += 1
 

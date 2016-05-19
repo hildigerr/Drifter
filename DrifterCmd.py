@@ -49,7 +49,6 @@ class CmdLineGame():
         if self.drifter.sys.qt > 0: string += "Perhaps one of these nearby planets has\n"
         else: string += "If you happen upon a solar system with\nplanets, perhaps you may find "
         string += "something interesting.\n"
-        string += "\nIf you are still confused type 'help' at the prompt.\n"
         return string
     def commands(self):
         '''Enumerate available commands into a string.'''
@@ -63,7 +62,7 @@ class CmdLineGame():
                     if attitude == "Friendly":
                         string                    += ", refine, gamble"
                 string                            += ", attack"
-            string                                += ", harvest, depart"
+            string                                += ", harvest"
         elif self.drifter.sys.qt > 0:      string += ", orbit"
         if   len(self.drifter.cargo) > 0:  string += ", jettison"
         string += ", and quit.\n"
@@ -89,7 +88,7 @@ class CmdLineGame():
         else:                return  string
     def main(self):
         ''' Play The Game. '''
-        print(('#' * 80) + "\n" + self.backstory())
+        print(('#' * 80) + "\n" + self.backstory() + "\nIf you are still confused type 'help' at the prompt.\n")
         while True:
             print ("{}\n{}\nScan:{}".format( self.commands(),
                                              self.listCargo(),

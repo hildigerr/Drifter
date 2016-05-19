@@ -210,6 +210,7 @@ class Graphics():
                     self.screen.blit(txt,txt_rect)
                     i += 1
                 i += 1
+        #TODO: Handle potential overflow.
     
         # Draw Current Planet #
         if self.player.sys.pos != None:

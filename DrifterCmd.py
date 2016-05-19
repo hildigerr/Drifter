@@ -80,7 +80,7 @@ class CmdLineGame():
                 int(100*(self.drifter.usedcap/self.drifter.cap)),
                 self.drifter.cargo   )
     def holyWaterHack(self,string): #XXX#
-        ''' XXX Change "Holy" to "Holy Water XXX"'''
+        ''' XXX Change "Holy" to "Holy Water" XXX'''
         if string == "Holy": return "Holy Water"
         else:                return  string
     def main(self):
@@ -94,12 +94,13 @@ class CmdLineGame():
                 cmdLine = raw_input(self.status()+" What will you do? ").split()
                 cmd = cmdLine[0]
             except (EOFError) : continue #cmd = "quit"
-            
-            print ("\n" +('#' * 80))
-            
+            print ("\n" + ('#' * 80) + "\n" + self.do(cmd,cmdLine) )
+            self.drifter.time += 1 #TODO: don't take a turn if cmd is rejected.
+    def do(self,cmd,cmdLine):
+            '''Perform a cmd and Return Result String, if not done.'''
             ############################################################## Help:
             if cmd == "help": #TODO Add command parameter
-                print ("The ship status is described as so:\n\t"
+                return ("The ship status is described as so:\n\t"
                       +"[T:time|D:distance|F:fuel|H:health|$credits]"
                       +"\nWhere time is how many turns have elapsed. "
                       +"Distance is how far from home you\nare. "
@@ -109,7 +110,6 @@ class CmdLineGame():
                       +"[i/n type]{health}[resource,list]"
                       +"\nWhere i is the number of the planet "
                       +"and n is quantity of planets in the system.\n")
-                continue
                 
             ############################################################## Quit:
             if cmd == "quit" or cmd == "exit" or cmd == "q":
@@ -117,42 +117,42 @@ class CmdLineGame():
                 
             ############################################################# Drift:
             if cmd == "drift": #TODO Drifting while under attack is dangerous.
-                print ("You allow the space craft to drift...")
                 if self.drifter.drift(): self.wingame()
+                return ("You allow the space craft to drift...")
                 
             ######################################################### Head Home:
             if cmd == "head":
-                print ("You set the ship autopilot to head home...")
-                print ("You are awakened from chryostasis when the fuel runs out.")
                 if self.drifter.goHome(): self.wingame()
+                return ("You set the ship autopilot to head home..." + "\n"
+                    "You are awakened from chryostasis when the fuel runs out.")
                 
             ########################################################### Harvest:
             if cmd == "harvest":
-                print ("Harvesting...")
                 if not self.drifter.harvest():
-                    self.losegame("You have been slain by the local civilization.")
+                    return self.losegame("You have been slain by the local civilization.")
+                else: return ("Harvesting...")
                 
             ###################################################### Orbit Planet:
             if cmd == "orbit":
                 try:
-                    print ("Entering orbit of planet #{}".format(cmdLine[1]))
                     self.drifter.sys.orbit(int(cmdLine[1])-1)
+                    return ("Entering orbit of planet #{}".format(cmdLine[1]))
                 except (IndexError, ValueError):
-                    print ("?\n\tUsage: 'orbit n'") ; continue
+                    return ("?\n\tUsage: 'orbit n'")
                     
             ##################################################### Depart System:
             if cmd == "depart": #XXX Not Necessary XXX#
-                print ("You leave the {} planet.".format(self.drifter.sys.pos+1))
                 self.drifter.sys.pos = None
+                return ("You leave the {} planet.".format(self.drifter.sys.pos+1))
                 
             #################################################### Jettison Cargo:
             if cmd == "jettison":
                 try:
                     cmdLine[2] = self.holyWaterHack(cmdLine[2])
-                    print ("Jettisoning", cmdLine[1], cmdLine[2])
                     self.drifter.jettison(int(cmdLine[1]),cmdLine[2])
+                    return ("Jettisoning {} {}".format(cmdLine[1], cmdLine[2]))
                 except (IndexError, ValueError):
-                    print ("?\n\tUsage: 'jettison n item'") ; continue
+                    return ("?\n\tUsage: 'jettison n item'")
             
             ####################################################### Buy or Sell:
             if cmd == "buy" or cmd == "sell":
@@ -162,14 +162,15 @@ class CmdLineGame():
                         self.losegame("While trying to make a deal to {} {} {}".
                              format(cmd,cmdLine[1],cmdLine[2])
                             +", you were seized and put to death.")
-                    else: print ("You {} some {}.".format(cmd,cmdLine[2]))
+                    else: return ("You {} some {}.".format(cmd,cmdLine[2]))
                 except (IndexError, ValueError):
-                    print ("?\n\tUsage: '{} n item'".format(cmd)) ; continue
+                    return ("?\n\tUsage: '{} n item'".format(cmd))
 
             ############################################################ Attack:
             if cmd == "attack":
                 if not self.drifter.harm(self.drifter.sys.attack()):
                     self.losegame("Your ship was destroyed in battle.")
+                else: return "You attack!"
                     
             ############################################################ Repair:
             #TODO: Use metal at friendly planet. 
@@ -183,7 +184,8 @@ class CmdLineGame():
                         self.losegame("You were caught tresspassing in "
                             +  "the refinery, seized, and put to death.")
                 except (IndexError, ValueError):
-                    print ("?\n\tUsage: 'refine n item'") ; continue
+                    return ("?\n\tUsage: 'refine n item'")
+                return "Refining..."
 
             ############################################################ Gamble:
             if cmd == "gamble":
@@ -192,21 +194,21 @@ class CmdLineGame():
                         self.losegame("Another gambler accused you of cheating."
                             + ", you have been seized and put to death.")
                 except (IndexError, ValueError):
-                    print ("?\n\tUsage: 'gamble bet'") ; continue
+                    return ("?\n\tUsage: 'gamble bet'")
 
             ############################################################# Craft:
             if cmd == "craft":
                 try:
                     self.drifter.craft(int(cmdLine[1]),cmdLine[2])
                 except (IndexError, ValueError):
-                    print ("?\n\tUsage: 'craft n item'") ; continue
+                    return ("?\n\tUsage: 'craft n item'")
 
             ############################################################### God:
             if cmd == "gm":
                 self.drifter.gm()
 
             ####################################################################
-            self.drifter.time += 1
+           
 
 ########################################################################## MAIN:
 if __name__ == '__main__': CmdLineGame()

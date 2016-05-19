@@ -17,6 +17,8 @@ from Cargo import planetType
 ##################################################################### Constants:
 RAD = 0.0174533 # One Degree Radian
 
+CRED_SYMBOL = u"\u00A2"  # "Cent"
+
 ## Tuning Parameters ##
 SCREEN_SIZE = (WIDTH_FULL, HEIGHT_FULL) = (800,600)
 
@@ -27,7 +29,8 @@ FUEL_GUAGE_OFFSET    =  15.0
 FUEL_GUAGE_LINE_LEN  =  60
 FUEL_GUAGE_LINE_WID  =  2
 DASH_DELTA_TOP_RIGHT = (466,362) # TOP_LEFT-->(351,362)
-SHIELD_STATUS_CENTER = (575,435)
+SHIELD_STATUS_CENTER = (633,465)
+DASH_CREDIT_TOP_LEFT = (624,571)
 
 ############################################################## Helper Functions:
 def load_img(name):
@@ -88,7 +91,8 @@ class PlanetSys():
         self.planetImg["Fire"  ] = load_img("planet002.png")
         self.planetImg["Barren"] = load_img("planet003.png")
         self.stockSolarSystemImg = load_img("star-chart-6.png" )[0]
-        #TODO: May look better to remake star-chart with sun centered at 0,0 
+        #TODO: May look better to remake star-chart with sun centered at 0,0
+        #       I drew it by hand to compare and don't think it would be better.
         self.solarSystemImg = None
     def gen_sys(self,sysInfo):
         self.solarSystemImg = self.stockSolarSystemImg.copy()
@@ -151,9 +155,19 @@ class Graphics():
         #TODO: Write str(self.player.health) over image.
     
         # Display Distance From Home #
-        txt = self.font.render(str(self.player.delta),1,pygame.Color("green"))
+        txt = self.font.render(str(self.player.delta),1,pygame.Color("yellow"))
+        #TODO: Perhaps change color based on distance
         txt_rect = txt.get_rect()
         txt_rect.topright = DASH_DELTA_TOP_RIGHT
+        self.screen.blit(txt,txt_rect)
+    
+        # Display Universal Credits Balance #
+        if self.player.credit < 0:
+            txt = self.font.render(CRED_SYMBOL+str(self.player.credit),1,pygame.Color("red"))
+        else:
+            txt = self.font.render(CRED_SYMBOL+str(self.player.credit),1,pygame.Color("green"))
+        txt_rect = txt.get_rect()
+        txt_rect.topleft = DASH_CREDIT_TOP_LEFT
         self.screen.blit(txt,txt_rect)
     
         # Draw Current Planet #
@@ -169,7 +183,7 @@ class Graphics():
                 self.screen.blit(splash,s_rect)
 
         #save_img(self.screen,self.name)#TODO Do save the img when testing is done!
-		return sol_sys
+        return sol_sys
 
 ############################################################## Main for Testing:
 if __name__ == '__main__':

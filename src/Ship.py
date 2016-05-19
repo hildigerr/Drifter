@@ -9,6 +9,7 @@
 
 import random
 from Planets import System
+from Crafting import Craft, CRAFT_LIST
 
 
 ##################################################################### Constants:
@@ -149,6 +150,23 @@ class Ship():
             (win,damage) = self.sys.planets[self.sys.pos].resource.civ.gamble(bet,self.credit)
             self.credit += win ; return self.harm(damage)
         return STILL_ALIVE
+    def craft(self,amt=0,item=None):
+        '''Craft the items ship's cargo resources.'''
+        if item != None and int(amt) > 0 and item in CRAFT_LIST:
+            Craft.craft(self, self.cargo, item, amt)
+        return 0
+    def gm(self):
+        self.cargo.update({"Dirt":1000})
+        self.cargo.update({"Rocks":1000})
+        self.cargo.update({"Stones":1000})
+        self.cargo.update({"Metal":1000})
+        self.cargo.update({"Gems":1000})
+        self.cargo.update({"Water":1000})
+        self.cargo.update({"Ice":1000})
+        self.cargo.update({"Holy Water":1000})
+        self.cargo.update({"Charcoal":1000})
+        self.cargo.update({"Lava":1000})
+        self.cargo.update({"Obsidian":1000})
             
 
 ############################################################## Main for Testing:

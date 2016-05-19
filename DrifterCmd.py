@@ -194,6 +194,17 @@ class CmdLineGame():
                 except (IndexError, ValueError):
                     print ("?\n\tUsage: 'gamble bet'") ; continue
 
+            ############################################################# Craft:
+            if cmd == "craft":
+                try:
+                    self.drifter.craft(int(cmdLine[1]),cmdLine[2])
+                except (IndexError, ValueError):
+                    print ("?\n\tUsage: 'craft n item'") ; continue
+
+            ############################################################### God:
+            if cmd == "gm":
+                self.drifter.gm()
+
             ####################################################################
             self.drifter.time += 1
 

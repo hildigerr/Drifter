@@ -70,7 +70,7 @@ class System():
         if self.pos != None:
             self.planets[self.pos].health -= random.randint(1, 6)       
             if (self.planets[self.pos].health <= 0):
-                self.planets[self.pos] = Planet(0, DEFAULT_CIV_SPAWN_CHANCE);
+                self.planets[self.pos] = Planet(0, 0);
 
             return self.planets[self.pos].harvest(adj,bonus)
         

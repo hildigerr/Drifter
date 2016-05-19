@@ -1,3 +1,5 @@
 # Ignore Python Stuff
 *.pyc
 src/*.pyc
+*~
+src/*~

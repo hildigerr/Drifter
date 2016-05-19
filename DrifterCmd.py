@@ -26,8 +26,9 @@ GAME_TERMINATE =  1   # The Game Is Completed
 ################################################################################
 class CmdLineGame():
     '''Implements a Command Line version of The Game.'''
-    def __init__(self,run=True):
-        self.drifter = Ship.Ship()
+    def __init__(self,run=True,ship=None):
+        if ship == None: self.drifter = Ship.Ship()
+        else:            self.drifter = ship
         if run: self.main()
     def backstory(self):
         '''Return the backstory string.'''
@@ -141,8 +142,13 @@ class CmdLineGame():
             ###################################################### Orbit Planet:
             if cmd == "orbit":
                 try:
-                    self.drifter.sys.orbit(int(cmdLine[1])-1)
-                    return ("Entering orbit of planet #{}".format(cmdLine[1]),GAME_ACTION)
+                    cmdLine[1] = int(cmdLine[1])-1
+                    (position,origin) = self.drifter.sys.orbit(cmdLine[1])
+                    if position != origin:
+                        if position != None:
+                            return ("Entering orbit of planet #{}".format(cmdLine[1]),GAME_ACTION)
+                        else: return ("Orbit of planet #{} had decayed".format(cmdLine[1]),GAME_ACTION)
+                    else: return ("",GAME_CONTINUE)
                 except (IndexError, ValueError):
                     return ("?\n\tUsage: 'orbit n'",GAME_CONTINUE)
                     

@@ -14,10 +14,9 @@ import pygame
 sys.path.append("src/")
 from src import Ship, Graphics
 
-##################################################################### Constants:
-STASIS_YEARS_MIN = 99
-STASIS_YEARS_MAX = 666
+from DrifterCmd import *
 
+##################################################################### Constants:
 # COMMANDS #
 CMD_QUIT       = pygame.K_q
 CMD_HEAD_HOME  = pygame.K_z
@@ -46,18 +45,17 @@ class GuiGame():
         self.name    = name
         self.drifter = Ship.Ship()
         self.gfx     = Graphics.Graphics(self.name,self.drifter)
+        self.command = CmdLineGame(False,self.drifter)
         self.starChart = None
-        if run: self.main()
+        if run: self.main() ; pygame.quit()
     def render(self):
+        print "DEBUG... Rendering"
         self.gfx.scene_gen(self.starChart) ; pygame.display.flip()
-    def orbit(self,ix):
-        if ix < 1 or ix >= self.drifter.sys.qt: self.drifter.sys.pos = None
-        else:                                   self.drifter.sys.orbit(ix-1)
     def main(self):
         self.render()
         while True:
-            something_happened = False
             for event in pygame.event.get():
+                result = None ; status = GAME_CONTINUE
                 if event.type == pygame.QUIT: return
                 if event.type == pygame.KEYDOWN:
                     cmd = event.key
@@ -67,43 +65,36 @@ class GuiGame():
 
                     ##################################################### Drift:
                     if cmd == CMD_DRIFT:
-                        something_happened = True ; self.starChart = None
-                        print ("You allow the space craft to drift...")
-                        if self.drifter.drift(): pass #self.wingame()
-
+                        self.starChart = None
+                        (result,status) = self.command.do("drift",None)
+                        
                     ################################################# Head Home:
                     if cmd == CMD_HEAD_HOME:
-                        something_happened = True ; self.starChart = None
-                        print ("You set the ship autopilot to head home...")
-                        print ("You are awakened from chryostasis when the fuel runs out.")
-                        if self.drifter.goHome(): pass #self.wingame()
+                        self.starChart = None
+                        (result,status) = self.command.do("head",None)
 
                     ############################################## Orbit Planet:
-                    if cmd == CMD_ORBIT_1: self.orbit(1) ; something_happened = True
-                    if cmd == CMD_ORBIT_2: self.orbit(2) ; something_happened = True
-                    if cmd == CMD_ORBIT_3: self.orbit(3) ; something_happened = True
-                    if cmd == CMD_ORBIT_4: self.orbit(4) ; something_happened = True
-                    if cmd == CMD_ORBIT_5: self.orbit(5) ; something_happened = True
-                    if cmd == CMD_ORBIT_6: self.orbit(6) ; something_happened = True
+                    if cmd == CMD_ORBIT_1: (result,status) = self.command.do("orbit",["orbit","1"])
+                    if cmd == CMD_ORBIT_2: (result,status) = self.command.do("orbit",["orbit","2"])
+                    if cmd == CMD_ORBIT_3: (result,status) = self.command.do("orbit",["orbit","3"])
+                    if cmd == CMD_ORBIT_4: (result,status) = self.command.do("orbit",["orbit","4"])
+                    if cmd == CMD_ORBIT_5: (result,status) = self.command.do("orbit",["orbit","5"])
+                    if cmd == CMD_ORBIT_6: (result,status) = self.command.do("orbit",["orbit","6"])
 
                     ############################################# Depart System:
-                    if cmd == CMD_DEPART:  self.orbit(0) ; something_happened = True
+                    if cmd == CMD_DEPART:  (result,status) = self.command.do("depart",None)
                     
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     (x,y) = event.pos
                     
                     ################################################### Harvest:
                     if x <= CMD_HARVEST_X and y <= CMD_HARVEST_Y:
-                        something_happened = True
-                        print ("Harvesting...")
-                        if not self.drifter.harvest():
-                            pass #self.losegame("You have been slain by the local civilization.")
+                        (result,status) = self.command.do("harvest",None)
 
                 ################################################################
-                if something_happened:
-                    self.drifter.time += 1 ; self.render()
-        pygame.quit()
-
+                if result != None:           print (result) ; self.render()
+                if status == GAME_TERMINATE: return
+                if status != GAME_CONTINUE:  self.drifter.time += 1
 
 ########################################################################## MAIN:
 if __name__ == '__main__': GuiGame()#time.asctime())

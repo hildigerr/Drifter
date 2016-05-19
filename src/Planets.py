@@ -52,7 +52,10 @@ class System():
                            Planet( random.randint(0,planetTypeQt), civ_chance) )
         self.pos = None
     def orbit(self,idx):
+        origin = self.pos
         if(( idx >= 0 )and( idx < self.qt )): self.pos = idx
+        else: self.pos = None
+        return (self.pos,origin)
     def scan(self):
         string = ""
         if self.pos != None:

@@ -66,30 +66,30 @@ class GuiGame():
                     ##################################################### Drift:
                     if cmd == CMD_DRIFT:
                         self.starChart = None
-                        (result,status) = self.command.do("drift",None)
+                        (result,status) = self.command.do(["drift"])
                         
                     ################################################# Head Home:
                     if cmd == CMD_HEAD_HOME:
                         self.starChart = None
-                        (result,status) = self.command.do("head",None)
+                        (result,status) = self.command.do(["head"])
 
                     ############################################## Orbit Planet:
-                    if cmd == CMD_ORBIT_1: (result,status) = self.command.do("orbit",["orbit","1"])
-                    if cmd == CMD_ORBIT_2: (result,status) = self.command.do("orbit",["orbit","2"])
-                    if cmd == CMD_ORBIT_3: (result,status) = self.command.do("orbit",["orbit","3"])
-                    if cmd == CMD_ORBIT_4: (result,status) = self.command.do("orbit",["orbit","4"])
-                    if cmd == CMD_ORBIT_5: (result,status) = self.command.do("orbit",["orbit","5"])
-                    if cmd == CMD_ORBIT_6: (result,status) = self.command.do("orbit",["orbit","6"])
+                    if cmd == CMD_ORBIT_1: (result,status) = self.command.do(["orbit","1"])
+                    if cmd == CMD_ORBIT_2: (result,status) = self.command.do(["orbit","2"])
+                    if cmd == CMD_ORBIT_3: (result,status) = self.command.do(["orbit","3"])
+                    if cmd == CMD_ORBIT_4: (result,status) = self.command.do(["orbit","4"])
+                    if cmd == CMD_ORBIT_5: (result,status) = self.command.do(["orbit","5"])
+                    if cmd == CMD_ORBIT_6: (result,status) = self.command.do(["orbit","6"])
 
                     ############################################# Depart System:
-                    if cmd == CMD_DEPART:  (result,status) = self.command.do("depart",None)
+                    if cmd == CMD_DEPART:  (result,status) = self.command.do(["depart"])
                     
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     (x,y) = event.pos
                     
                     ################################################### Harvest:
                     if x <= CMD_HARVEST_X and y <= CMD_HARVEST_Y:
-                        (result,status) = self.command.do("harvest",None)
+                        (result,status) = self.command.do(["harvest"])
 
                 ################################################################
                 if result != None:           print (result) ; self.render()

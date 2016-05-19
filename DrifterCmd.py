@@ -96,14 +96,14 @@ class CmdLineGame():
                                              self.drifter.sys.scan() ))
             try:
                 cmdLine = raw_input(self.status()+" What will you do? ").split()
-                cmd = cmdLine[0]
-            except (EOFError) : cmd = "quit" # CTRL-D Quits
-            (output,status) = self.do(cmd,cmdLine)
+            except (EOFError) : cmdLine[0] = "quit" # CTRL-D Quits
+            (output,status) = self.do(cmdLine)
             print ("\n" + ('#' * 80) + "\n" + output)
             if status == GAME_TERMINATE: sys.exit(0) 
             if status != GAME_CONTINUE:  self.drifter.time += 1
-    def do(self,cmd,cmdLine):
+    def do(self,cmdLine):
             '''Perform a cmd and Return Result String and status.'''
+            cmd = cmdLine[0]
             ############################################################## Help:
             if cmd == "help": #TODO Add command parameter
                 return ("The ship status is described as so:\n\t"

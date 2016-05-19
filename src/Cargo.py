@@ -79,6 +79,9 @@ PRICE_LOCAL_MAX =              10 # Maximum base price for local resources  #
 PRICE_FOREIGN_MIN =            10 # Minimum base price for remote resources # 
 PRICE_FOREIGN_MAX =            20 # Maximum base price for remote resources #
 
+GEM_FLUX_LOW  =                 2 # Multipliers for Gem prices              #
+GEM_FLUX_HIGH =                 5 
+
 CIV_DAM_MIN =                  10 # Minimum damage done by civ defenses     # 
 CIV_DAM_MAX =                  33 # Maximum damage done by civ defenses     # 
 PLAYER_BASE_DAM_MIN =           3 # Base Minimum damage done by player      #
@@ -91,6 +94,7 @@ class Civilization():
     fiendlyMin -- Minimum attitude for civilization to remain friendly.
     enemyMax   -- Civilization will be hostile until attitude reaches this max.
     ty         -- Host planet type index.
+    price      -- Prices of available resources for trade.
     '''
     def __init__(self,ty,fri=ATTITUDE_FRIEND_MIN_DEFAULT,foe=ATTITUDE_ENEMY_MAX_DEFAULT):
         self.fiendlyMin = fri ; self.enemyMax = foe ; self.ty = ty
@@ -98,8 +102,11 @@ class Civilization():
         self.price = {}
         for i in range (len(resourceType[self.ty])):
             self.price[resourceType[self.ty][i]] = random.randint(PRICE_LOCAL_MIN,PRICE_LOCAL_MAX)
+        self.price.pop("Nothing",None)
+        self.price["Gems"] = random.randint(PRICE_FOREIGN_MIN*GEM_FLUX_LOW,PRICE_FOREIGN_MAX*GEM_FLUX_HIGH)
+        #TODO: if "Gems" not in local resources: else use PRICE_LOCAL_ * GEM_FLUX_
+        self.price["Fuel"] = random.randint(PRICE_FOREIGN_MIN,PRICE_LOCAL_MAX)
         #TODO: Add remote resources for trade, with higher prices by default
-        #      Everyone should buy/sell Gems.
     def Attitude(self,op=0):
         ''' Returns attitude string, and/or optionally modifies attitude.'''
         self.attitude += op
@@ -116,7 +123,7 @@ class Civilization():
                   adj -= random.randint(ATTITUDE_PRICE_ADJ_MIN,ATTITUDE_PRICE_ADJ_MAX)
             else: adj += random.randint(ATTITUDE_PRICE_ADJ_MIN,ATTITUDE_PRICE_ADJ_MAX)
             self.price[keys[i]] += adj
-        #TODO: Remove or Add random foreign resources for trade
+        #TODO: Remove or Add random foreign resources for trade, except "Gems"
     def attack(self,dam):
         self.attitude -= random.randint(1,ATTITUDE_ANGER_RAND_MAX) * random.randint(1,dam) #TODO Tune
         if self.attitude < 0: self.attitude = 0

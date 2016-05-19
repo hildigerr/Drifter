@@ -68,7 +68,8 @@ class System():
             string += '{' + str(self.planets[self.pos].health)        + '}'
             if self.planets[self.pos].resource.civ != None:
                 string += '{' + str(self.planets[self.pos].resource.civ.attitude) + '}'
-            string +=       str(self.planets[self.pos].resource.res)
+                string += str(self.planets[self.pos].resource.civ.price)
+            else: string += str(self.planets[self.pos].resource.res)
         else: string += "[0/{}]".format(self.qt)
         return string
     def harvest(self,adj=0,bonus=0):

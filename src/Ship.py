@@ -17,8 +17,8 @@ MAX_PLANETS = 6
 INIT_CARGO_CAP = 100
 
 # Starting Money #
-INIT_CREDIT_MIN = 0 # Or Debt!
-INIT_CREDIT_MAX = 100
+INIT_CREDIT_MIN = -100 # Or Debt!
+INIT_CREDIT_MAX =  100
 
 # Starting Fuel #
 INIT_FUEL_MIN = 0
@@ -97,7 +97,7 @@ class Ship():
             for i in range (len(res_keys)):
                 if res_keys[i] == "Nothing": continue
                 if res_keys[i] == "Damage":
-                    if not self.harm(result['Damage']): return False # Died #
+                    if not self.harm(result['Damage']): return (False,None) # Died #
                 elif res_keys[i] == "Fuel": self.fuelerize(result['Fuel'])
                 else: self.load(result[res_keys[i]],res_keys[i])
         return (STILL_ALIVE,result)

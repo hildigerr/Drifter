@@ -14,7 +14,9 @@ from Cargo import Resource, planetTypeQt, DEFAULT_CIV_SPAWN_CHANCE
 
 ##################################################################### Constants:
 MAX_BASE_CHANCE = 66
-MIN_HEALTH = 25
+MIN_HEALTH      = 25
+HARVEST_DAM_MIN =  1
+HARVEST_DAM_MAX =  6
 
 ################################################################## Planet Class:
 class Planet():
@@ -62,7 +64,7 @@ class System():
             string += "[{}/{} ".format(self.pos+1,self.qt)
             if self.planets[self.pos].resource.civ != None:
                 string += "Civilized " + self.planets[self.pos].resource.civ.Attitude() + ' '
-            string +=       self.planets[self.pos].resource.type     + ']'
+            string +=       self.planets[self.pos].resource.kind      + ']'
             string += '{' + str(self.planets[self.pos].health)        + '}'
             if self.planets[self.pos].resource.civ != None:
                 string += '{' + str(self.planets[self.pos].resource.civ.attitude) + '}'
@@ -71,12 +73,12 @@ class System():
         return string
     def harvest(self,adj=0,bonus=0):
         if self.pos != None:
-            self.planets[self.pos].health -= random.randint(1, 6)       
-            if (self.planets[self.pos].health <= 0):
-                self.planets[self.pos] = Planet(0, 0);
-
-            return self.planets[self.pos].harvest(adj,bonus)
-        
+            planet = self.planets[self.pos] ; result = planet.harvest(adj,bonus)
+            planet.health -= random.randint(HARVEST_DAM_MIN,HARVEST_DAM_MAX)
+            if planet.health <= 0:
+                if planet.resource.civ == None: self.planets[self.pos] = Planet(0, 0);
+                else: self.planets[self.pos] = Planet(planet.resource.ty, 0);
+            return result
         else: return None #TODO: Solar scoop? gain fuel without leaving system.
     def buy(self,item):
         if self.pos == None: return 0 #TODO: Trade with other ships

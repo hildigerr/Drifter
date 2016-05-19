@@ -137,7 +137,7 @@ class CmdLineGame():
             if cmd == "harvest":
                 (alive,result) = self.drifter.harvest()
                 if not alive: self.losegame("The local population rise against you and destroy the ship.")
-                else: return ("Harvesting...\nFound: {}".format(result),GAME_ACTION)
+                else: return ("Harvesting...\n\nFound: {}".format(result),GAME_ACTION)
                 
             ###################################################### Orbit Planet:
             if cmd == "orbit":
@@ -200,7 +200,7 @@ class CmdLineGame():
                     (alive,result) = self.drifter.refine(int(cmdLine[1]),cmdLine[2])
                     if not alive: self.losegame("You were caught tresspassing in "
                             +  "the refinery, seized, and put to death.")
-                    return ("Refining {} {}...\nResult: {}".format(cmdLine[1],cmdLine[2],result),GAME_ACTION)
+                    return ("Refining {} {}...\n\nResult: {}".format(cmdLine[1],cmdLine[2],result),GAME_ACTION)
                 except (IndexError, ValueError):
                     return ("?\n\tUsage: 'refine n item'",GAME_CONTINUE)
 

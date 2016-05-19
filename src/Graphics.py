@@ -113,7 +113,7 @@ class PlanetSys():
             x = CHART_RING_INNER_LOC_X + i*CHART_RING_DELTA_AVG
             y = CHART_RING_MIDDLE_Y
             #TODO: Randomize location, ensure stagger, follow ellipse
-            img = self.planetImg[sysInfo.planets[i].resource.type][0].copy()
+            img = self.planetImg[sysInfo.planets[i].resource.kind][0].copy()
             img = pygame.transform.scale(img,CHART_PLANET_SCALE)
             img_rect = img.get_rect()
             img_rect.center = (x,y)
@@ -214,7 +214,7 @@ class Graphics():
         # Draw Current Planet #
         if self.player.sys.pos != None:
             planet = self.player.sys.planets[self.player.sys.pos]
-            kind   = planet.resource.type
+            kind   = planet.resource.kind
             (splash,s_rect) = self.sys.planetImg.get(kind,"Barren")
             s_rect.center = (0,0)
             self.screen.blit(splash,s_rect)

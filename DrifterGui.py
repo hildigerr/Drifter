@@ -52,7 +52,7 @@ class GuiGame():
         self.gfx.scene_gen(self.starChart) ; pygame.display.flip()
     def orbit(self,ix):
         if ix < 1 or ix >= self.drifter.sys.qt: self.drifter.sys.pos = None
-        else:                                   self.drifter.sys.orbit(ix)
+        else:                                   self.drifter.sys.orbit(ix-1)
     def main(self):
         self.render()
         while True:

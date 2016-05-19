@@ -32,6 +32,12 @@ DASH_DELTA_TOP_RIGHT = (466,362) # TOP_LEFT-->(351,362)
 SHIELD_STATUS_CENTER = (633,465)
 DASH_CREDIT_TOP_LEFT = (624,571)
 
+## Star Chart Properties ##
+CHART_RING_INNER_LOC_X =  311
+CHART_RING_DELTA_AVG   =   90  #94+92+94+90+82
+CHART_RING_MIDDLE_Y    =  300
+CHART_PLANET_SCALE     = (95,95)
+
 ############################################################## Helper Functions:
 def load_img(name):
     '''
@@ -80,7 +86,6 @@ def get_fuel_line_end(qt):
     return tuple(map(op.add, FUEL_GUAGE_START_LOC, (x,y)))
 
 ##################################################################### PlanetSys:
-#TODO
 class PlanetSys():
     #TODO: Have muliple planet images of each kind and randomize selection.
     #TODO: Rotate the spheres randomly to simulate time passing in orbit.
@@ -96,7 +101,15 @@ class PlanetSys():
         self.solarSystemImg = None
     def gen_sys(self,sysInfo):
         self.solarSystemImg = self.stockSolarSystemImg.copy()
-        #TODO: Draw planets.
+        for i in range (0, sysInfo.qt):
+            x = CHART_RING_INNER_LOC_X + i*CHART_RING_DELTA_AVG
+            y = CHART_RING_MIDDLE_Y
+            #TODO: Randomize location, ensure stagger, follow ellipse
+            img = self.planetImg[sysInfo.planets[i].resource.type][0].copy()
+            img = pygame.transform.scale(img,CHART_PLANET_SCALE)
+            img_rect = img.get_rect()
+            img_rect.center = (x,y)
+            self.solarSystemImg.blit(img,img_rect)
         return self.solarSystemImg
 
 ############################################################### ShieldIndicator:
@@ -152,11 +165,14 @@ class Graphics():
         (splash, splash_rect) = self.sh.get(self.player.health)
         splash_rect.center = SHIELD_STATUS_CENTER
         self.screen.blit(splash,splash_rect)
-        #TODO: Write str(self.player.health) over image.
+        txt = self.font.render(str(self.player.health),1,pygame.Color("black"))
+        txt_rect = txt.get_rect()
+        txt_rect.center = SHIELD_STATUS_CENTER
+        self.screen.blit(txt,txt_rect)
     
         # Display Distance From Home #
         txt = self.font.render(str(self.player.delta),1,pygame.Color("yellow"))
-        #TODO: Perhaps change color based on distance
+        #TODO: Perhaps change color based on distance?
         txt_rect = txt.get_rect()
         txt_rect.topright = DASH_DELTA_TOP_RIGHT
         self.screen.blit(txt,txt_rect)
@@ -187,6 +203,6 @@ class Graphics():
 
 ############################################################## Main for Testing:
 if __name__ == '__main__':
-    scene_gen( "Testing", Ship.Ship(), pygame.display.set_mode(SCREEN_SIZE) )    
+    scene_gen( "Testing", Ship.Ship() )    
     # pygame.display.flip()
     pygame.quit()

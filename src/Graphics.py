@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 ################################################################################
 #                                                                              #
@@ -67,13 +67,14 @@ def save_img(me,name):
     Parameters:
         me: The image to be saved.
         name: The name of the directory to save the image in.
-     The image will be saved as dat/name/timestamp.png
+     The image will be saved as dat/name/latest.png
     '''
     name = os.path.join("dat",name)
     if not os.path.exists(name): os.makedirs(name)
-    name = os.path.join(name,time.asctime())
-    pygame.image.save(me,name+".png")
-    
+    fileName = os.path.join(name,'latest.png')
+    pygame.image.save(me,fileName)
+    return fileName
+
 def get_fuel_line_end(qt):
     '''
     Function: get_fuel_line_end
@@ -122,7 +123,7 @@ class PlanetSys():
 
 ############################################################### ShieldIndicator:
 class ShieldIndicator():
-    def __init__(self):                                 #  STATUS  # 
+    def __init__(self):                                 #  STATUS  #
         self.images = [load_img("shield-red.png"),      #  0 - 29  #
                        load_img("shield-orange.png"),   # 30 - 49  #
                        load_img("shield-yellow.png"),   # 50 - 69  #
@@ -143,7 +144,8 @@ class Graphics():
     '''
     def __init__(self,name,player,backstory=None):
         self.screen = pygame.display.set_mode(SCREEN_SIZE)
-        self.name = name ; self.player = player
+        self.name = name
+        self.player = player
         self.sh = ShieldIndicator()
         self.sys = PlanetSys()
         self.txt = backstory
@@ -167,11 +169,11 @@ class Graphics():
               self.screen.blit(self.sys.solarSystemImg,self.sys.solarSystemImg.get_rect())
         else: self.screen.blit(self.bg,self.bg_rect)
         self.screen.blit(self.db,self.db_rect) # Draw the Dashboard #
-        
+
         # Draw Fuel Gauge Indicator #
-        pygame.draw.line(self.screen, pygame.Color("red"), 
+        pygame.draw.line(self.screen, pygame.Color("red"),
             FUEL_GUAGE_START_LOC, get_fuel_line_end(self.player.fuel), FUEL_GUAGE_LINE_WID)
-    
+
         # Draw Shield Status Indicator #
         (splash, splash_rect) = self.sh.get(self.player.health)
         splash_rect.center = SHIELD_STATUS_CENTER
@@ -180,14 +182,14 @@ class Graphics():
         txt_rect = txt.get_rect()
         txt_rect.center = SHIELD_STATUS_CENTER
         self.screen.blit(txt,txt_rect)
-    
+
         # Display Distance From Home #
         txt = self.font.render(str(self.player.delta),1,pygame.Color("yellow"))
         #TODO: Perhaps change color based on distance?
         txt_rect = txt.get_rect()
         txt_rect.topright = DASH_DELTA_TOP_RIGHT
         self.screen.blit(txt,txt_rect)
-    
+
         # Display Universal Credits Balance #
         if self.player.credit < 0:
             txt = self.font.render(CRED_SYMBOL+str(self.player.credit),1,pygame.Color("red"))
@@ -196,10 +198,10 @@ class Graphics():
         txt_rect = txt.get_rect()
         txt_rect.topleft = DASH_CREDIT_TOP_LEFT
         self.screen.blit(txt,txt_rect)
-    
+
         # Display Text on Ship Console #
         if self.txt != None:
-            print self.txt
+            print(self.txt)
             i = 0 ; size = self.term.get_linesize()
             for line in self.txt.split("\n\n"):
                 for txt in chunkstring(line,TERM_CHAR_WIDTH):
@@ -211,7 +213,7 @@ class Graphics():
                     i += 1
                 i += 1
         #TODO: Handle potential overflow.
-    
+
         # Draw Current Planet #
         if self.player.sys.pos != None:
             planet = self.player.sys.planets[self.player.sys.pos]
@@ -224,11 +226,11 @@ class Graphics():
                 s_rect.center = (0,0)
                 self.screen.blit(splash,s_rect)
 
-        #save_img(self.screen,self.name)#TODO Do save the img when testing is done!
-        return sol_sys
+        return save_img(self.screen,self.name)#TODO Do save the img when testing is done!
+        #return sol_sys
 
 ############################################################## Main for Testing:
 if __name__ == '__main__':
-    scene_gen( "Testing", Ship.Ship() )    
+    scene_gen( "Testing", Ship.Ship() )
     # pygame.display.flip()
     pygame.quit()

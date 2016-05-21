@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python
 ################################################################################
 #                                                                              #
 # DrifterCmd.py -- The Command Line Game Implementation                        #
@@ -98,7 +98,7 @@ class CmdLineGame():
             except (EOFError) : cmdLine[0] = "quit" # CTRL-D Quits
             (output,status) = self.do(cmdLine)
             print ("\n" + ('#' * 80) + "\n" + output)
-            if status == GAME_TERMINATE: sys.exit(0) 
+            if status == GAME_TERMINATE: sys.exit(0)
             if status != GAME_CONTINUE:  self.drifter.time += 1
     def do(self,cmdLine):
             '''Perform a cmd and Return Result String and status.'''
@@ -114,35 +114,35 @@ class CmdLineGame():
                       +"\n\nThe planet scan is described as so:\n\t"
                       +"[i/n type]{health}[resource,list]"
                       +"\nWhere i is the number of the planet "
-                      +"and n is quantity of planets in the system.\n", 
+                      +"and n is quantity of planets in the system.\n",
                       GAME_CONTINUE)
-                
+
             ############################################################## Quit:
             if cmd == "quit" or cmd == "exit" or cmd == "q":
                 return self.losegame("\tSELF DESTRUCT SEQUENCE ACTIVATED!")
-                                
+
             ############################################################# Drift:
             if cmd == "drift": #TODO Drifting while under attack is dangerous.
                 if self.drifter.drift(): return self.wingame()
                 return ("The space craft is allowed to drift into another solar system...",GAME_ACTION)
-                
+
             ######################################################### Head Home:
             if cmd == "head":
                 if self.drifter.goHome(): return self.wingame()
                 return ("The ship autopilot is set to head home..." + "\n\n"
                     "You are awakened from chryostasis when the fuel runs out.",GAME_ACTION)
-                
+
             ########################################################### Harvest:
             if cmd == "harvest":
                 (alive,result) = self.drifter.harvest()
                 if not alive: self.losegame("The local population rise against you and destroy the ship.")
                 else: return ("Harvesting...\n\nFound: {}".format(result),GAME_ACTION)
-                
+
             ###################################################### Orbit Planet:
             if cmd == "orbit":
                 try:
-                    cmdLine[1] = int(cmdLine[1])-1
-                    (position,origin) = self.drifter.sys.orbit(cmdLine[1])
+                    planetNum = int(cmdLine[1]) - 1
+                    (position,origin) = self.drifter.sys.orbit(planetNum)
                     if position != origin:
                         if position != None:
                             return ("Entering orbit of planet #{}".format(cmdLine[1]),GAME_ACTION)
@@ -150,14 +150,14 @@ class CmdLineGame():
                     else: return ("",GAME_CONTINUE)
                 except (IndexError, ValueError):
                     return ("?\n\tUsage: 'orbit n'",GAME_CONTINUE)
-                    
+
             ##################################################### Depart System:
             if cmd == "depart": #XXX Not Necessary && Costs Travel Time XXX#
                 old = self.drifter.sys.pos
                 if old != None: old+=1
                 self.drifter.sys.pos = None
                 return ("You leave the {} planet.".format(old),GAME_ACTION)
-                
+
             #################################################### Jettison Cargo:
             if cmd == "jettison":
                 try:
@@ -166,7 +166,7 @@ class CmdLineGame():
                     return ("Jettisoning {} {}".format(cmdLine[1], cmdLine[2]),GAME_ACTION)
                 except (IndexError, ValueError):
                     return ("?\n\tUsage: 'jettison n item'",GAME_CONTINUE)
-            
+
             ####################################################### Buy or Sell:
             if cmd == "buy" or cmd == "sell":
                 try:
@@ -187,9 +187,9 @@ class CmdLineGame():
                     self.losegame("Your ship was destroyed in battle.")
                 return ("You attack for {} damage, while sustaining {} damage.".
                         format(damDone,damSustained),GAME_ACTION)
-                    
+
             ############################################################ Repair:
-            #TODO: Use metal at friendly planet. 
+            #TODO: Use metal at friendly planet.
             #      Not 1:1, and probably not random either. Tunable.
 
             ############################################################ Refine:

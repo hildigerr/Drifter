@@ -1,5 +1,5 @@
 #Standard Python libs
-import collections, configparser, os, pickle, sys
+import collections, configparser, os, pickle, sqlite3, sys
 
 #Site-libs
 import tweepy
@@ -69,11 +69,11 @@ class Twitter(object):
                 #Add datetime comparison here
                 if tweets[t.user.screen_name][1] < t.created_at:
                     print('Overwriting old tweet from %s' % t.user.screen_name)
-                    tweets[t.user.screen_name] = [t.text, t.created_at, t.id, False]
+                    tweets[t.user.screen_name] = [t.text, t.created_at, False]
                 else:
                     continue
 
-            tweets[t.user.screen_name] = [t.text, t.created_at, t.id, False]
+            tweets[t.user.screen_name] = [t.text, t.created_at, False]
 
 
         for t in tweets:
@@ -126,6 +126,22 @@ class Twitter(object):
                 rawVotes[t[1]] = 1
 
         return sorted(rawVotes.items(), key=lambda t: t[1])[:5]
+
+    def top5ToString(self, top5):
+        msg = 'Top 5 Votes:\n\n'
+
+        for t in top5:
+            msg += '"' + t[0] + '" - Votes: ' + str(t[1]) + '\n\n'
+
+        if msg == 'Top 5 Votes:\n\n':
+            msg = 'No votes submitted this round. Craft will drift into space...\n\n'
+
+        return msg
+
+    def setSuccess(self, winningTweet):
+        for t in self.cleanTweets:
+            if t[1] == winningTweet:
+                t[3] = True
 
     def resetTweets(self):
         self.rawTweets = []

@@ -24,15 +24,21 @@ with con:
     cur = con.cursor()
 
     cur.executescript("""
-        DRO  P TABLE IF EXISTS Player;
-        CREATE TABLE Player(Id INT, Name TEXT, Message TEXT, Success INT, Total INT);
+        DROP TABLE IF EXISTS Player;
+        CREATE TABLE Player(id INTEGER primary key autoincrement, Name TEXT, Success INT, Total INT, TotalDay INT, LastDay TEXT);
 
-        Insert Into Player VALUES(1, '@MrBot', 'goto A', 2, 10);
-        Insert Into Player VALUES(2, '@Driller', 'goto A', 2, 4);
-        Insert Into Player VALUES(3, '@Destroyer', 'goto B', 1, 5);
-        Insert Into Player VALUES(4, '@Player4', 'goto C', 3, 10);
-        Insert Into Player VALUES(5, '@Player5', 'goto A', 5, 20);
-        Insert Into Player VALUES(6, '@Player6', 'goto K', 2, 3);
+        Insert Into Player (Name, Success, Total, TotalDay, LastDay) VALUES('@MrBot', 2, 10, 4, '05/24/16');
+        Insert Into Player (Name, Success, Total, TotalDay, LastDay) VALUES('@Driller', 3, 11, 1, '05/24/16');
+        Insert Into Player (Name, Success, Total, TotalDay, LastDay) VALUES('@Destroyer', 1, 10, 2, '05/23/16');
+        Insert Into Player (Name, Success, Total, TotalDay, LastDay) VALUES('@Player4', 2, 10, 4, '05/24/16');
+        Insert Into Player (Name, Success, Total, TotalDay, LastDay) VALUES('@Player2', 1, 17, 5, '05/25/16');
         """)
     con.commit()
 con.close()
+
+
+        # Insert Into Player VALUES(2, '@Driller', 'goto A', 2, 4);
+        # Insert Into Player VALUES(3, '@Destroyer', 'goto B', 1, 5);
+        # Insert Into Player VALUES(4, '@Player4', 'goto C', 3, 10);
+        # Insert Into Player VALUES(5, '@Player5', 'goto A', 5, 20);
+        # Insert Into Player VALUES(6, '@Player6', 'goto K', 2, 3);

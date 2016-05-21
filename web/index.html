@@ -4,11 +4,14 @@
 <html>
 <head>
 	<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>SPACE DRIFT</title>
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-    <link href="css/main.css" rel="stylesheet" type="text/css">	
+    <link href="css/main.css" rel="stylesheet" type="text/css">
+    <link href="css/bootstrap-lightbox.min.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript"> src="css/bootstrap-lightbox.min.js"</script>
 </head>		
 
 <body>
@@ -25,72 +28,104 @@
         </div>
         
         <h2>Story</h2>
-        <p>The last thing you remember before awaking from chryostasis, is the captain being decapitated by some flying debris. There was a battle. You don't know if the enemy was destroyed, but obviously your ship is intact. The onboard computer reports that you have been in stasis for 345 years. The ship has been drifting the entire time.
+        <p>The last thing you remember before awaking from chryostasis, is the captain being decapitated by some flying debris. There was a battle. You don't know if the enemy was destroyed, but obviously your ship is intact. The onboard computer reports that you have been in stasis for <b>345</b> years. The ship has been drifting the entire time.
         <br><br>
-        You are 81000 light years from home, but the solar sails are functional.
+        You are <b>81000</b> light years from home, but the solar sails are functional.
         <br><br>
         You may return to stasis and allow the ship to drift at any time. Or, if you have fuel, you can head toward home. Perhaps one of these nearby planets has something interesting.</p>
         
         <br><br><br>
-        
+
+        <!-- Displaying thumbnails -->
+        <h2>Status</h2>
+        <div class="row">
+            <div class="col-xs-12 col-md-4">
+                <a href="image/Thu May 19 14:01:35 2016.png" class="thumbnail"><img src="image/Thu May 19 14:01:35 2016.png" alt="First Image" id="imagelightbox"></a>
+            </div>
+            <div class="col-xs-12 col-md-4">
+                <a href="image/Thu May 19 14:01:35 2016.png" class="thumbnail"><img src="image/Thu May 19 14:01:35 2016.png" alt="First Image"></a>
+            </div>
+            <div class="col-xs-12 col-md-4">
+                <a href="image/Thu May 19 14:01:35 2016.png" class="thumbnail"><img src="image/Thu May 19 14:01:35 2016.png" alt="First Image"></a>
+            </div>
+        </div>
+
+
+        <!-- <div id="demoLightbox" class="lightbox hide fade"  tabindex="-1" role="dialog" aria-hidden="true">
+            <div class='lightbox-content'>
+                <img src="image/Thu May 19 14:01:35 2016.png">
+                <div class="lightbox-caption"><p>Your caption here</p></div>
+            </div>
+        </div> -->
+
+        <div class="example">
+            <ul class="thumbnails">
+                <li class="span2">
+                    <a data-toggle="lightbox" href="#demoLightbox" class="thumbnail">
+                        <img src="image/Thu May 19 14:01:35 2016.png" alt="Click to view the lightbox">
+                    </a>
+                </li>
+            </ul>
+            <div id="demoLightbox" class="lightbox hide fade"  tabindex="-1" role="dialog" aria-hidden="true">
+                <div class='lightbox-content'>
+                    <img src="image/Thu May 19 14:01:35 2016.png">
+                    <div class="lightbox-caption"><p>Your caption here</p></div>
+                </div>
+            </div>
+        </div>
+
+        <br><br><br>
+
         <h2>Result</h2>
 
         <!-- Important Table -->
         <table class="table table-striped table-hover">
             <tr>
-                <th>#</th>
                 <th>User Name</th>
-                <th>Date &amp; Time</th>
                 <th>Success</th>
-                <th>Success Total</th>
+                <th>Total Tweets</th>
+                <th>Day Play</th>
+                <th>Last Day Play</th>
             </tr>
 		
 			<tr>
+                <td id="@Driller">@Driller</td>
+                <td>3</td>
+                <td>11</td>
                 <td>1</td>
-                <td>@MrBot</td>
-                <td>goto A</td>
+                <td>05/24/16</td>
+            </tr>
+            
+			<tr>
+                <td id="@MrBot">@MrBot</td>
                 <td>2</td>
                 <td>10</td>
-            </tr>
-            
-			<tr>
-                <td>2</td>
-                <td>@Driller</td>
-                <td>goto A</td>
-                <td>2</td>
                 <td>4</td>
+                <td>05/24/16</td>
             </tr>
             
 			<tr>
-                <td>3</td>
-                <td>@Destroyer</td>
-                <td>goto B</td>
-                <td>1</td>
-                <td>5</td>
-            </tr>
-            
-			<tr>
-                <td>4</td>
-                <td>@Player4</td>
-                <td>goto C</td>
-                <td>3</td>
+                <td id="@Player4">@Player4</td>
+                <td>2</td>
                 <td>10</td>
+                <td>4</td>
+                <td>05/24/16</td>
             </tr>
             
 			<tr>
-                <td>5</td>
-                <td>@Player5</td>
-                <td>goto A</td>
-                <td>5</td>
-                <td>20</td>
-            </tr>
-            
-			<tr>
-                <td>6</td>
-                <td>@Player6</td>
-                <td>goto K</td>
+                <td id="@Destroyer">@Destroyer</td>
+                <td>1</td>
+                <td>10</td>
                 <td>2</td>
-                <td>3</td>
+                <td>05/23/16</td>
+            </tr>
+            
+			<tr>
+                <td id="@Player2">@Player2</td>
+                <td>1</td>
+                <td>17</td>
+                <td>5</td>
+                <td>05/25/16</td>
             </tr>
             
 	   </table>
@@ -99,8 +134,9 @@
     <div class="emptyBot"></div>
     <footer>
         <h3>Twitter Bot---></h3>
-    </footer>    
-    
-</body>    
+    </footer> 
+</body>
+
+
 </html>
 	

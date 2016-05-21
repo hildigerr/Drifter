@@ -6,7 +6,7 @@ con = lite.connect('tweet.db')
 
 with con:
 	cur = con.cursor()
-	cur.execute("SELECT * FROM Player")
+	cur.execute("SELECT * FROM Player ORDER BY Success DESC")
 
 	rows = cur.fetchall()
 
@@ -22,6 +22,7 @@ with con:
 <html>
 <head>
 	<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>SPACE DRIFT</title>
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
@@ -43,9 +44,9 @@ with con:
         </div>
         
         <h2>Story</h2>
-        <p>The last thing you remember before awaking from chryostasis, is the captain being decapitated by some flying debris. There was a battle. You don't know if the enemy was destroyed, but obviously your ship is intact. The onboard computer reports that you have been in stasis for 345 years. The ship has been drifting the entire time.
+        <p>The last thing you remember before awaking from chryostasis, is the captain being decapitated by some flying debris. There was a battle. You don't know if the enemy was destroyed, but obviously your ship is intact. The onboard computer reports that you have been in stasis for <b>345</b> years. The ship has been drifting the entire time.
         <br><br>
-        You are 81000 light years from home, but the solar sails are functional.
+        You are <b>81000</b> light years from home, but the solar sails are functional.
         <br><br>
         You may return to stasis and allow the ship to drift at any time. Or, if you have fuel, you can head toward home. Perhaps one of these nearby planets has something interesting.</p>
         
@@ -56,11 +57,11 @@ with con:
         <!-- Important Table -->
         <table class="table table-striped table-hover">
             <tr>
-                <th>#</th>
                 <th>User Name</th>
-                <th>Date &amp; Time</th>
                 <th>Success</th>
-                <th>Success Total</th>
+                <th>Total Tweets</th>
+                <th>Day Play</th>
+                <th>Last Day Play</th>
             </tr>
 		''')
 
@@ -69,13 +70,13 @@ with con:
 	for row in rows:
 		htmlF.write('''
 			<tr>
-                <td>%s</td>
+                <td id="%s">%s</td>
                 <td>%s</td>
                 <td>%s</td>
                 <td>%s</td>
                 <td>%s</td>
             </tr>
-            ''' % (row[0], row[1], row[2], row[3], row[4]))
+            ''' % (row[1], row[1], row[2], row[3], row[4], row[5]))
 
 	htmlF.write('''
 	   </table>

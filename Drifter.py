@@ -75,7 +75,7 @@ class TwitterGame():
                 if len(top5) > 0:
                     self.twitter.setSuccess(top5[0][0])
 
-                #TODO: Save these tweets to a database before deleting them
+                self.twitter.logTweets()
                 self.twitter.resetTweets()
 
             #Toggle display/execute

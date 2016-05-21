@@ -7,8 +7,8 @@ import sys
 con = lite.connect('tweet.db')
 
 # with con:
-    
-#     cur = con.cursor()    
+
+#     cur = con.cursor()
 #     cur.execute("CREATE TABLE Cars(Id INT, Name TEXT, Price INT)")
 #     cur.execute("INSERT INTO Cars VALUES(1,'Audi',52642)")
 #     cur.execute("INSERT INTO Cars VALUES(2,'Mercedes',57127)")
@@ -20,18 +20,18 @@ con = lite.connect('tweet.db')
 #     cur.execute("INSERT INTO Cars VALUES(8,'Volkswagen',21600)")
 
 with con:
-    
+
     cur = con.cursor()
 
     cur.executescript("""
         DROP TABLE IF EXISTS Player;
         CREATE TABLE Player(id INTEGER primary key autoincrement, Name TEXT, Success INT, Total INT, TotalDay INT, LastDay TEXT);
 
-        Insert Into Player (Name, Success, Total, TotalDay, LastDay) VALUES('@MrBot', 2, 10, 4, '05/24/16');
-        Insert Into Player (Name, Success, Total, TotalDay, LastDay) VALUES('@Driller', 3, 11, 1, '05/24/16');
-        Insert Into Player (Name, Success, Total, TotalDay, LastDay) VALUES('@Destroyer', 1, 10, 2, '05/23/16');
-        Insert Into Player (Name, Success, Total, TotalDay, LastDay) VALUES('@Player4', 2, 10, 4, '05/24/16');
-        Insert Into Player (Name, Success, Total, TotalDay, LastDay) VALUES('@Player2', 1, 17, 5, '05/25/16');
+        Insert Into Player (Name, Success, Total, TotalDay, LastDay) VALUES('@MrBot', 2, 10, 4, '05/24/2016');
+        Insert Into Player (Name, Success, Total, TotalDay, LastDay) VALUES('@Driller', 3, 11, 1, '05/24/2016');
+        Insert Into Player (Name, Success, Total, TotalDay, LastDay) VALUES('@Destroyer', 1, 10, 2, '05/23/2016');
+        Insert Into Player (Name, Success, Total, TotalDay, LastDay) VALUES('@Player4', 2, 10, 4, '05/24/2016');
+        Insert Into Player (Name, Success, Total, TotalDay, LastDay) VALUES('@Player2', 1, 17, 5, '05/25/2016');
         """)
     con.commit()
 con.close()

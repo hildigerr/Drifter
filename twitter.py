@@ -57,9 +57,9 @@ class Twitter(object):
         newTweets = []
 
         if self.lastTweetId:
-            self.rawTweets = self.api.mentions_timeline(count=200, since_id=self.lastTweetId)
+            self.rawTweets += self.api.mentions_timeline(count=200, since_id=self.lastTweetId)
         else:
-            self.rawTweets = self.api.mentions_timeline(count=200)
+            self.rawTweets += self.api.mentions_timeline(count=200)
 
         for t in self.rawTweets:
             if t.id > self.lastTweetId:
@@ -69,13 +69,13 @@ class Twitter(object):
                 #Add datetime comparison here
                 if tweets[t.user.screen_name][1] < t.created_at:
                     print('Overwriting old tweet from %s' % t.user.screen_name)
-                    tweets[t.user.screen_name] = [t.text, t.created_at, t.id]
+                    tweets[t.user.screen_name] = [t.text, t.created_at, t.id, False]
                 else:
                     continue
 
-            tweets[t.user.screen_name] = [t.text, t.created_at, t.id]
+            tweets[t.user.screen_name] = [t.text, t.created_at, t.id, False]
 
-        
+
         for t in tweets:
             newTweets.append([t, self.cleanTweet(tweets[t][0]), tweets[t][1], tweets[t][2]])
 
@@ -88,8 +88,11 @@ class Twitter(object):
 
         return newTweets
 
-    def sendTweet(self, msg):
-        return True
+    def sendTweet(self, msg, picFileName=None):
+        if picFileName:
+            return self.api.update_with_media(picFileName, msg)
+        else:
+            return self.api.update_status(msg)
 
     def cleanTweet(self, msg):
         #Remove whitespace around msg
@@ -112,14 +115,18 @@ class Twitter(object):
 
         return newMsg.strip()
 
-    def findTop5Votes(self, tweets):
+    def findTop5Votes(self):
         rawVotes = {}
         top5Votes = []
 
-        for t in tweets:
+        for t in self.cleanTweets:
             if t[1] in rawVotes:
                 rawVotes[t[1]] += 1
             else:
                 rawVotes[t[1]] = 1
 
         return sorted(rawVotes.items(), key=lambda t: t[1])[:5]
+
+    def resetTweets(self):
+        self.rawTweets = []
+        self.cleanTweets = []

@@ -3,3 +3,4 @@
 src/*.pyc
 *~
 src/*~
+*__pycache__/*

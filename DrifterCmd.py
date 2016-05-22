@@ -124,7 +124,7 @@ class CmdLineGame():
             ############################################################# Drift:
             if cmd == "drift": #TODO Drifting while under attack is dangerous.
                 if self.drifter.drift(): return self.wingame()
-                return ("The space craft is allowed to drift into another solar system...",GAME_ACTION)
+                return ("The space craft is allowed to drift...",GAME_ACTION)
 
             ######################################################### Head Home:
             if cmd == "head":

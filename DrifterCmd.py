@@ -7,10 +7,11 @@
 #                                                                              #
 ################################################################################
 
-import random, sys, time
+import random, re, sys, time
 
 sys.path.append("src/")
 from src import Ship
+from src.Crafting import CRAFT_LIST
 
 raw_input = input #python3
 
@@ -50,6 +51,86 @@ class CmdLineGame():
         else: string += "If you happen upon a solar system with\nplanets, perhaps you may find "
         string += "something interesting.\n"
         return string
+    def buildRegexFromList(self, listForRegex):
+        buildRegex = '('
+        for c in listForRegex:
+            buildRegex += c + '|'
+        buildRegex = buildRegex[:-1]
+        buildRegex += ')'
+        if buildRegex == ')':
+            buildRegex = ''
+        return buildRegex
+    def validCommand(self, cmd):
+        validCmds = [
+            ['orbit', '[1-6]'],
+            ['depart'],
+            ['drift'],
+            ['head home'],
+            ['harvest'],
+            ['jettison', 'INV'],
+            ['buy', '#O', 'P_INV'],
+            ['sell', '#O', 'INV'],
+            ['attack'],
+            ['refine', '#O', 'INV'],
+            ['gamble', '#'],
+            ['craft', '#O', 'CRAFT']
+        ]
+        curCmds = self.commands().split(', ')
+        buildRegex = ''
+        curRegex = ''
+        cmd = cmd.strip()
+
+        #Remove commands not currently applicable
+        for c in validCmds:
+            if c[0] not in curCmds:
+                validCmds.remove(c)
+            
+        for c in validCmds:
+            curRegex = '(\s*'
+            for o in c:
+                if o == '#':
+                    curRegex += '\d+'
+                elif o == '#O':
+                    curRegex += '\d*'
+                elif o == 'INV':
+                    inv = self.buildRegexFromList(self.drifter.cargo)
+                    if inv:
+                        curRegex += inv
+                    else:
+                        curRegex = ''
+                        break
+                elif o == 'P_INV':
+                    if self.drifter.sys.pos != None and self.drifter.sys.planets[self.drifter.sys.pos].resource.civ:
+                        pinv = self.buildRegexFromList(self.drifter.sys.planets[self.drifter.sys.pos].resource.civ.price)
+                        if pinv:
+                            curRegex += pinv
+                        else:
+                            curRegex = ''
+                            break
+                    else:
+                        curRegex = ''
+                        break
+                elif o == 'CRAFT':
+                    craft = self.buildRegexFromList(CRAFT_LIST)
+                    if craft:
+                        curRegex += craft
+                    else:
+                        curRegex = ''
+                        break
+                else:
+                    curRegex += o.replace(' ', '\s+')
+                curRegex += '\s*'
+            if curRegex:
+                buildRegex += curRegex + ')|'
+        #Strip the last '|'
+        buildRegex = buildRegex[:-1]
+        print(buildRegex)
+        m = re.search(buildRegex, cmd, re.I)
+        if m:
+            return m.group()
+        else:
+            return None
+
     def commands(self):
         '''Enumerate available commands into a string.'''
         string =               "Available commands are: drift"
@@ -96,6 +177,9 @@ class CmdLineGame():
             try:
                 cmdLine = raw_input(self.status()+" What will you do? ").split()
             except (EOFError) : cmdLine[0] = "quit" # CTRL-D Quits
+
+            print(self.validCommand(' '.join(cmdLine)))
+            
             (output,status) = self.do(cmdLine)
             print ("\n" + ('#' * 80) + "\n" + output)
             if status == GAME_TERMINATE: sys.exit(0)

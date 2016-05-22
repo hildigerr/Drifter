@@ -165,6 +165,7 @@ class Twitter(object):
                     data[3] += 1
 
                     #Check for a newer date
+                    print(t[2], ' > ', datetime.datetime.strptime(data[5], '%m/%d/%Y'), t[2] > datetime.datetime.strptime(data[5], '%m/%d/%Y'))
                     if t[2] > datetime.datetime.strptime(data[5], '%m/%d/%Y'):
                         data[5] = t[2].strftime('%m/%d/%Y')
                         data[4] += 1

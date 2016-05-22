@@ -52,7 +52,7 @@ class GuiGame():
         print "DEBUG... Rendering"#TODO: Ensuring no extra rendering occurs.
         self.gfx.scene_gen(self.starChart,filename)
     def main(self):
-        self.render("Backstory.png")
+        self.render("Backstory.png") ; pygame.display.flip()
         while True:
             for event in pygame.event.get():
                 result = None ; status = GAME_CONTINUE

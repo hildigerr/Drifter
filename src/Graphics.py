@@ -111,8 +111,6 @@ class PlanetSys():
         self.planetImg["City"  ] = load_img("city-overlay.png")
         self.stockSolarSystemImg = load_img("star-chart-big.png" )
         self.panel               = load_img("panel-right-big.png")
-        #TODO: May look better to remake star-chart with sun centered at 0,0
-        #       I drew it by hand to compare and don't think it would be better.
         self.solarSystemImg = None
     def gen_sys(self,sysInfo):
         self.solarSystemImg = self.stockSolarSystemImg.copy()
@@ -128,7 +126,7 @@ class PlanetSys():
         return self.solarSystemImg
 
 ############################################################### ShieldIndicator:
-class ShieldIndicator():
+class ShieldIndicator():#TODO: pre-scale images.
     def __init__(self):                                                                      #  STATUS  #
         self.images = [pygame.transform.scale(load_img("shield-red.png"),SHIELD_SCALE),      #  0 - 29  #
                        pygame.transform.scale(load_img("shield-orange.png"),SHIELD_SCALE),   # 30 - 49  #

@@ -30,7 +30,9 @@ class Planet():
         self.health = random.randint(MIN_HEALTH,100)
         self.baseChance = random.randint(0,MAX_BASE_CHANCE)
     def harvest(self,adj = 0, bonus = 0):
-        if self.health > 0: #TODO: Possibly harm planet's health?
+        if self.resource.civ == None and self.health > 0:
+            self.health -= random.randint(HARVEST_DAM_MIN,HARVEST_DAM_MAX)
+        if self.health > 0:
             if (adj + random.randint(1,100)) > self.baseChance:
                 return self.resource.harvest(bonus)
         return None
@@ -75,9 +77,10 @@ class System():
     def harvest(self,adj=0,bonus=0):
         if self.pos != None:
             planet = self.planets[self.pos] ; result = planet.harvest(adj,bonus)
-            planet.health -= random.randint(HARVEST_DAM_MIN,HARVEST_DAM_MAX)
             if planet.health <= 0:
-                if planet.resource.civ == None: self.planets[self.pos] = Planet(0, 0);
+                if planet.resource.civ == None:
+                    if planet.resource.kind != "Barren":
+                        self.planets[self.pos] = Planet(0, 0);
                 else: self.planets[self.pos] = Planet(planet.resource.ty, 0);
             return result
         else: return None #TODO: Solar scoop? gain fuel without leaving system.

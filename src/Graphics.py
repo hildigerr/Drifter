@@ -35,6 +35,8 @@ DASH_FONT_SIZE       =  15
 TERM_TOP_LEFT        = (216,408)
 TERM_FONT_SIZE       =  10
 TERM_CHAR_WIDTH      =  61
+PANEL_TOP_LEFT       = (609,0)
+PANEL_CHAR_WIDTH     =  19
 
 ## Star Chart Properties ##
 CHART_RING_INNER_LOC_X =  311
@@ -104,7 +106,9 @@ class PlanetSys():
         self.planetImg["Water" ] = load_img("planet001.png")
         self.planetImg["Fire"  ] = load_img("planet002.png")
         self.planetImg["Barren"] = load_img("planet003.png")
+        self.planetImg["City"  ] = load_img("city-overlay.png")
         self.stockSolarSystemImg = load_img("star-chart-6.png" )[0]
+        self.panel               = load_img("panel-right.png")
         #TODO: May look better to remake star-chart with sun centered at 0,0
         #       I drew it by hand to compare and don't think it would be better.
         self.solarSystemImg = None
@@ -139,8 +143,16 @@ class ShieldIndicator():
 ################################################################ Graphics Class:
 class Graphics():
     '''
-    name:   Name of current game. Used to organize saved images.
-    player: The Ship.
+    screen: The display to which the graphics are rendered.
+    name:      Name of current game. Used to organize saved images.
+    player:    The Ship.
+    sh:        The shield indicator object.
+    sys:       Planet and solar system image resource object.
+    txt:       The text to display on the ship's terminal.
+    font:      The default font for the dashboard.
+    term:      The font used in the ship's terminal.
+    bg[_rect]: The background star-field image.
+    db[_rect]: The dashboard image.
     '''
     def __init__(self,name,player,backstory=None):
         self.screen = pygame.display.set_mode(SCREEN_SIZE)
@@ -212,7 +224,7 @@ class Graphics():
                     self.screen.blit(txt,txt_rect)
                     i += 1
                 i += 1
-        #TODO: Handle potential overflow.
+        #TODO: Handle potential overflow, convert to method.
 
         # Draw Current Planet #
         if self.player.sys.pos != None:
@@ -222,9 +234,33 @@ class Graphics():
             s_rect.center = (0,0)
             self.screen.blit(splash,s_rect)
             if planet.resource.civ != None:
-                (splash,s_rect) = load_img("city-overlay.png")
+                (splash,s_rect) = self.sys.planetImg.get("City")
                 s_rect.center = (0,0)
                 self.screen.blit(splash,s_rect)
+                (splash,s_rect) = self.sys.panel
+                self.screen.blit(splash,s_rect)
+                i = 1 ; scanOutput = self.player.sys.scan().split("]")
+                #TODO: Display more of scan information
+                # scanOutput[0].split()
+                #                      [0] ==  index/total               (TODO on dash)
+                #                      [1] == "Civilized"                (can tell by city-overlay)
+                #                      [2] == "Friendly|Neutral|Hostile" (done)
+                #                      [3] ==  kind                      (can tell by planet image)
+                txt = scanOutput[0].split()[2].lstrip()
+                txt = self.font.render(txt,1,pygame.Color("black"))
+                txt_rect.topleft = PANEL_TOP_LEFT
+                self.screen.blit(txt,txt_rect)
+                for line in scanOutput[1].split("}")[2].split(","):
+                    for txt in chunkstring(line,PANEL_CHAR_WIDTH):
+                        txt = txt.replace('\n',' ').replace('}','').replace('{','').lstrip()
+                        #print ("TESTING:"+txt)
+                        txt = self.font.render(txt,1,pygame.Color("black"))
+                        txt_rect.topleft = PANEL_TOP_LEFT
+                        txt_rect.top += i * size
+                        self.screen.blit(txt,txt_rect)
+                        i += 1
+                i += 1
+                
 
         return save_img(self.screen,self.name)#TODO Do save the img when testing is done!
         #return sol_sys

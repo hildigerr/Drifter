@@ -134,7 +134,7 @@ class Twitter(object):
             msg += '"' + t[0] + '" - Votes: ' + str(t[1]) + '\n\n'
 
         if msg == 'Top 5 Votes:\n\n':
-            msg = 'No votes submitted this round. Craft will drift into space...\n\n'
+            msg = 'No votes submitted this round...\n\n'
 
         return msg
 

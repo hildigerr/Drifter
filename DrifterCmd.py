@@ -275,7 +275,23 @@ class CmdLineGame():
             ############################################################ Repair:
             #TODO: Use metal at friendly planet.
             #      Not 1:1, and probably not random either. Tunable.
+            
+            #NOTE : Repairing the ship uses the crafting system to check if the user's cargo
+            #       meets the necessary requirements to repair the ship. Repairing ship increase
+            #       ship's health by 15.
 
+            #REQUIREMENTS: To repair the ship, the user must have these materials in their cargo.
+            #              7 Metals , 3 Coolant , 2 Engine , 5 Glass
+
+            if cmd == "repair":
+                try:
+                    attitude = self.drifter.sys.planets[self.drifter.sys.pos].resource.civ.Attitude()
+                    if (attitude == "Friendly" or attitude == "Neutral"):
+                        self.drifter.craft(1, cmdLine[0]);
+                    else: return ("You're currently under attack! Get out before you try to repair.\n",GAME_CONTINUE)
+                except (IndexError, ValueError):
+                    return ("Unable to repair the ship.",GAME_CONTINUE)
+                    
             ############################################################ Refine:
             if cmd == "refine": #TODO: Planet charges for this service?
                 try:

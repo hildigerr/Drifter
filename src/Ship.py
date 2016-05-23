@@ -172,7 +172,9 @@ class Ship():
         self.cargo.update({"Charcoal":1000})
         self.cargo.update({"Lava":1000})
         self.cargo.update({"Obsidian":1000})
-            
+        self.cargo.update({"Engine":1000})
+        self.cargo.update({"Coolant":1000})
+        self.cargo.update({"Glass":1000})    
 
 ############################################################## Main for Testing:
 if __name__ == '__main__':

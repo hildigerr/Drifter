@@ -55,7 +55,8 @@ class TwitterGame():
                 print("Sent!")
             except:
                 #Some twitter error occured, just keep polling
-                print("Error sending tweet!")
+                print("Error sending tweet!\nSleeping for 15 MINUTES!!!")
+                time.sleep(15 * 60)
                 dispTop5 = True
                 continue
 
@@ -70,7 +71,8 @@ class TwitterGame():
                 top5 = self.twitter.findTop5Votes()
             except:
                 #Some twitter error occured, just keep polling
-                print("Error getting tweets!")
+                print("Error getting tweets!\nSleeping for 15 MINUTES!!!")
+                time.sleep(15 * 60)
                 dispTop5 = True
                 continue
 

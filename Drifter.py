@@ -47,20 +47,32 @@ class TwitterGame():
             self.command.buildCommandRegex()
             self.twitter.validRegex = self.command.validRegex
 
-            self.render()
-
-            print("Sending tweet with image...",)
-            self.twitter.sendTweet('', self.imgFileName)
-            print("Sent!")
-
             x = 1.5
             print("Sleeping for %.1f minutes...\n" % x)
             time.sleep(x * 60)
 
+            self.render()
+
+            try:
+                print("Sending tweet with image...",)
+                self.twitter.sendTweet('', self.imgFileName)
+                print("Sent!")
+            except:
+                #Some twitter error occured, just keep polling
+                print("Error sending tweet!")
+                dispTop5 = True
+                continue
+
             print("I have awoken! Time to read the tweetmails!\n")
 
-            tweets = self.twitter.getTweets()
-            top5 = self.twitter.findTop5Votes()
+            try:
+                tweets = self.twitter.getTweets()
+                top5 = self.twitter.findTop5Votes()
+            except:
+                #Some twitter error occured, just keep polling
+                print("Error getting tweets!")
+                dispTop5 = True
+                continue
 
             # if dispTop5:
             #     #Only display the top 5, don't execute them

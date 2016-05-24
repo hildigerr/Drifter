@@ -44,6 +44,9 @@ class TwitterGame():
         status = GAME_CONTINUE
 
         while True:
+            self.command.buildCommandRegex()
+            self.twitter.validRegex = self.command.validRegex
+
             self.render()
 
             print("Sending tweet with image...",)

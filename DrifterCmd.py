@@ -30,6 +30,7 @@ class CmdLineGame():
     def __init__(self,run=True,ship=None):
         if ship == None: self.drifter = Ship.Ship()
         else:            self.drifter = ship
+        self.validRegex = None
         if run: self.main()
     def backstory(self):
         '''Return the backstory string.'''
@@ -60,7 +61,7 @@ class CmdLineGame():
         if buildRegex == ')':
             buildRegex = ''
         return buildRegex
-    def validCommand(self, cmd):
+    def buildCommandRegex(self):
         validCmds = [
             ['orbit', '[1-6]'],
             ['depart'],
@@ -76,9 +77,9 @@ class CmdLineGame():
             ['craft', '#O', 'CRAFT']
         ]
         curCmds = self.commands().split(', ')
+        print(curCmds)
         buildRegex = ''
         curRegex = ''
-        cmd = cmd.strip()
 
         #Remove commands not currently applicable
         for c in validCmds:
@@ -124,13 +125,16 @@ class CmdLineGame():
                 buildRegex += curRegex + ')|'
         #Strip the last '|'
         buildRegex = buildRegex[:-1]
-        print(buildRegex)
-        m = re.search(buildRegex, cmd, re.I)
+        #Save the regex
+        self.validRegex = buildRegex
+    def isValidCommand(self, cmd):
+        if not self.validRegex:
+            self.buildCommandRegex()
+        m = re.search(self.validRegex, cmd, re.I)
         if m:
             return m.group()
         else:
             return None
-
     def commands(self):
         '''Enumerate available commands into a string.'''
         string =               "Available commands are: drift"
@@ -174,6 +178,7 @@ class CmdLineGame():
             print ("{}\n{}\nScan:{}".format( self.commands(),
                                              self.listCargo(),
                                              self.drifter.sys.scan() ))
+            self.buildCommandRegex()
             try:
                 cmdLine = raw_input(self.status()+" What will you do? ").split()
             except (EOFError) : cmdLine[0] = "quit" # CTRL-D Quits

@@ -1,5 +1,5 @@
 #Standard Python libs
-import collections, configparser, datetime, os, pickle, sqlite3, sys
+import collections, configparser, datetime, os, pickle, re, sqlite3, sys
 
 #Site-libs
 import tweepy
@@ -10,6 +10,7 @@ class Twitter(object):
         self.botName = botName
         self.rawTweets = []
         self.cleanTweets = []
+        self.validRegex = None
 
         if os.path.exists('twitter.pickle'):
             self.loadState()
@@ -73,7 +74,14 @@ class Twitter(object):
                 else:
                     continue
 
-            tweets[t.user.screen_name] = [t.text, t.created_at, False]
+            if self.validRegex:
+                match = re.search(self.validRegex, t.text, re.I)
+                if match:
+                    tweets[t.user.screen_name] = [t.text, t.created_at, False]
+                else:
+                    print("INVALID TWEET -- {}: {}".format(t.user.screen_name, t.text))
+            else:
+                tweets[t.user.screen_name] = [t.text, t.created_at, False]
 
 
         for t in tweets:
@@ -165,8 +173,7 @@ class Twitter(object):
                     data[3] += 1
 
                     #Check for a newer date
-                    print(t[2], ' > ', datetime.datetime.strptime(data[5], '%m/%d/%Y'), t[2] > datetime.datetime.strptime(data[5], '%m/%d/%Y'))
-                    if t[2] > datetime.datetime.strptime(data[5], '%m/%d/%Y'):
+                    if t[2].date() > datetime.datetime.strptime(data[5], '%m/%d/%Y').date():
                         data[5] = t[2].strftime('%m/%d/%Y')
                         data[4] += 1
 

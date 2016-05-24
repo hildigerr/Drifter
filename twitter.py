@@ -74,18 +74,19 @@ class Twitter(object):
                 else:
                     continue
 
-            if self.validRegex:
-                match = re.search(self.validRegex, t.text, re.I)
-                if match:
-                    tweets[t.user.screen_name] = [t.text, t.created_at, False]
-                else:
-                    print("INVALID TWEET -- {}: {}".format(t.user.screen_name, t.text))
-            else:
-                tweets[t.user.screen_name] = [t.text, t.created_at, False]
+            tweets[t.user.screen_name] = [t.text, t.created_at, False]
 
 
         for t in tweets:
-            newTweets.append([t, self.cleanTweet(tweets[t][0]), tweets[t][1], tweets[t][2]])
+            msg = self.cleanTweet(tweets[t][0])
+            if self.validRegex:
+                match = re.search(self.validRegex, msg, re.I)
+                if match:
+                    newTweets.append([t, msg, tweets[t][1], tweets[t][2]])
+                else:
+                    print("INVALID TWEET -- {}: {}".format(t, msg))
+            else:
+                newTweets.append([t, msg, tweets[t][1], tweets[t][2]])
 
         #Don't lose the lastTweetId!
         self.saveState()

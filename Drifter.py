@@ -103,16 +103,13 @@ class TwitterGame():
                 if len(top5) > 0:
                     cmdLine = top5[0][0].split()
                     cmd = cmdLine[0]
+                    #Flag the winning votes
+                    self.twitter.setSuccess(top5[0][0])
+                    self.twitter.logTweets()
+                    self.twitter.resetTweets()
                 else:
                     cmdLine = ('drift',)
                     cmd = 'drift'
-
-                    #Flag the winning votes
-                    if len(top5) > 0:
-                        self.twitter.setSuccess(top5[0][0])
-
-                    self.twitter.logTweets()
-                    self.twitter.resetTweets()
 
             #Toggle display/execute
             dispTop5 = (not dispTop5)

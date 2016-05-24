@@ -12,6 +12,7 @@ import datetime, io, random, sys, time
 
 #Extra libraries
 import pygame, twitter
+from web import web
 
 #Game libraries
 sys.path.append("src/")
@@ -53,6 +54,7 @@ class TwitterGame():
         print("DEBUG... Rendering") #TODO: Ensuring no extra rendering occurs.
         self.imgFileName  = self.gfx.scene_gen(self.starChart)
         pygame.display.flip()
+        web.writeWeb()
 
     def main(self):
         ''' Play The Game. '''

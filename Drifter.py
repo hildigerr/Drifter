@@ -28,10 +28,27 @@ class TwitterGame():
         self.drifter = Ship.Ship()
         self.twitter = twitter.Twitter(self.name)
         self.command = CmdLineGame(False,self.drifter)
+        self.command.commands = self.commands #Overwrite the command list to build a better regex
         self.gfx     = Graphics.Graphics(self.name,self.drifter,self.command.backstory()+"\n\n"+self.command.commands())
         self.starChart = None
         if run: self.main() ; pygame.quit()
 
+    def commands(self):
+        '''Enumerate available commands into a msg.'''
+        msg =                                     "drift"
+        if   self.drifter.fuel > 0:        msg += ", head home"
+        if self.drifter.sys.pos != None:
+            if self.drifter.sys.planets[self.drifter.sys.pos].resource.civ != None:
+                attitude = self.drifter.sys.planets[self.drifter.sys.pos].resource.civ.Attitude()
+                if attitude != "Hostile":
+                    msg                        += ", buy, sell"
+                    if attitude == "Friendly":
+                        msg                    += ", refine, gamble"
+                msg                            += ", attack"
+            msg                                += ", harvest"
+        elif self.drifter.sys.qt > 0:      msg += ", orbit"
+        if   len(self.drifter.cargo) > 0:  msg += ", jettison"
+        return msg
     def render(self):
         print("DEBUG... Rendering") #TODO: Ensuring no extra rendering occurs.
         self.imgFileName  = self.gfx.scene_gen(self.starChart)

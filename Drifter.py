@@ -47,10 +47,6 @@ class TwitterGame():
             self.command.buildCommandRegex()
             self.twitter.validRegex = self.command.validRegex
 
-            x = 1.5
-            print("Sleeping for %.1f minutes...\n" % x)
-            time.sleep(x * 60)
-
             self.render()
 
             try:
@@ -62,6 +58,10 @@ class TwitterGame():
                 print("Error sending tweet!")
                 dispTop5 = True
                 continue
+
+            x = 1.5
+            print("Sleeping for %.1f minutes...\n" % x)
+            time.sleep(x * 60)
 
             print("I have awoken! Time to read the tweetmails!\n")
 

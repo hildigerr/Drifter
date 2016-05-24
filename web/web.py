@@ -10,8 +10,6 @@ with con:
 
 	rows = cur.fetchall()
 
-
-	# MSG = open('msg.txt', 'r').read()
 	TITLE = 'SPACE DRIFT'
 
 	htmlF = open('index.html', 'w')
@@ -27,7 +25,7 @@ with con:
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-    <link href="css/main.css" rel="stylesheet" type="text/css">	
+    <link href="css/main.css" rel="stylesheet" type="text/css">
 </head>		
 
 <body>
@@ -50,6 +48,22 @@ with con:
         <br><br>
         You may return to stasis and allow the ship to drift at any time. Or, if you have fuel, you can head toward home. Perhaps one of these nearby planets has something interesting.</p>
         
+        <br><br><br>
+
+        <!-- Displaying thumbnails -->
+        <h2>Status</h2>
+        <div class="row">
+            <div class="col-xs-12 col-md-4">
+                <a href="image/Thu May 19 14:01:35 2016.png" class="thumbnail"><img src="image/Thu May 19 14:01:35 2016.png" alt="First Image" id="imagelightbox"></a>
+            </div>
+            <div class="col-xs-12 col-md-4">
+                <a href="image/Thu May 19 14:01:35 2016.png" class="thumbnail"><img src="image/Thu May 19 14:01:35 2016.png" alt="First Image"></a>
+            </div>
+            <div class="col-xs-12 col-md-4">
+                <a href="image/Thu May 19 14:01:35 2016.png" class="thumbnail"><img src="image/Thu May 19 14:01:35 2016.png" alt="First Image"></a>
+            </div>
+        </div>
+
         <br><br><br>
         
         <h2>Result</h2>

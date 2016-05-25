@@ -2,19 +2,28 @@
 import sqlite3 as lite
 import sys
 
-con = lite.connect('tweet.db')
+def writeWeb():
+        con = lite.connect('web/tweet.db')
 
-with con:
-	cur = con.cursor()
-	cur.execute("SELECT * FROM Player ORDER BY Success DESC")
+        with con:
+	        cur = con.cursor()
+	        cur.execute("SELECT * FROM Player ORDER BY Success DESC")
+	        rows = cur.fetchall()
 
-	rows = cur.fetchall()
+	        # MSG = open('msg.txt', 'r').read()
+	        TITLE = 'SPACE DRIFT'
 
+<<<<<<< HEAD
 	TITLE = 'SPACE DRIFT'
 
 	htmlF = open('index.html', 'w')
 
 	htmlF.write('''
+=======
+	        htmlF = open('web/index.html', 'w')
+
+	        htmlF.write('''
+>>>>>>> 624208b74aa1db6d3c652b5d3a78c7d592909e44
 <!DOCTYPE html>
 
 <html>
@@ -34,13 +43,13 @@ with con:
     </header>
     
     <div class="empty"></div>
-    
+
     <div class="inner">
         <div class="row">
             <div class="col-md-8"></div>
             <div class="col-md-4" align="right"><a href="https://twitter.com"><img src="image/twii.png" onmouseover="this.src='image/twitter.png'" onmouseout="this.src='image/twii.png'" /></a></div>
         </div>
-        
+
         <h2>Story</h2>
         <p>The last thing you remember before awaking from chryostasis, is the captain being decapitated by some flying debris. There was a battle. You don't know if the enemy was destroyed, but obviously your ship is intact. The onboard computer reports that you have been in stasis for <b>345</b> years. The ship has been drifting the entire time.
         <br><br>
@@ -76,13 +85,12 @@ with con:
                 <th>Total Tweets</th>
                 <th>Day Play</th>
                 <th>Last Day Play</th>
-            </tr>
-		''')
+            </tr>''')
 
 
 
-	for row in rows:
-		htmlF.write('''
+	        for row in rows:
+		        htmlF.write('''
 			<tr>
                 <td id="%s">%s</td>
                 <td>%s</td>
@@ -92,7 +100,7 @@ with con:
             </tr>
             ''' % (row[1], row[1], row[2], row[3], row[4], row[5]))
 
-	htmlF.write('''
+	        htmlF.write('''
 	   </table>
     </div> 
 
@@ -102,7 +110,6 @@ with con:
     </footer>    
     
 </body>    
-</html>
-	''')
+</html>''')
 
-con.close()
+        con.close()

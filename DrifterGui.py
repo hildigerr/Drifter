@@ -48,11 +48,11 @@ class GuiGame():
         self.gfx     = Graphics.Graphics(self.name,self.drifter,self.command.backstory()+"\n\n"+self.command.commands())
         self.starChart = None
         if run: self.main() ; pygame.quit()
-    def render(self):
+    def render(self,filename):
         print "DEBUG... Rendering"#TODO: Ensuring no extra rendering occurs.
-        self.gfx.scene_gen(self.starChart) ; pygame.display.flip()
+        self.gfx.scene_gen(self.starChart,filename)
     def main(self):
-        self.render()
+        self.render("Backstory.png") ; pygame.display.flip()
         while True:
             for event in pygame.event.get():
                 result = None ; status = GAME_CONTINUE
@@ -96,7 +96,9 @@ class GuiGame():
                     self.gfx.txt = ( result
                                    + "\n\n" + self.command.listCargo()
                                    + "\n\n" + self.command.commands() )
-                    self.render()
+                    if self.name == "Testing": self.render(time.asctime())
+                    else:                      self.render("Latest.png");
+                    pygame.display.flip()
                 if status == GAME_TERMINATE: return
                 if status != GAME_CONTINUE:  self.drifter.time += 1
 

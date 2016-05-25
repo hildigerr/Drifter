@@ -75,11 +75,14 @@ class Ship():
         self.sys = System(MAX_PLANETS) ; return False
     def drift(self):
         '''Depart the System while not only preserving fuel but accumulating it.'''
-        tval = self.depart(
-             random.randint(DRIFT_FUEL_GAIN_MIN,DRIFT_FUEL_GAIN_MAX),
-             random.randint(DRIFT_DIST_MIN,DRIFT_DIST_MAX) )
-        self.heading = 0
-        while self.heading == 0: self.heading = random.randint(-1,1)
+        if self.sys.pos == None:
+            tval = self.depart(
+                 random.randint(DRIFT_FUEL_GAIN_MIN,DRIFT_FUEL_GAIN_MAX),
+                 random.randint(DRIFT_DIST_MIN,DRIFT_DIST_MAX) )
+            self.heading = 0
+            while self.heading == 0: self.heading = random.randint(-1,1)
+        else:
+            self.sys.pos = None ; return False
         return tval
     def goHome(self):
         '''Depart the system, using fuel to go home.'''
@@ -169,7 +172,9 @@ class Ship():
         self.cargo.update({"Charcoal":1000})
         self.cargo.update({"Lava":1000})
         self.cargo.update({"Obsidian":1000})
-            
+        self.cargo.update({"Engine":1000})
+        self.cargo.update({"Coolant":1000})
+        self.cargo.update({"Glass":1000})    
 
 ############################################################## Main for Testing:
 if __name__ == '__main__':

@@ -12,6 +12,7 @@ import datetime, io, random, sys, time
 
 #Extra libraries
 import pygame, twitter
+from web import web
 
 #Game libraries
 sys.path.append("src/")
@@ -28,14 +29,32 @@ class TwitterGame():
         self.drifter = Ship.Ship()
         self.twitter = twitter.Twitter(self.name)
         self.command = CmdLineGame(False,self.drifter)
+        self.command.commands = self.commands #Overwrite the command list to build a better regex
         self.gfx     = Graphics.Graphics(self.name,self.drifter,self.command.backstory()+"\n\n"+self.command.commands())
         self.starChart = None
         if run: self.main() ; pygame.quit()
 
+    def commands(self):
+        '''Enumerate available commands into a msg.'''
+        msg =                                     "drift"
+        if   self.drifter.fuel > 0:        msg += ", head home"
+        if self.drifter.sys.pos != None:
+            if self.drifter.sys.planets[self.drifter.sys.pos].resource.civ != None:
+                attitude = self.drifter.sys.planets[self.drifter.sys.pos].resource.civ.Attitude()
+                if attitude != "Hostile":
+                    msg                        += ", buy, sell"
+                    if attitude == "Friendly":
+                        msg                    += ", refine, gamble"
+                msg                            += ", attack"
+            msg                                += ", harvest"
+        elif self.drifter.sys.qt > 0:      msg += ", orbit"
+        if   len(self.drifter.cargo) > 0:  msg += ", jettison"
+        return msg
     def render(self):
         print("DEBUG... Rendering") #TODO: Ensuring no extra rendering occurs.
         self.imgFileName  = self.gfx.scene_gen(self.starChart)
         pygame.display.flip()
+        web.writeWeb()
 
     def main(self):
         ''' Play The Game. '''
@@ -44,11 +63,21 @@ class TwitterGame():
         status = GAME_CONTINUE
 
         while True:
+            self.command.buildCommandRegex()
+            self.twitter.validRegex = self.command.validRegex
+
             self.render()
 
-            print("Sending tweet with image...",)
-            self.twitter.sendTweet('', self.imgFileName)
-            print("Sent!")
+            try:
+                print("Sending tweet with image...",)
+                self.twitter.sendTweet('', self.imgFileName)
+                print("Sent!")
+            except:
+                #Some twitter error occured, just keep polling
+                print("Error sending tweet!\nSleeping for 15 MINUTES!!!")
+                time.sleep(15 * 60)
+                dispTop5 = True
+                continue
 
             x = 1.5
             print("Sleeping for %.1f minutes...\n" % x)
@@ -56,8 +85,15 @@ class TwitterGame():
 
             print("I have awoken! Time to read the tweetmails!\n")
 
-            tweets = self.twitter.getTweets()
-            top5 = self.twitter.findTop5Votes()
+            try:
+                tweets = self.twitter.getTweets()
+                top5 = self.twitter.findTop5Votes()
+            except:
+                #Some twitter error occured, just keep polling
+                print("Error getting tweets!\nSleeping for 15 MINUTES!!!")
+                time.sleep(15 * 60)
+                dispTop5 = True
+                continue
 
             if dispTop5:
                 #Only display the top 5, don't execute them
@@ -67,16 +103,13 @@ class TwitterGame():
                 if len(top5) > 0:
                     cmdLine = top5[0][0].split()
                     cmd = cmdLine[0]
+                    #Flag the winning votes
+                    self.twitter.setSuccess(top5[0][0])
+                    self.twitter.logTweets()
+                    self.twitter.resetTweets()
                 else:
                     cmdLine = ('drift',)
                     cmd = 'drift'
-
-                #Flag the winning votes
-                if len(top5) > 0:
-                    self.twitter.setSuccess(top5[0][0])
-
-                #TODO: Save these tweets to a database before deleting them
-                self.twitter.resetTweets()
 
             #Toggle display/execute
             dispTop5 = (not dispTop5)

@@ -7,10 +7,11 @@
 #                                                                              #
 ################################################################################
 
-import random, sys, time
+import random, re, sys, time
 
 sys.path.append("src/")
 from src import Ship
+from src.Crafting import CRAFT_LIST
 
 raw_input = input #python3
 
@@ -29,6 +30,7 @@ class CmdLineGame():
     def __init__(self,run=True,ship=None):
         if ship == None: self.drifter = Ship.Ship()
         else:            self.drifter = ship
+        self.validRegex = None
         if run: self.main()
     def backstory(self):
         '''Return the backstory string.'''
@@ -50,6 +52,89 @@ class CmdLineGame():
         else: string += "If you happen upon a solar system with\nplanets, perhaps you may find "
         string += "something interesting.\n"
         return string
+    def buildRegexFromList(self, listForRegex):
+        buildRegex = '('
+        for c in listForRegex:
+            buildRegex += c + '|'
+        buildRegex = buildRegex[:-1]
+        buildRegex += ')'
+        if buildRegex == ')':
+            buildRegex = ''
+        return buildRegex
+    def buildCommandRegex(self):
+        validCmds = [
+            ['orbit', '[1-6]'],
+            ['depart'],
+            ['drift'],
+            ['head home'],
+            ['harvest'],
+            ['jettison', 'INV'],
+            ['buy', '#O', 'P_INV'],
+            ['sell', '#O', 'INV'],
+            ['attack'],
+            ['refine', '#O', 'INV'],
+            ['gamble', '#'],
+            ['craft', '#O', 'CRAFT']
+        ]
+        curCmds = self.commands().split(', ')
+        print(curCmds)
+        buildRegex = ''
+        curRegex = ''
+
+        #Remove commands not currently applicable
+        for c in validCmds:
+            if c[0] not in curCmds:
+                validCmds.remove(c)
+            
+        for c in validCmds:
+            curRegex = '(\s*'
+            for o in c:
+                if o == '#':
+                    curRegex += '\d+'
+                elif o == '#O':
+                    curRegex += '\d*'
+                elif o == 'INV':
+                    inv = self.buildRegexFromList(self.drifter.cargo)
+                    if inv:
+                        curRegex += inv
+                    else:
+                        curRegex = ''
+                        break
+                elif o == 'P_INV':
+                    if self.drifter.sys.pos != None and self.drifter.sys.planets[self.drifter.sys.pos].resource.civ:
+                        pinv = self.buildRegexFromList(self.drifter.sys.planets[self.drifter.sys.pos].resource.civ.price)
+                        if pinv:
+                            curRegex += pinv
+                        else:
+                            curRegex = ''
+                            break
+                    else:
+                        curRegex = ''
+                        break
+                elif o == 'CRAFT':
+                    craft = self.buildRegexFromList(CRAFT_LIST)
+                    if craft:
+                        curRegex += craft
+                    else:
+                        curRegex = ''
+                        break
+                else:
+                    curRegex += o.replace(' ', '\s+')
+                curRegex += '\s*'
+            if curRegex:
+                buildRegex += curRegex + ')|'
+        #Strip the last '|'
+        buildRegex = buildRegex[:-1]
+        #Save the regex
+        self.validRegex = buildRegex
+    def isValidCommand(self, cmd):
+        if not self.validRegex:
+            self.buildCommandRegex()
+        m = re.search(self.validRegex, cmd, re.I)
+        if m:
+            return m.group()
+        else:
+            return None
     def commands(self):
         '''Enumerate available commands into a string.'''
         string =               "Available commands are: drift"
@@ -93,9 +178,13 @@ class CmdLineGame():
             print ("{}\n{}\nScan:{}".format( self.commands(),
                                              self.listCargo(),
                                              self.drifter.sys.scan() ))
+            self.buildCommandRegex()
             try:
                 cmdLine = raw_input(self.status()+" What will you do? ").split()
             except (EOFError) : cmdLine[0] = "quit" # CTRL-D Quits
+
+            print(self.validCommand(' '.join(cmdLine)))
+            
             (output,status) = self.do(cmdLine)
             print ("\n" + ('#' * 80) + "\n" + output)
             if status == GAME_TERMINATE: sys.exit(0)
@@ -124,7 +213,7 @@ class CmdLineGame():
             ############################################################# Drift:
             if cmd == "drift": #TODO Drifting while under attack is dangerous.
                 if self.drifter.drift(): return self.wingame()
-                return ("The space craft is allowed to drift into another solar system...",GAME_ACTION)
+                return ("The space craft is allowed to drift...",GAME_ACTION)
 
             ######################################################### Head Home:
             if cmd == "head":
@@ -191,7 +280,23 @@ class CmdLineGame():
             ############################################################ Repair:
             #TODO: Use metal at friendly planet.
             #      Not 1:1, and probably not random either. Tunable.
+            
+            #NOTE : Repairing the ship uses the crafting system to check if the user's cargo
+            #       meets the necessary requirements to repair the ship. Repairing ship increase
+            #       ship's health by 15.
 
+            #REQUIREMENTS: To repair the ship, the user must have these materials in their cargo.
+            #              7 Metals , 3 Coolant , 2 Engine , 5 Glass
+
+            if cmd == "repair":
+                try:
+                    attitude = self.drifter.sys.planets[self.drifter.sys.pos].resource.civ.Attitude()
+                    if (attitude == "Friendly" or attitude == "Neutral"):
+                        self.drifter.craft(1, cmdLine[0]);
+                    else: return ("You're currently under attack! Get out before you try to repair.\n",GAME_CONTINUE)
+                except (IndexError, ValueError):
+                    return ("Unable to repair the ship.",GAME_CONTINUE)
+                    
             ############################################################ Refine:
             if cmd == "refine": #TODO: Planet charges for this service?
                 try:

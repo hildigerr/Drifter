@@ -1,5 +1,5 @@
 #Standard Python libs
-import collections, configparser, os, pickle, sqlite3, sys
+import collections, configparser, datetime, os, pickle, re, sqlite3, sys
 
 #Site-libs
 import tweepy
@@ -10,6 +10,7 @@ class Twitter(object):
         self.botName = botName
         self.rawTweets = []
         self.cleanTweets = []
+        self.validRegex = None
 
         if os.path.exists('twitter.pickle'):
             self.loadState()
@@ -77,7 +78,15 @@ class Twitter(object):
 
 
         for t in tweets:
-            newTweets.append([t, self.cleanTweet(tweets[t][0]), tweets[t][1], tweets[t][2]])
+            msg = self.cleanTweet(tweets[t][0])
+            if self.validRegex:
+                match = re.search(self.validRegex, msg, re.I)
+                if match:
+                    newTweets.append([t, msg, tweets[t][1], tweets[t][2]])
+                else:
+                    print("INVALID TWEET -- {}: {}".format(t, msg))
+            else:
+                newTweets.append([t, msg, tweets[t][1], tweets[t][2]])
 
         #Don't lose the lastTweetId!
         self.saveState()
@@ -134,7 +143,7 @@ class Twitter(object):
             msg += '"' + t[0] + '" - Votes: ' + str(t[1]) + '\n\n'
 
         if msg == 'Top 5 Votes:\n\n':
-            msg = 'No votes submitted this round. Craft will drift into space...\n\n'
+            msg = 'No votes submitted this round...\n\n'
 
         return msg
 
@@ -146,3 +155,40 @@ class Twitter(object):
     def resetTweets(self):
         self.rawTweets = []
         self.cleanTweets = []
+
+    def logTweets(self):
+        con = None
+
+        try:
+            con = sqlite3.connect('web/tweet.db')
+            cur = con.cursor()
+            for t in self.cleanTweets:
+                cur.execute('''SELECT * FROM Player WHERE name=?;''', (t[0],))
+                data = cur.fetchone()
+                if data: #User exists in database, update their info
+                    data = list(data)
+                    #Update success
+                    if t[3]:
+                        data[2] += 1
+                    #Update tweet count
+                    data[3] += 1
+
+                    #Check for a newer date
+                    if t[2].date() > datetime.datetime.strptime(data[5], '%m/%d/%Y').date():
+                        data[5] = t[2].strftime('%m/%d/%Y')
+                        data[4] += 1
+
+                    #Update the existing entry
+                    cur.execute('''UPDATE Player SET Success=?, Total=?, TotalDay=?, LastDay=? WHERE id=?;''', (data[2], data[3], data[4], data[5], data[0]))
+
+                else: #Add user to DB
+                    success = 1 if t[3] else 0
+                    cur.execute('''INSERT INTO Player (Name, Success, Total, TotalDay, LastDay) VALUES(?, ?, 1, 1, ?);''', (t[0], success, t[2].strftime('%m/%d/%Y')))
+
+                con.commit()
+
+        except sqlite3.Error as e:
+            print("Error: {}".format(e))
+        finally:
+            if con:
+                con.close()

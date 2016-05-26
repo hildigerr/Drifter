@@ -66,7 +66,7 @@ def writeWeb():
         <div class="row">
             <div class="col-xs-12 col-md-3"></div>
             <div class="col-xs-12 col-md-6">
-                <a href="image/Latest.png" class="thumbnail"><img src="image/Latest.png" alt="First Image" class="img-responsive"></a>
+                <a href="latest.png" class="thumbnail"><img src="latest.png" alt="First Image" class="img-responsive"></a>
             </div>
         </div>
 

@@ -6,4 +6,4 @@ src/*~
 *__pycache__/*
 
 #Other stuff
-web/index.html
+web/*.html

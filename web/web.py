@@ -3,7 +3,8 @@ import sqlite3 as lite
 import sys
 
 def writeWeb():
-    con = lite.connect('web/tweet.db')
+    # con = lite.connect('web/tweet.db')
+    con = lite.connect('tweet.db')
 
     with con:
         cur = con.cursor()
@@ -11,23 +12,23 @@ def writeWeb():
         rows = cur.fetchall()
 
         # MSG = open('msg.txt', 'r').read()
-    	TITLE = 'SPACE DRIFT'
+        TITLE = 'SPACE DRIFT'
 
-    	htmlF = open('index3.html', 'w')
+        htmlF = open('index4.html', 'w')
 
-    	htmlF.write('''
+        htmlF.write('''
 <!DOCTYPE html>
 
 <html>
 <head>
-	<meta charset="utf-8">
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>SPACE DRIFT</title>
+    <title>SPACE DRIFT</title>
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <link href="css/main.css" rel="stylesheet" type="text/css">
-</head>		
+</head>     
 
 <body>
     <header>
@@ -48,8 +49,17 @@ def writeWeb():
         You are <b>81000</b> light years from home, but the solar sails are functional.
         <br><br>
         You may return to stasis and allow the ship to drift at any time. Or, if you have fuel, you can head toward home. Perhaps one of these nearby planets has something interesting.</p>
-        
-        <br><br><br>
+
+        <br><br><br><br>
+
+        <div class="row">
+            <div class="col-md-4" id="button"></div>
+           <div class="col-md-4" id="button">
+                <a href="week6.html"><span class="glyphicon glyphicon glyphicon-leaf" aria-hidden="true"></span> How to Play</a>
+           </div>
+           <div class="col-md-4" id="button"></div>
+        </div>
+
 
         <!-- Displaying thumbnails -->
         <h2>Status</h2>
@@ -78,7 +88,7 @@ def writeWeb():
 
         for row in rows:
             htmlF.write('''
-    		<tr>
+            <tr>
                 <td id="%s">%s</td>
                 <td>%s</td>
                 <td>%s</td>
@@ -88,7 +98,7 @@ def writeWeb():
             ''' % (row[1], row[1], row[2], row[3], row[4], row[5]))
 
     htmlF.write('''
-	   </table>
+       </table>
     </div> 
 
     <div class="emptyBot"></div>

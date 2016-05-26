@@ -3,8 +3,8 @@ import sqlite3 as lite
 import sys
 
 def writeWeb():
-    # con = lite.connect('web/tweet.db')
-    con = lite.connect('tweet.db')
+    con = lite.connect('web/tweet.db')
+    # con = lite.connect('tweet.db')
 
     with con:
         cur = con.cursor()
@@ -14,7 +14,7 @@ def writeWeb():
         # MSG = open('msg.txt', 'r').read()
         TITLE = 'SPACE DRIFT'
 
-        htmlF = open('index4.html', 'w')
+        htmlF = open('web/index.html', 'w')
 
         htmlF.write('''
 <!DOCTYPE html>

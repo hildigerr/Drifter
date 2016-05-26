@@ -85,7 +85,7 @@ class CmdLineGame():
         for c in validCmds:
             if c[0] not in curCmds:
                 validCmds.remove(c)
-            
+
         for c in validCmds:
             curRegex = '(\s*'
             for o in c:
@@ -184,7 +184,7 @@ class CmdLineGame():
             except (EOFError) : cmdLine[0] = "quit" # CTRL-D Quits
 
             print(self.validCommand(' '.join(cmdLine)))
-            
+
             (output,status) = self.do(cmdLine)
             print ("\n" + ('#' * 80) + "\n" + output)
             if status == GAME_TERMINATE: sys.exit(0)
@@ -280,7 +280,7 @@ class CmdLineGame():
             ############################################################ Repair:
             #TODO: Use metal at friendly planet.
             #      Not 1:1, and probably not random either. Tunable.
-            
+
             #NOTE : Repairing the ship uses the crafting system to check if the user's cargo
             #       meets the necessary requirements to repair the ship. Repairing ship increase
             #       ship's health by 15.
@@ -296,7 +296,7 @@ class CmdLineGame():
                     else: return ("You're currently under attack! Get out before you try to repair.\n",GAME_CONTINUE)
                 except (IndexError, ValueError):
                     return ("Unable to repair the ship.",GAME_CONTINUE)
-                    
+
             ############################################################ Refine:
             if cmd == "refine": #TODO: Planet charges for this service?
                 try:

@@ -2,34 +2,33 @@
 import sqlite3 as lite
 import sys
 
-def writeWeb():
-        con = lite.connect('web/tweet.db')
+con = lite.connect('tweet.db')
 
-        with con:
-	        cur = con.cursor()
-	        cur.execute("SELECT * FROM Player ORDER BY Success DESC")
-	        rows = cur.fetchall()
+with con:
+    cur = con.cursor()
+    cur.execute("SELECT * FROM Player")
 
-	        # MSG = open('msg.txt', 'r').read()
-	        TITLE = 'SPACE DRIFT'
+    rows = cur.fetchall()
 
-	TITLE = 'SPACE DRIFT'
 
-	htmlF = open('index3.html', 'w')
+    # MSG = open('msg.txt', 'r').read()
+    TITLE = 'SPACE DRIFT'
 
-	htmlF.write('''
+    htmlF = open('index3.html', 'w')
+
+    htmlF.write('''
 <!DOCTYPE html>
 
 <html>
 <head>
-	<meta charset="utf-8">
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>SPACE DRIFT</title>
+    <title>SPACE DRIFT</title>
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <link href="css/main.css" rel="stylesheet" type="text/css">
-</head>		
+</head>     
 
 <body>
     <header>
@@ -73,13 +72,14 @@ def writeWeb():
                 <th>Total Tweets</th>
                 <th>Day Play</th>
                 <th>Last Day Play</th>
-            </tr>''')
+            </tr>
+        ''')
 
 
 
-        for row in rows:
-	        htmlF.write('''
-			<tr>
+    for row in rows:
+        htmlF.write('''
+            <tr>
                 <td id="%s">%s</td>
                 <td>%s</td>
                 <td>%s</td>
@@ -88,8 +88,8 @@ def writeWeb():
             </tr>
             ''' % (row[1], row[1], row[2], row[3], row[4], row[5]))
 
-	        htmlF.write('''
-	   </table>
+    htmlF.write('''
+   </table>
     </div> 
 
     <div class="emptyBot"></div>
@@ -100,6 +100,4 @@ def writeWeb():
 </body>    
 </html>''')
 
-        con.close()
-
-writeWeb()
+con.close()

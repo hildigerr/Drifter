@@ -100,6 +100,4 @@ def writeWeb():
 </body>    
 </html>''')
 
-        con.close()
-
-writeWeb()
+con.close()

@@ -3,21 +3,19 @@ import sqlite3 as lite
 import sys
 
 def writeWeb():
-        con = lite.connect('web/tweet.db')
+    con = lite.connect('web/tweet.db')
 
-        with con:
-	        cur = con.cursor()
-	        cur.execute("SELECT * FROM Player ORDER BY Success DESC")
-	        rows = cur.fetchall()
+    with con:
+        cur = con.cursor()
+        cur.execute("SELECT * FROM Player ORDER BY Success DESC")
+        rows = cur.fetchall()
 
-	        # MSG = open('msg.txt', 'r').read()
-	        TITLE = 'SPACE DRIFT'
+        # MSG = open('msg.txt', 'r').read()
+    	TITLE = 'SPACE DRIFT'
 
-	TITLE = 'SPACE DRIFT'
+    	htmlF = open('index3.html', 'w')
 
-	htmlF = open('index3.html', 'w')
-
-	htmlF.write('''
+    	htmlF.write('''
 <!DOCTYPE html>
 
 <html>
@@ -56,8 +54,9 @@ def writeWeb():
         <!-- Displaying thumbnails -->
         <h2>Status</h2>
         <div class="row">
-            <div class="col-xs-12 col-md-4">
-                <a href="image/Thu May 19 14:01:35 2016.png" class="thumbnail"><img src="image/Thu May 19 14:01:35 2016.png" alt="First Image" id="imagelightbox"></a>
+            <div class="col-xs-12 col-md-3"></div>
+            <div class="col-xs-12 col-md-6">
+                <a href="image/Latest.png" class="thumbnail"><img src="image/Latest.png" alt="First Image" class="img-responsive"></a>
             </div>
         </div>
 
@@ -78,8 +77,8 @@ def writeWeb():
 
 
         for row in rows:
-	        htmlF.write('''
-			<tr>
+            htmlF.write('''
+    		<tr>
                 <td id="%s">%s</td>
                 <td>%s</td>
                 <td>%s</td>
@@ -88,7 +87,7 @@ def writeWeb():
             </tr>
             ''' % (row[1], row[1], row[2], row[3], row[4], row[5]))
 
-	        htmlF.write('''
+    htmlF.write('''
 	   </table>
     </div> 
 
@@ -100,4 +99,6 @@ def writeWeb():
 </body>    
 </html>''')
 
-con.close()
+    con.close()
+
+if __name__ == '__main__': writeWeb()

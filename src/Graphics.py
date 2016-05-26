@@ -105,7 +105,7 @@ class PlanetSys():
     def __init__(self):
         self.planetImg = {} ; self.planetImgBig = {}
         self.planetImg["Rocky" ] = load_img("planet000.png")
-        self.planetImg["Water" ] = load_img("planet001.png")#TODO: Use blue lava render instead of pool bottom pattern fill
+        self.planetImg["Water" ] = load_img("planet001.png")
         self.planetImg["Fire"  ] = load_img("planet002.png")
         self.planetImg["Barren"] = load_img("planet003.png")
         self.planetImg["City"  ] = load_img("city-overlay.png")

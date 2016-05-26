@@ -103,12 +103,17 @@ class PlanetSys():
     #TODO: Have muliple planet images of each kind and randomize selection.
     #TODO: Rotate the spheres randomly to simulate time passing in orbit.
     def __init__(self):
-        self.planetImg = {}
+        self.planetImg = {} ; self.planetImgBig = {}
         self.planetImg["Rocky" ] = load_img("planet000.png")
-        self.planetImg["Water" ] = load_img("planet001.png")
+        self.planetImg["Water" ] = load_img("planet001.png")#TODO: Use blue lava render instead of pool bottom pattern fill
         self.planetImg["Fire"  ] = load_img("planet002.png")
         self.planetImg["Barren"] = load_img("planet003.png")
         self.planetImg["City"  ] = load_img("city-overlay.png")
+        self.planetImgBig["Rocky" ] = load_img("planet000-1440.png")
+        self.planetImgBig["Water" ] = load_img("planet001-1440.png")
+        self.planetImgBig["Fire"  ] = load_img("planet002-1440.png")
+        self.planetImgBig["Barren"] = load_img("planet003-1440.png")
+        self.planetImgBig["City"  ] = load_img("city-overlay-big.png")
         self.stockSolarSystemImg = load_img("star-chart-big.png" )
         self.panel               = load_img("panel-right-big.png")
         self.solarSystemImg = None
@@ -234,12 +239,12 @@ class Graphics():
         if self.player.sys.pos != None:
             planet = self.player.sys.planets[self.player.sys.pos]
             kind   = planet.resource.kind
-            splash = self.sys.planetImg.get(kind,"Barren")
+            splash = self.sys.planetImgBig.get(kind,"Barren")
             s_rect = splash.get_rect()
             s_rect.center = (0,0)
             self.screen.blit(splash,s_rect)
             if planet.resource.civ != None:
-                splash = self.sys.planetImg.get("City")
+                splash = self.sys.planetImgBig.get("City")
                 s_rect = splash.get_rect()
                 s_rect.center = (0,0)
                 self.screen.blit(splash,s_rect)

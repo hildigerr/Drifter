@@ -54,7 +54,7 @@ class TwitterGame():
         print("DEBUG... Rendering") #TODO: Ensuring no extra rendering occurs.
         self.imgFileName  = self.gfx.scene_gen(self.starChart)
         pygame.display.flip()
-        web.writeWeb()
+        web.writeWeb(self.command.stasisYears, self.drifter.delta, self.drifter.credit)
 
     def main(self):
         ''' Play The Game. '''

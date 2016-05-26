@@ -2,9 +2,14 @@
 import sqlite3 as lite
 import sys
 
-def writeWeb():
+def writeWeb(stasisYears, homeDelta, credit):
     con = lite.connect('web/tweet.db')
     # con = lite.connect('tweet.db')
+
+    if credit < 0:
+        libraryFine = '<p>You have an overdue library fine of ${} universal credits.</p>\n'.format(-credit)
+    else:
+        libraryFine = ''
 
     with con:
         cur = con.cursor()
@@ -28,13 +33,13 @@ def writeWeb():
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     <link href="css/main.css" rel="stylesheet" type="text/css">
-</head>     
+</head>
 
 <body>
     <header>
         <h1>SPACE DRIFT</h1>
     </header>
-    
+
     <div class="empty"></div>
 
     <div class="inner">
@@ -44,13 +49,12 @@ def writeWeb():
         </div>
 
         <h2>Story</h2>
-        <p>The last thing you remember before awaking from chryostasis, is the captain being decapitated by some flying debris. There was a battle. You don't know if the enemy was destroyed, but obviously your ship is intact. The onboard computer reports that you have been in stasis for <b>345</b> years. The ship has been drifting the entire time.
-        <br><br>
-        You are <b>81000</b> light years from home, but the solar sails are functional.
-        <br><br>
-        You may return to stasis and allow the ship to drift at any time. Or, if you have fuel, you can head toward home. Perhaps one of these nearby planets has something interesting.</p>
-
-        <br><br><br><br>
+        <p>The last thing you remember before awaking from chryostasis, is the captain being decapitated by some flying debris. There was a battle. You don't know if the enemy was destroyed, but obviously your ship is intact. The onboard computer reports that you have been in stasis for <b>{}</b> years. The ship has been drifting the entire time.</p>
+        <p>You are <b>{}</b> light years from home, but the solar sails are functional.</p>
+        '''.format(stasisYears, homeDelta) + libraryFine +
+        '''
+        <p>You may return to stasis and allow the ship to drift at any time. Or, if you have fuel, you can head toward home. Perhaps one of these nearby planets has something interesting.</p>'''
+        '''<br><br>
 
         <div class="row">
             <div class="col-md-4" id="button"></div>
@@ -71,7 +75,7 @@ def writeWeb():
         </div>
 
         <br><br><br>
-        
+
         <h2>Result</h2>
 
         <!-- Important Table -->
@@ -99,14 +103,14 @@ def writeWeb():
 
     htmlF.write('''
        </table>
-    </div> 
+    </div>
 
     <div class="emptyBot"></div>
     <footer>
         <h3>Twitter Bot---></h3>
-    </footer>    
-    
-</body>    
+    </footer>
+
+</body>
 </html>''')
 
     con.close()

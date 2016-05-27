@@ -36,9 +36,9 @@ def writeWeb(stasisYears, homeDelta, credit):
 </head>
 
 <body>
-    <header>
+    <div class="page-header header">
         <h1>DRIFTER GAME</h1>
-    </header>
+    </div>
 
     <div class="empty"></div>
 

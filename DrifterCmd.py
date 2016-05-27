@@ -208,6 +208,8 @@ class CmdLineGame():
                 self.drifter.cargo   )
     def holyWaterHack(self,string): #XXX#
         ''' XXX Change "Holy" to "Holy Water" XXX'''
+        ''' Also Ensure Item is Capitalized '''
+        string = string.capitalize()
         if string == "Holy": return "Holy Water"
         else:                return  string
     def main(self):

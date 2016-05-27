@@ -99,6 +99,7 @@ class CmdLineGame():
             ['attack'],
             ['refine', '#O', 'INV'],
             ['gamble', '#'],
+            ['repair'],
             ['craft', '#O', 'CRAFT']
         ]
         curCmds = self.commands().split(', ')
@@ -176,8 +177,9 @@ class CmdLineGame():
             return None
     def commands(self):
         '''Enumerate available commands into a string.'''
-        string =               "Available commands are: drift"
-        if   self.drifter.fuel > 0:        string += ", home"
+        string = "Available commands are: "
+        if self.drifter.sys.pos == None: string += "drift, "
+        if self.drifter.fuel > 0: string += "home"
         if self.drifter.sys.pos != None:
             if self.drifter.sys.planets[self.drifter.sys.pos].resource.civ != None:
                 attitude = self.drifter.sys.planets[self.drifter.sys.pos].resource.civ.Attitude()
@@ -234,7 +236,10 @@ class CmdLineGame():
             if status != GAME_CONTINUE:  self.drifter.time += 1
     def do(self,cmdLine):
             '''Perform a cmd and Return Result String and status.'''
-            cmd = cmdLine[0]
+            try:
+                cmd = cmdLine[0]
+            except (TypeError):
+                return ("Captain, that's a stupid idea.", GAME_CONTINUE)
             ############################################################## Help:
             if cmd == "help": #TODO Add command parameter
                 return ("The ship status is described as so:\n\t"
@@ -321,9 +326,6 @@ class CmdLineGame():
                         format(damDone,damSustained),GAME_ACTION)
 
             ############################################################ Repair:
-            #TODO: Use metal at friendly planet.
-            #      Not 1:1, and probably not random either. Tunable.
-
             #NOTE : Repairing the ship uses the crafting system to check if the user's cargo
             #       meets the necessary requirements to repair the ship. Repairing ship increase
             #       ship's health by 15.

@@ -37,7 +37,7 @@ class TwitterGame():
     def commands(self):
         '''Enumerate available commands into a msg.'''
         msg =                                     "drift"
-        if   self.drifter.fuel > 0:        msg += ", head home"
+        if   self.drifter.fuel > 0:        msg += ", home"
         if self.drifter.sys.pos != None:
             if self.drifter.sys.planets[self.drifter.sys.pos].resource.civ != None:
                 attitude = self.drifter.sys.planets[self.drifter.sys.pos].resource.civ.Attitude()
@@ -64,7 +64,7 @@ class TwitterGame():
 
         while True:
             self.command.buildCommandRegex()
-            self.twitter.validRegex = self.command.validRegex
+            self.twitter.isValidCommand = self.command.isValidCommand
 
             self.render()
 
@@ -129,7 +129,7 @@ class TwitterGame():
                 (result, status) = self.command.do(["drift"])
 
             ######################################################### Head Home:
-            elif cmd == "head":
+            elif cmd == "home":
                 self.starChart = None
                 (result,status) = self.command.do(["head"])
 

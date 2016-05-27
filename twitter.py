@@ -1,5 +1,5 @@
 #Standard Python libs
-import collections, configparser, datetime, os, pickle, re, sqlite3, sys
+import collections, configparser, datetime, os, pickle, re, sqlite3, statistics, sys
 
 #Site-libs
 import tweepy
@@ -10,7 +10,7 @@ class Twitter(object):
         self.botName = botName
         self.rawTweets = []
         self.cleanTweets = []
-        self.validRegex = None
+        self.isValidCommand = None
 
         if os.path.exists('twitter.pickle'):
             self.loadState()
@@ -79,9 +79,9 @@ class Twitter(object):
 
         for t in tweets:
             msg = self.cleanTweet(tweets[t][0])
-            if self.validRegex:
-                match = re.search(self.validRegex, msg, re.I)
-                if match:
+            if self.isValidCommand:
+                msg = self.isValidCommand(msg)
+                if msg:
                     newTweets.append([t, msg, tweets[t][1], tweets[t][2]])
                 else:
                     print("INVALID TWEET -- {}: {}".format(t, msg))
@@ -127,8 +127,50 @@ class Twitter(object):
     def findTop5Votes(self):
         rawVotes = {}
         top5Votes = []
+        mergedTweets = []
+        commandCounts = {}
+        countedCommands = ['jettison', 'buy', 'sell', 'refine', 'gamble', 'craft']
+        count = 0
+        biggest = None
+        biggestCount = 0
 
-        for t in self.cleanTweets:
+        for t in self.cleanedTweets:
+            tmp = t[1].split()
+            if tmp[0] in countedCommands:
+                if not tmp[0] in commandCounts:
+                    commandCounts[tmp[0]] = {}
+                #XXX: Hack for gamble since it doesn't take an item param
+                if tmp[0] == 'gamble':
+                    tmp.append('gamble')
+                if not tmp[2] in commandCounts[tmp[0]]:
+                    commandCounts[tmp[0]][tmp[2]] = []
+                try:
+                    commandCounts[tmp[0]][tmp[2]].append(int(tmp[1]))
+                except e:
+                    pass
+            else:
+                self.mergedTweets.append(t)
+        #Merge the counted command tweets
+        for c in commandCounts:
+            count = 0
+            for i in commandCounts[c]:
+                avg = int(statistics.mean(commandCounts[c][i]))
+                length = len(commandCounts[c][i])
+                count += length
+                if length > biggestCount:
+                    biggestCount = length
+                    biggest = i
+                #Update the data we're keeping. Don't care about individual #s,
+                #just keep the average and how many votes
+                commandCounts[c][i] = [avg, length]
+            for x in range(count):
+                if c != 'gamble':
+                    mergedTweets.append(['MERGED', '{} {} {}'.format(c, avg, biggest)])
+                else:
+                    mergedTweets.append(['MERGED', '{} {}'.format(c, avg)])
+
+
+        for t in mergedTweets:
             if t[1] in rawVotes:
                 rawVotes[t[1]] += 1
             else:

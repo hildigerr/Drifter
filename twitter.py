@@ -134,7 +134,7 @@ class Twitter(object):
         biggest = None
         biggestCount = 0
 
-        for t in self.cleanedTweets:
+        for t in self.cleanTweets:
             tmp = t[1].split()
             if tmp[0] in countedCommands:
                 if not tmp[0] in commandCounts:
@@ -149,10 +149,12 @@ class Twitter(object):
                 except e:
                     pass
             else:
-                self.mergedTweets.append(t)
+                mergedTweets.append(t)
         #Merge the counted command tweets
         for c in commandCounts:
             count = 0
+            biggestCount = 0
+            biggest = ''
             for i in commandCounts[c]:
                 avg = int(statistics.mean(commandCounts[c][i]))
                 length = len(commandCounts[c][i])
@@ -165,9 +167,9 @@ class Twitter(object):
                 commandCounts[c][i] = [avg, length]
             for x in range(count):
                 if c != 'gamble':
-                    mergedTweets.append(['MERGED', '{} {} {}'.format(c, avg, biggest)])
+                    mergedTweets.append(['MERGED', '{} {} {}'.format(c, commandCounts[c][biggest][0], biggest)])
                 else:
-                    mergedTweets.append(['MERGED', '{} {}'.format(c, avg)])
+                    mergedTweets.append(['MERGED', '{} {}'.format(c, commandCounts[c][biggest][0])])
 
 
         for t in mergedTweets:

@@ -49,7 +49,7 @@ class CmdLineGame():
         string += "You are {} light years from home, ".format(self.drifter.delta)
         string += "but the solar sails are functional.\n"
         if self.drifter.credit < 0:
-            string += "You have an overdue library fine of ${} universal credits.\n".format(-self.drifter.credit)
+            string += "You have a gambling debt of ${} universal credits.\n".format(-self.drifter.credit)
         string += "\nYou may return to stasis and allow the ship to drift at any time. "
         string += "Or, if you\nhave fuel, you can head toward home. "
         if self.drifter.sys.qt > 0: string += "Perhaps one of these nearby planets has\n"

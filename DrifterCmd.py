@@ -100,7 +100,8 @@ class CmdLineGame():
             ['refine', '#O', 'INV'],
             ['gamble', '#'],
             ['repair'],
-            ['craft', '#O', 'CRAFT']
+            ['craft', '#O', 'CRAFT'],
+            ['gm']
         ]
         curCmds = self.commands().split(', ')
         print(curCmds)
@@ -335,10 +336,13 @@ class CmdLineGame():
 
             if cmd == "repair":
                 try:
-                    attitude = self.drifter.sys.planets[self.drifter.sys.pos].resource.civ.Attitude()
-                    if (attitude == "Friendly" or attitude == "Neutral"):
-                        self.drifter.craft(1, cmdLine[0]);
-                    else: return ("You're currently under attack! Get out before you try to repair.\n",GAME_CONTINUE)
+                    if self.drifter.sys.pos and self.drifter.sys.planets[self.drifter.sys.pos].resource.civ:
+                        attitude = self.drifter.sys.planets[self.drifter.sys.pos].resource.civ.Attitude()
+                        if (attitude == "Friendly" or attitude == "Neutral"):
+                            self.drifter.craft(1, cmdLine[0]);
+                        else: return ("You're currently under attack! Get out before you try to repair.\n",GAME_CONTINUE)
+                    else:
+                        return ("You must orbit a civilized planet in order to repair!\n", GAME_CONTINUE)
                 except (IndexError, ValueError):
                     return ("Unable to repair the ship.",GAME_CONTINUE)
 

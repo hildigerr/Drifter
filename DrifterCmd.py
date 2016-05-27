@@ -7,7 +7,7 @@
 #                                                                              #
 ################################################################################
 
-import random, re, sys, time
+import copy, random, re, sys, time
 
 sys.path.append("src/")
 from src import Ship
@@ -32,6 +32,22 @@ class CmdLineGame():
         else:            self.drifter = ship
         self.validRegex = None
         self.stasisYears = 0
+        self.validCmds = [
+            ['orbit', 'PLANETS'],
+            ['depart'],
+            ['drift'],
+            ['home'],
+            ['harvest'],
+            ['jettison', '#O', 'INV'],
+            ['buy', '#O', 'P_INV'],
+            ['sell', '#O', 'INV'],
+            ['attack'],
+            ['refine', '#O', 'INV'],
+            ['gamble', '#'],
+            ['repair'],
+            ['craft', '#O', 'CRAFT'],
+            ['gm']
+        ]
         if run: self.main()
     def registerFun(winfun,loosefun):
         self.wingame = winfun
@@ -90,34 +106,21 @@ class CmdLineGame():
             buildRegex = ''
         return buildRegex
     def buildCommandRegex(self):
-        validCmds = [
-            ['orbit', 'PLANETS'],
-            ['depart'],
-            ['drift'],
-            ['home'],
-            ['harvest'],
-            ['jettison', '#O', 'INV'],
-            ['buy', '#O', 'P_INV'],
-            ['sell', '#O', 'INV'],
-            ['attack'],
-            ['refine', '#O', 'INV'],
-            ['gamble', '#'],
-            ['repair'],
-            ['craft', '#O', 'CRAFT'],
-            ['gm']
-        ]
         curCmds = self.commands().split(', ')
+        #You can always drift
+        curCmds.append('drift')
         print(curCmds)
         buildRegex = ''
         curRegex = ''
-
+        #Copy the commands because we don't want to lose this list!
+        validCmds = copy.copy(self.validCmds)
         #Remove commands not currently applicable
         for c in validCmds:
             if c[0] not in curCmds:
                 validCmds.remove(c)
 
         for c in validCmds:
-            curRegex = '(.*'
+            curRegex = '(?P<{}>.*'.format(c[0])
             for o in c:
                 if o == '#':
                     curRegex += '(\d+)'
@@ -172,10 +175,15 @@ class CmdLineGame():
             self.buildCommandRegex()
         m = re.search(self.validRegex, cmd, re.I)
         if m:
-            for x in m.groups()[1:]:
-                if x:
-                    validCommand += (x + ' ')
+            print(m.groups())
+            print(m.groupdict())
+            for x in m.groupdict():
+                if m.group(x):
+                    for y in m.groups():
+                        if y and m.group(x) != y:
+                            validCommand += (y + ' ')
             validCommand = validCommand[:-1]
+            print("Valid Command: ", validCommand)
             return validCommand
         else:
             return None

@@ -178,9 +178,8 @@ class CmdLineGame():
             return None
     def commands(self):
         '''Enumerate available commands into a string.'''
-        string = "Available commands are: "
-        if self.drifter.sys.pos == None: string += "drift, "
-        if self.drifter.fuel > 0: string += "home"
+        string =               "Available commands are: drift"
+        if self.drifter.fuel > 0: string          += ", home"
         if self.drifter.sys.pos != None:
             if self.drifter.sys.planets[self.drifter.sys.pos].resource.civ != None:
                 attitude = self.drifter.sys.planets[self.drifter.sys.pos].resource.civ.Attitude()

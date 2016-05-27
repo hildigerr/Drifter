@@ -15,8 +15,6 @@ def writeWeb(stasisYears, homeDelta, credit):
         cur = con.cursor()
         cur.execute("SELECT * FROM Player ORDER BY Success DESC")
         rows = cur.fetchall()
-
-        # MSG = open('msg.txt', 'r').read()
         TITLE = 'SPACE DRIFT'
 
         htmlF = open('web/index.html', 'w')

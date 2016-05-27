@@ -12,6 +12,7 @@ import random, re, sys, time
 sys.path.append("src/")
 from src import Ship
 from src.Crafting import CRAFT_LIST
+from src.Cargo import CIV_DAM_MIN, CIV_DAM_MAX
 
 raw_input = input #python3
 
@@ -239,10 +240,7 @@ class CmdLineGame():
             if status != GAME_CONTINUE:  self.drifter.time += 1
     def do(self,cmdLine):
             '''Perform a cmd and Return Result String and status.'''
-            try:
-                cmd = cmdLine[0]
-            except (TypeError):
-                return ("Captain, that's a stupid idea.", GAME_CONTINUE)
+            cmd = cmdLine[0]
             ############################################################## Help:
             if cmd == "help": #TODO Add command parameter
                 return ("The ship status is described as so:\n\t"
@@ -262,9 +260,18 @@ class CmdLineGame():
                 return self.losegame("\tSELF DESTRUCT SEQUENCE ACTIVATED!")
 
             ############################################################# Drift:
-            if cmd == "drift": #TODO Drifting while under attack is dangerous.
+            if cmd == "drift":
+                driftString = "The space craft is allowed to drift..."
+                if self.drifter.sys.pos != None:
+                    if self.drifter.sys.planets[self.drifter.sys.pos].resource.civ != None:
+                        attitude = self.drifter.sys.planets[self.drifter.sys.pos].resource.civ.Attitude()
+                        if attitude == "Hostile":
+                            civDmg = random.randint(CIV_DAM_MIN, CIV_DAM_MAX)
+                            self.drifter.harm(civDmg);
+                            driftString += " The civilization attacked for {} as you tried to flee.".format(civDmg);
+                            
                 if self.drifter.drift(): return self.wingame()
-                return ("The space craft is allowed to drift...",GAME_ACTION)
+                return (driftString,GAME_ACTION)
 
             ######################################################### Head Home:
             if cmd == "home":
@@ -324,9 +331,9 @@ class CmdLineGame():
             if cmd == "attack":
                 (damDone,damSustained) = self.drifter.sys.attack()
                 if not self.drifter.harm(damDone):
-                    self.losegame("Your ship was destroyed in battle.")
+                    self.losegame("Your ship was destroyed in battle.") 
                 return ("You attack for {} damage, while sustaining {} damage.".
-                        format(damDone,damSustained),GAME_ACTION)
+                        format(damDone,damSustained),GAME_ACTION) 
 
             ############################################################ Repair:
             #NOTE : Repairing the ship uses the crafting system to check if the user's cargo

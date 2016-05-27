@@ -33,6 +33,9 @@ class CmdLineGame():
         self.validRegex = None
         self.stasisYears = 0
         if run: self.main()
+    def registerFun(winfun,loosefun):
+        self.wingame = winfun
+        self.losegame = loosefun
     def backstory(self):
         '''Return the backstory string.'''
 

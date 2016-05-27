@@ -7,9 +7,9 @@ def writeWeb(stasisYears, homeDelta, credit):
     # con = lite.connect('tweet.db')
 
     if credit < 0:
-        libraryFine = '<p>You have an overdue library fine of ${} universal credits.</p>\n'.format(-credit)
+        gamblingDebt = '<p>You have a gambling debt of ${} universal credits.</p>\n'.format(-credit)
     else:
-        libraryFine = ''
+        gamblingDebt = ''
 
     with con:
         cur = con.cursor()
@@ -49,7 +49,7 @@ def writeWeb(stasisYears, homeDelta, credit):
         <h2>Story</h2>
         <p>The last thing you remember before awaking from chryostasis, is the captain being decapitated by some flying debris. There was a battle. You don't know if the enemy was destroyed, but obviously your ship is intact. The onboard computer reports that you have been in stasis for <b>{}</b> years. The ship has been drifting the entire time.</p>
         <p>You are <b>{}</b> light years from home, but the solar sails are functional.</p>
-        '''.format(stasisYears, homeDelta) + libraryFine +
+        '''.format(stasisYears, homeDelta) + gamblingDebt +
         '''
         <p>You may return to stasis and allow the ship to drift at any time. Or, if you have fuel, you can head toward home. Perhaps one of these nearby planets has something interesting.</p>'''
         '''<br><br>

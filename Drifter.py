@@ -50,9 +50,9 @@ class TwitterGame():
         elif self.drifter.sys.qt > 0:      msg += ", orbit"
         if   len(self.drifter.cargo) > 0:  msg += ", jettison"
         return msg
-    def render(self):
+    def render(self, filename):
         print("DEBUG... Rendering") #TODO: Ensuring no extra rendering occurs.
-        self.imgFileName  = self.gfx.scene_gen(self.starChart)
+        self.imgFileName  = self.gfx.scene_gen(self.starChart,filename)
         pygame.display.flip()
         web.writeWeb(self.command.stasisYears, self.drifter.delta, self.drifter.credit)
 
@@ -62,11 +62,13 @@ class TwitterGame():
         result = None
         status = GAME_CONTINUE
 
+        self.render("backstory.png") ; pygame.display.flip()
+
         while True:
             self.command.buildCommandRegex()
             self.twitter.isValidCommand = self.command.isValidCommand
 
-            self.render()
+            self.render("latest.png")
 
             try:
                 print("Sending tweet with image...",)
@@ -143,7 +145,7 @@ class TwitterGame():
                                  + result
                                  + "\n\n" + self.command.listCargo()
                                  + "\n\n" + self.command.commands() )
-                self.render()
+                self.render("latest.png")
 
             if status == GAME_TERMINATE: return
             if status != GAME_CONTINUE:  self.drifter.time += 1

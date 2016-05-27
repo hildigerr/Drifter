@@ -226,9 +226,9 @@ class CmdLineGame():
                 cmdLine = raw_input(self.status()+" What will you do? ").split()
             except (EOFError) : cmdLine[0] = "quit" # CTRL-D Quits
 
-            cmdLine = self.isValidCommand(' '.join(cmdLine))
-            if cmdLine:
-                cmdLine = cmdLine.split()
+            cmdLine2 = self.isValidCommand(' '.join(cmdLine))
+            if cmdLine2:
+                cmdLine = cmdLine2.split()
 
             (output,status) = self.do(cmdLine)
             print ("\n" + ('#' * 80) + "\n" + output)

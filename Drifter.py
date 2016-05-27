@@ -62,6 +62,8 @@ class TwitterGame():
         result = None
         status = GAME_CONTINUE
 
+        self.render("backstory.png") ; pygame.display.flip()
+
         while True:
             self.command.buildCommandRegex()
             self.twitter.isValidCommand = self.command.isValidCommand

@@ -23,7 +23,7 @@ def writeWeb():
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>SPACE DRIFT</title>
+    <title>DRIFTER GAME</title>
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
@@ -32,7 +32,7 @@ def writeWeb():
 
 <body>
     <header>
-        <h1>SPACE DRIFT</h1>
+        <h1>DRIFTER GAME</h1>
     </header>
     
     <div class="empty"></div>
@@ -40,7 +40,7 @@ def writeWeb():
     <div class="inner">
         <div class="row">
             <div class="col-md-8"></div>
-            <div class="col-md-4" align="right"><a href="https://twitter.com"><img src="image/twii.png" onmouseover="this.src='image/twitter.png'" onmouseout="this.src='image/twii.png'" /></a></div>
+            <div class="col-md-4" align="right"><a href="https://twitter.com/DrifterGame"><img src="image/twii.png" onmouseover="this.src='image/twitter.png'" onmouseout="this.src='image/twii.png'" /></a></div>
         </div>
 
         <h2>Story</h2>
@@ -55,7 +55,7 @@ def writeWeb():
         <div class="row">
             <div class="col-md-4" id="button"></div>
            <div class="col-md-4" id="button">
-                <a href="week6.html"><span class="glyphicon glyphicon glyphicon-leaf" aria-hidden="true"></span> How to Play</a>
+                <a class="btn" role="button" href="tutorial.html"><span class="glyphicon glyphicon glyphicon-leaf" aria-hidden="true"></span> How to Play</a>
            </div>
            <div class="col-md-4" id="button"></div>
         </div>
@@ -99,6 +99,7 @@ def writeWeb():
 
     htmlF.write('''
        </table>
+    <a href="#" class="scrollToTop"><span class="glyphicon glyphicon-triangle-top" aria-hidden="true"></span></a>
     </div> 
 
     <div class="emptyBot"></div>
@@ -106,7 +107,27 @@ def writeWeb():
         <h3>Twitter Bot---></h3>
     </footer>    
     
-</body>    
+</body>
+<script>
+    $(document).ready(function(){
+        
+        //Check to see if the window is top if not then display button
+        $(window).scroll(function(){
+            if ($(this).scrollTop() > 100) {
+                $('.scrollToTop').fadeIn();
+            } else {
+                $('.scrollToTop').fadeOut();
+            }
+        });
+        
+        //Click event to scroll to top
+        $('.scrollToTop').click(function(){
+            $('html, body').animate({scrollTop : 0},800);
+            return false;
+        });
+        
+    });
+</script>    
 </html>''')
 
     con.close()

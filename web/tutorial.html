@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>DRIFTER GAME</title>
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <link href="css/main.css" rel="stylesheet" type="text/css">
+</head>     
+
+<body>
+    <header>
+        <h1>DRIFTER GAME</h1>
+    </header>
+    
+    <div class="empty"></div>
+
+    <div class="inner">
+        <div class="row">
+            <div class="col-md-8"></div>
+            <div class="col-md-4" align="right"><a href="https://twitter.com/DrifterGame"><img src="image/twii.png" onmouseover="this.src='image/twitter.png'" onmouseout="this.src='image/twii.png'" /></a></div>
+        </div>
+
+        <h2>How to Play <small>@DrifterGame</small></h2>
+
+        <p>The game is designed to play on <b>Twitter</b> platform</p>
+
+        <p>Send your voting command to <strong>@DrifterGame</strong> where everyone is the commander who has a responsibility to direct your ship and crew members to get back home safely. All commands will be compiled every <i>5 minutes</i> and a top voted command will be excuted according.</p>
+
+        <br><br>
+
+        <!-- Displaying available Commands -->
+        <h2 id="removePadding">Commands</h2>
+        <hr>
+        <h3>Orbit &lt;Planet Number&gt;</h3>
+        <p>&emsp;&emsp;Travel to and orbit a specific planet.</p>
+        <h4><small>Example---</small></h4>
+        <p>&emsp;&emsp;<b>@DrifterGame</b> Orbit <i>1</i></p>
+
+        <hr>
+        <h3>Depart</h3>
+        <p>&emsp;&emsp;Take off from a current orbited planet.</p>
+        <h4><small>Example---</small></h4>
+        <p>&emsp;&emsp;<b>@DrifterGame</b> Depart</p>
+
+        <hr>
+        <h3>Drift</h3>
+        <p>&emsp;&emsp;Drifting a random place without incurring a fuel cost.</p>
+        <h4><small>Example---</small></h4>
+        <p>&emsp;&emsp;<b>@DrifterGame</b> Drift</p>
+
+        <hr>
+        <h3>Home</h3>
+        <p>&emsp;&emsp;Automically choose a path toward home in the cost all fuel in the ship.</p>
+        <h4><small>Example---</small></h4>
+        <p>&emsp;&emsp;<b>@DrifterGame</b> Home</p>
+
+        <hr>
+        <h3>Harvest</h3>
+        <p>&emsp;&emsp; Harvesting and Collecting available natural resources on a planet.</p>
+        <h4><small>Example---</small></h4>
+        <p>&emsp;&emsp;<b>@DrifterGame</b> Harvest</p>
+
+        <hr>
+        <h3>Jettison &#91;#&#93; &lt;item&gt;</h3>
+        <p>&emsp;&emsp;Throw out an item from your cargo by a specific amount.</p>
+        <h4><small>Example---</small></h4>
+        <p>&emsp;&emsp;<b>@DrifterGame</b> Jettison <i>3</i> <i>Diamond</i></p>
+
+        <hr>
+        <h3>Buy &#91;#&#93; &lt;item&gt;</h3>
+        <p>&emsp;&emsp;Purchasing item(s) from a civilized planet.</p>
+        <h4><small>Example---</small></h4>
+        <p>&emsp;&emsp;<b>@DrifterGame</b> Buy <i>2</i> <i>Rock</i></p>
+
+        <hr>
+        <h3>Sell &#91;#&#93; &lt;item&gt;</h3>
+        <p>&emsp;&emsp;Selling item(s) from a civilized planet.</p>
+        <h4><small>Example---</small></h4>
+        <p>&emsp;&emsp;<b>@DrifterGame</b> Sell <i>5</i> <i>Holy Water</i></p>
+
+        <hr>
+        <h3>Attack</h3>
+        <p>&emsp;&emsp; Attack any hostile civilizations while docking in a visited planet.</p>
+        <h4><small>Example---</small></h4>
+        <p>&emsp;&emsp;<b>@DrifterGame</b> Attack</p>
+
+        <hr>
+        <h3>Refine &#91;#&#93; &lt;item&gt;</h3>
+        <p>&emsp;&emsp;Refine an item as a material to produce other materials.</p>
+        <h4><small>Example---</small></h4>
+        <p>&emsp;&emsp;<b>@DrifterGame</b> Refine <i>10</i> <i>Motherboard</i></p>
+
+        <hr>
+        <h3>Gamble &lt;#&gt;</h3>
+        <p>&emsp;&emsp;Try your luck and gamble your money with other civilized planet. Earn money without trying.</p>
+        <h4><small>Example---</small></h4>
+        <p>&emsp;&emsp;<b>@DrifterGame</b> Gamble <i>500</i></p>
+
+        <hr>
+        <h3>Craft &lt;#&gt; &lt;item&gt;</h3>
+        <p>&emsp;&emsp;Craft an awesome item by utilizing exisiting natural/artificial resources. Check out our crafting database to find out all the crafting options that are available.</p>
+        <h4><small>Example---</small></h4>
+        <p>&emsp;&emsp;<b>@DrifterGame</b> Craft <i>1</i> <i>Engine</i></p>
+
+        <br><br><br>
+        
+        <h2 id="removePadding">Craft</h2>
+        <hr>
+
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-3 col-xs-6">
+                    <h3>Fuel</h3>
+                    <ol class="list-unstyled"> 
+                        <li><b>4</b> Plasma</li>
+                        <li><b>6</b> Laser</li>
+                        <li><b>8</b> Holy Water</li>
+                        <li>&emsp;</li>
+                    </ol>
+                </div>
+                <div class="col-md-3 col-xs-6">
+                    <h3>Plasma</h3>
+                    <ol class="list-unstyled"> 
+                        <li><b>8</b> Charcoal</li>
+                        <li><b>8</b> Holy Water</li>
+                        <li><b>8</b> Obsidian</li>
+                        <li>&emsp;</li>
+                    </ol>
+                </div>
+                <div class="col-md-3 col-xs-6">
+                    <h3>Lazer</h3>
+                    <ol class="list-unstyled"> 
+                        <li><b>5</b> Metal</li>
+                        <li><b>4</b> Stones</li>
+                        <li><b>2</b> Lava</li>
+                        <li><b>5</b> Charcoal</li>
+                    </ol>
+                </div>
+                <div class="col-md-3 col-xs-6">
+                    <h3>Motherboard</h3>
+                    <ol class="list-unstyled"> 
+                        <li><b>4</b> Plasma</li>
+                        <li><b>6</b> Laser</li>
+                        <li><b>2</b> Gems</li>
+                        <li>&emsp;</li>
+                    </ol>
+                </div>
+                <div class="col-md-3 col-xs-6">
+                    <h3>Foam</h3>
+                    <ol class="list-unstyled"> 
+                        <li><b>2</b> Holy Water</li>
+                        <li><b>1</b> Charcoal</li>
+                        <li>&emsp;</li>
+                        <li>&emsp;</li>
+                    </ol>
+                </div>
+                <div class="col-md-3 col-xs-6">
+                    <h3>Coolant</h3>
+                    <ol class="list-unstyled"> 
+                        <li><b>3</b> Water</li>
+                        <li><b>5</b> Ice</li>
+                        <li><b>2</b> Beaker</li>
+                        <li>&emsp;</li>
+                    </ol>
+                </div>
+                <div class="col-md-3 col-xs-6">
+                    <h3>Sand</h3>
+                    <ol class="list-unstyled"> 
+                        <li><b>5</b> Stone</li>
+                        <li>&emsp;</li>
+                        <li>&emsp;</li>
+                        <li>&emsp;</li>
+                    </ol>
+                </div>
+                <div class="col-md-3 col-xs-6">
+                    <h3>Glass</h3>
+                    <ol class="list-unstyled"> 
+                        <li><b>3</b> Sand</li>
+                        <li><b>1</b> Lava</li>
+                        <li><b>2</b> Water</li>
+                        <li>&emsp;</li>
+                    </ol>
+                </div>
+                <div class="col-md-3 col-xs-6">
+                    <h3>Engine</h3>
+                    <ol class="list-unstyled"> 
+                        <li><b>2</b> Motherboard</li>
+                        <li><b>4</b> Coolant</li>
+                        <li><b>7</b> Metal</li>
+                        <li>&emsp;</li>
+                    </ol>
+                </div>
+                <div class="col-md-3 col-xs-6">
+                    <h3>Beaker</h3>
+                    <ol class="list-unstyled"> 
+                        <li><b>3</b> Glass</li>
+                        <li>&emsp;</li>
+                        <li>&emsp;</li>
+                        <li>&emsp;</li>
+                    </ol>
+                </div>
+                <div class="col-md-3 col-xs-6">
+                    <h3>Repair</h3>
+                    <ol class="list-unstyled"> 
+                        <li><b>7</b> Metal</li>
+                        <li><b>3</b> Coolant</li>
+                        <li><b>2</b> Engine</li>
+                        <li><b>5</b> Glass</li>
+                    </ol>
+                </div>
+                <div class="col-md-3 col-xs-6">
+                    <h3>Cargo</h3>
+                    <ol class="list-unstyled"> 
+                        <li><b>15</b> Metal</li>
+                        <li><b>7</b> Stone</li>
+                        <li><b>3</b> Lava</li>
+                        <li><b>6</b> Water</li>
+                        <li><b>5</b> Gems</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <a href="#" class="scrollToTop"><span class="glyphicon glyphicon-triangle-top" aria-hidden="true"></span></a>
+       
+    </div> 
+
+    <footer>
+        <h3>Twitter Bot---></h3>
+    </footer>    
+    
+</body>
+
+<script>
+    $(document).ready(function(){
+        
+        //Check to see if the window is top if not then display button
+        $(window).scroll(function(){
+            if ($(this).scrollTop() > 100) {
+                $('.scrollToTop').fadeIn();
+            } else {
+                $('.scrollToTop').fadeOut();
+            }
+        });
+        
+        //Click event to scroll to top
+        $('.scrollToTop').click(function(){
+            $('html, body').animate({scrollTop : 0},800);
+            return false;
+        });
+        
+    });
+</script>
+</html>

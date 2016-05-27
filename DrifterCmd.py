@@ -31,16 +31,20 @@ class CmdLineGame():
         if ship == None: self.drifter = Ship.Ship()
         else:            self.drifter = ship
         self.validRegex = None
+        self.stasisYears = 0
         if run: self.main()
     def backstory(self):
         '''Return the backstory string.'''
+
+        if not self.stasisYears:
+            self.stasisYears = random.randint(STASIS_YEARS_MIN,STASIS_YEARS_MAX)
+
         #TODO: Add more randomized flavour.
         string  = "The last thing you remember before awaking from chryostasis,"
         string += " is the captain\nbeing decapitated by some flying debris. "
         string += "There was a battle. You don't know if\nthe enemy was destroyed,"
         string += " but obviously your ship is intact. The onboard computer\n"
-        string += "reports that you have been in stasis for {} years. ".format(
-                              random.randint(STASIS_YEARS_MIN,STASIS_YEARS_MAX))
+        string += "reports that you have been in stasis for {} years. ".format(self.stasisYears)
         string += "The ship has been drifting\nthe entire time.\n\n"
         string += "You are {} light years from home, ".format(self.drifter.delta)
         string += "but the solar sails are functional.\n"
@@ -63,7 +67,7 @@ class CmdLineGame():
         return buildRegex
     def buildCommandRegex(self):
         validCmds = [
-            ['orbit', '[1-6]'],
+            ['orbit', 'PLANETS'],
             ['depart'],
             ['drift'],
             ['head home'],
@@ -76,7 +80,7 @@ class CmdLineGame():
             ['gamble', '#'],
             ['craft', '#O', 'CRAFT']
         ]
-        curCmds = self.commands().split(', ')
+        curCmds = self.commands().split(', ').append('orbit')
         print(curCmds)
         buildRegex = ''
         curRegex = ''
@@ -93,6 +97,8 @@ class CmdLineGame():
                     curRegex += '\d+'
                 elif o == '#O':
                     curRegex += '\d*'
+                elif o == 'PLANETS':
+                    pass
                 elif o == 'INV':
                     inv = self.buildRegexFromList(self.drifter.cargo)
                     if inv:

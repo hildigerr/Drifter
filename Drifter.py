@@ -62,7 +62,7 @@ class TwitterGame():
         self.gfx.txt = self.command.backstory()+"\n\n"+self.command.commands()
     def wingame(self):
         self.gfx.txt = ( "Congratulations! You have made it home!\n\n"
-                     + "The enemy appears--seemingly out of nowhere. "
+                     + "The enemy appears--seemingly out of nowhere.\n\n"
                      + "You are under attack!\n\n"
                      + "Emergency!!   Emergency!!\n\n"
                      + "All hands report to chryostasis immedetly!" )

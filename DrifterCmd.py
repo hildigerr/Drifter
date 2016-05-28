@@ -39,14 +39,14 @@ class CmdLineGame():
             ['drift'],
             ['home'],
             ['harvest'],
-            ['jettison', '#O', 'INV'],
-            ['buy', '#O', 'P_INV'],
-            ['sell', '#O', 'INV'],
+            ['jettison', '#', 'INV'],
+            ['buy', '#', 'P_INV'],
+            ['sell', '#', 'INV'],
             ['attack'],
-            ['refine', '#O', 'INV'],
+            ['refine', '#', 'INV'],
             ['gamble', '#'],
             ['repair'],
-            ['craft', '#O', 'CRAFT'],
+            ['craft', '#', 'CRAFT'],
             ['gm']
         ]
         if run: self.main()
@@ -121,7 +121,7 @@ class CmdLineGame():
                 validCmds.remove(c)
 
         for c in validCmds:
-            curRegex = '(?P<{}>.*'.format(c[0])
+            curRegex = '(?P<{}>.*?'.format(c[0])
             for o in c:
                 if o == '#':
                     curRegex += '(\d+)'
@@ -137,7 +137,7 @@ class CmdLineGame():
                 elif o == 'INV':
                     inv = self.buildRegexFromList(self.drifter.cargo)
                     if inv:
-                        curRegex += '(' + inv + ')'
+                        curRegex += inv
                     else:
                         curRegex = ''
                         break
@@ -145,7 +145,7 @@ class CmdLineGame():
                     if self.drifter.sys.pos != None and self.drifter.sys.planets[self.drifter.sys.pos].resource.civ:
                         pinv = self.buildRegexFromList(self.drifter.sys.planets[self.drifter.sys.pos].resource.civ.price)
                         if pinv:
-                            curRegex += '(' + pinv + ')'
+                            curRegex += pinv
                         else:
                             curRegex = ''
                             break
@@ -160,8 +160,8 @@ class CmdLineGame():
                         curRegex = ''
                         break
                 else:
-                    curRegex += '(' + o.replace(' ', '.*') + ')'
-                curRegex += '.*'
+                    curRegex += '(' + o.replace(' ', '.*?') + ')'
+                curRegex += '.*?'
             if curRegex:
                 buildRegex += curRegex + ')|'
         #Strip the last '|'
@@ -180,13 +180,21 @@ class CmdLineGame():
             print(m.groupdict())
             for x in m.groupdict():
                 if m.group(x):
-                    for y in m.groups():
-                        if y and m.group(x) != y:
-                            validCommand += (y + ' ')
+                    for y in range(len(m.groups())):
+                        if x == m.groups()[y]:
+                            print('X:', x, 'Y:', y, 'm.groups()[y]:', m.groups()[y])
+                            for z in range(y, len(m.groups())):
+                                print('z:', z, 'm.groups()[z]:', m.groups()[z])
+                                if m.groups()[z]:
+                                    validCommand += (m.groups()[z] + ' ')
+                            break
+                        # if y and (m.group(x) != y or x == y):
+                        #     validCommand += (y + ' ')
             validCommand = validCommand[:-1]
             print("Valid Command: ", validCommand)
             return validCommand
         else:
+            print("No valid command")
             return None
     def commands(self):
         '''Enumerate available commands into a string.'''
@@ -201,7 +209,7 @@ class CmdLineGame():
                         string                    += ", refine, gamble"
                 string                            += ", attack"
             string                                += ", harvest"
-        elif self.drifter.sys.qt > 0:      string += ", orbit"
+        if self.drifter.sys.qt > 0:        string += ", orbit"
         if   len(self.drifter.cargo) > 0:  string += ", jettison"
         string += ", and quit.\n"
         return string

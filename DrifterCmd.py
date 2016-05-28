@@ -176,15 +176,11 @@ class CmdLineGame():
             self.buildCommandRegex()
         m = re.search(self.validRegex, cmd, re.I)
         if m:
-            print(m.groups())
-            print(m.groupdict())
             for x in m.groupdict():
                 if m.group(x):
                     for y in range(len(m.groups())):
                         if x == m.groups()[y]:
-                            print('X:', x, 'Y:', y, 'm.groups()[y]:', m.groups()[y])
                             for z in range(y, len(m.groups())):
-                                print('z:', z, 'm.groups()[z]:', m.groups()[z])
                                 if m.groups()[z]:
                                     validCommand += (m.groups()[z] + ' ')
                             break

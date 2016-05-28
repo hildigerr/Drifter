@@ -61,6 +61,8 @@ class TwitterGame():
                      + "You are under attack!\n\n"
                      + "Emergency!!   Emergency!!\n\n"
                      + "All hands report to chryostasis immedetly!" )
+        self.render("latest.png")
+        self.twitter.sendTweet('', self.imgFileName)
  
     def render(self, filename):
         print("DEBUG... Rendering") #TODO: Ensuring no extra rendering occurs.

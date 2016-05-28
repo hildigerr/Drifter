@@ -116,13 +116,16 @@ class Ship():
             else:           self.cargo[item] += amt
             return amt
         return 0
-    def jettison(self,amt=0,item=None):
+    def jettison(self,amt,item):
         ''' Jettison some cargo to make room for more. Returns acutal amount removed. '''
         if item != None and int(amt) > 0 and item in self.cargo:
+            #if int(amt) > self.cargo[item] : amt = self.cargo[item]
             self.cargo[item] -= amt ; self.usedcap -= amt
             if self.cargo[item] <= 0:
-                if self.cargo[item] < 0: self.usedcap -= self.cargo[item]
+                if self.cargo[item] < 0:
+                    self.usedcap -= self.cargo[item]
                 del self.cargo[item]
+            if self.usedcap < 0: self.usedcap = 0
             return amt
         return 0
     def shop(self,cmd,amt,item):

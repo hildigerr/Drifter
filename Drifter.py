@@ -44,10 +44,10 @@ class TwitterGame():
                 if attitude != "Hostile":
                     msg                        += ", buy, sell"
                     if attitude == "Friendly":
-                        msg                    += ", refine, gamble"
-                msg                            += ", attack"
+                        msg                    += ", refine, repair"
+                msg                            += ", gamble, attack"
             msg                                += ", harvest"
-        elif self.drifter.sys.qt > 0:      msg += ", orbit"
+        if self.drifter.sys.qt > 0:        msg += ", orbit"
         if   len(self.drifter.cargo) > 0:  msg += ", jettison"
         return msg
     def render(self, filename):

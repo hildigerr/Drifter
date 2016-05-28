@@ -202,10 +202,10 @@ class CmdLineGame():
                 if attitude != "Hostile":
                     string                        += ", buy, sell"
                     if attitude == "Friendly":
-                        string                    += ", refine, gamble"
-                string                            += ", attack"
-            string                                += ", harvest"
-        if self.drifter.sys.qt > 0:        string += ", orbit"
+                        string                    += ", refine, repair"
+                string                            += ", gamble, attack"
+            else: string                          += ", harvest"
+        if self.drifter.sys.qt > 0:      string += ", orbit"
         if   len(self.drifter.cargo) > 0:  string += ", jettison"
         string += ", and quit.\n"
         return string

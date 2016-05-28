@@ -82,7 +82,7 @@ def writeWeb(stasisYears, homeDelta, credit):
                 <th>User Name</th>
                 <th>Success</th>
                 <th>Total Tweets</th>
-                <th>Day Play</th>
+                <th>Days Played</th>
                 <th>Last Day Play</th>
             </tr>''')
 

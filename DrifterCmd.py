@@ -47,17 +47,19 @@ class CmdLineGame():
             ['gamble', '#'],
             ['repair'],
             ['craft', '#', 'CRAFT'],
-            ['gm']
+            ['gm'],
+            ['win'],
+            ['lose']
         ]
         if run: self.main()
-    def registerFun(winfun,loosefun):
+    def registerFun(self,winfun,loosefun):
         self.wingame = winfun
         self.losegame = loosefun
     def backstory(self):
-        '''Return the backstory string.
-            Resets stasisYears.
-        '''
-        self.stasisYears = random.randint(STASIS_YEARS_MIN,STASIS_YEARS_MAX)
+        '''Return the backstory string.'''
+
+        if not self.stasisYears:
+            self.stasisYears = random.randint(STASIS_YEARS_MIN,STASIS_YEARS_MAX)
 
         #TODO: Add more randomized flavour.
         string  = "The last thing you remember before awaking from chryostasis,"
@@ -207,8 +209,8 @@ class CmdLineGame():
                         string                    += ", refine, repair"
                 string                            += ", gamble, attack"
             else: string                          += ", harvest"
-        if self.drifter.sys.qt > 0:        string += ", orbit"
-        if len(self.drifter.cargo) > 0:    string += ", jettison"
+        if self.drifter.sys.qt > 0:      string += ", orbit"
+        if   len(self.drifter.cargo) > 0:  string += ", jettison"
         string += ", and quit.\n"
         return string
     def wingame(self):
@@ -407,6 +409,11 @@ class CmdLineGame():
             if cmd == "gm":
                 self.drifter.gm()
                 return("You unlock the secrets of the universe!",GAME_CONTINUE)
+
+            if cmd == "win":
+                return self.wingame()
+            if cmd == "lose":
+                return self.losegame()
 
             ####################################################################
             return ("\"{}\" is an invalid command.".format(cmd),GAME_CONTINUE)

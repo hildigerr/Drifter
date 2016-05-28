@@ -50,16 +50,17 @@ class TwitterGame():
             msg                                += ", harvest"
         if self.drifter.sys.qt > 0:        msg += ", orbit"
         if   len(self.drifter.cargo) > 0:  msg += ", jettison"
+        msg += ", win, lose"
         return msg
         
     def losegame(self):        
         self.gfx.txt = self.command.backstory()+"\n\n"+self.command.commands()
     def wingame(self):
-        self.gfx.txt = "Congratulations! You have made it home!\n\n"
+        self.gfx.txt = ( "Congratulations! You have made it home!\n\n"
                      + "The enemy appears--seemingly out of nowhere. "
                      + "You are under attack!\n\n"
                      + "Emergency!!   Emergency!!\n\n"
-                     + "All hands report to chryostasis immedetly!"
+                     + "All hands report to chryostasis immedetly!" )
  
     def render(self, filename):
         print("DEBUG... Rendering") #TODO: Ensuring no extra rendering occurs.
@@ -147,7 +148,12 @@ class TwitterGame():
                 self.starChart = None
                 (result,status) = self.command.do(["head"])
                 if status == GAME_TERMINATE: return self.wingame()
-
+            elif cmd == 'win':
+                self.starChart = None
+                return self.wingame()
+            elif cmd == 'lose':
+                self.starChart = None
+                return ("You haved failed to return home.",GAME_TERMINATE)
             ################################################### Everything else:
             else:
                 (result,status) = self.command.do(cmdLine)

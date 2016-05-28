@@ -28,6 +28,7 @@ class TwitterGame():
         self.name = name
         self.twitter = twitter.Twitter(self.name)
         self.starChart = None
+        self.savedState = None
         while run: 
             self.drifter = Ship.Ship()
             self.command = CmdLineGame(False,self.drifter)

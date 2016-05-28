@@ -180,8 +180,10 @@ class CmdLineGame():
                 if m.group(x):
                     for y in range(len(m.groups())):
                         if x == m.groups()[y]:
+                            print(y, m.groups())
                             for z in range(y, len(m.groups())):
-                                if m.groups()[z]:
+                                print(z, m.groups()[z])
+                                if z >= 1 and m.groups()[z] and m.groups()[z-1] != m.groups()[z]:
                                     validCommand += (m.groups()[z] + ' ')
                             break
                         # if y and (m.group(x) != y or x == y):

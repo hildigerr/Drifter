@@ -55,12 +55,12 @@ class TwitterGame():
     def losegame(self):        
         self.gfx.txt = self.command.backstory()+"\n\n"+self.command.commands()
     def wingame(self):
-        self.gfx.txt = "Congratulations! You have made it home!\n\n" 
+        self.gfx.txt = "Congratulations! You have made it home!\n\n"
                      + "The enemy appears--seemingly out of nowhere. "
                      + "You are under attack!\n\n"
                      + "Emergency!!   Emergency!!\n\n"
                      + "All hands report to chryostasis immedetly!"
-        
+ 
     def render(self, filename):
         print("DEBUG... Rendering") #TODO: Ensuring no extra rendering occurs.
         self.imgFileName  = self.gfx.scene_gen(self.starChart,filename)

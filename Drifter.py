@@ -81,7 +81,7 @@ class TwitterGame():
                 dispTop5 = True
                 continue
 
-            x = 5
+            x = 1.5
             print("Sleeping for %.1f minutes...\n" % x)
             time.sleep(x * 60)
 

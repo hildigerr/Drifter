@@ -157,6 +157,18 @@ table {
     .empty {
         margin-bottom: 20px;
     }
+
+    tr th {
+        font-size: 0.7em;
+    }
+    
+    tr td {
+        font-size: 0.7em;
+    }
+    
+    #button a {
+    padding: 25px 10px;
+    }
 }
 
 @media screen and (max-width: 600px) {
@@ -167,5 +179,9 @@ table {
         text-indent: 1.5em;
         color : white;
         padding-top: 5px;
+    }
+
+    #button a {
+    	padding: 25px 10px;
     }
 }

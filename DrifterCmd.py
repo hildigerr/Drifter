@@ -54,10 +54,10 @@ class CmdLineGame():
         self.wingame = winfun
         self.losegame = loosefun
     def backstory(self):
-        '''Return the backstory string.'''
-
-        if not self.stasisYears:
-            self.stasisYears = random.randint(STASIS_YEARS_MIN,STASIS_YEARS_MAX)
+        '''Return the backstory string.
+            Resets stasisYears.
+        '''
+        self.stasisYears = random.randint(STASIS_YEARS_MIN,STASIS_YEARS_MAX)
 
         #TODO: Add more randomized flavour.
         string  = "The last thing you remember before awaking from chryostasis,"
@@ -207,8 +207,8 @@ class CmdLineGame():
                         string                    += ", refine, repair"
                 string                            += ", gamble, attack"
             else: string                          += ", harvest"
-        if self.drifter.sys.qt > 0:      string += ", orbit"
-        if   len(self.drifter.cargo) > 0:  string += ", jettison"
+        if self.drifter.sys.qt > 0:        string += ", orbit"
+        if len(self.drifter.cargo) > 0:    string += ", jettison"
         string += ", and quit.\n"
         return string
     def wingame(self):

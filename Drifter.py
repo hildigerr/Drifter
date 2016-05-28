@@ -153,7 +153,7 @@ class TwitterGame():
                 return self.wingame()
             elif cmd == 'lose':
                 self.starChart = None
-                return ("You haved failed to return home.",GAME_TERMINATE)
+                (result,status) = ("You haved failed to return home.",GAME_TERMINATE)
             ################################################### Everything else:
             else:
                 (result,status) = self.command.do(cmdLine)

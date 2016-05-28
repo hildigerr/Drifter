@@ -158,8 +158,8 @@ class Ship():
     def craft(self,amt=0,item=None):
         '''Craft the items ship's cargo resources.'''
         if item != None and int(amt) > 0 and item in CRAFT_LIST:
-            Craft.craft(self, self.cargo, item, amt)
-        return 0
+            return (Craft.craft(self, self.cargo, item, amt))
+        return ("Sorry, you can not craft that item..")
     def gm(self):
         self.cargo.update({"Dirt":1000})
         self.cargo.update({"Rocks":1000})

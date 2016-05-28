@@ -37,15 +37,12 @@ CRAFT_LIST = {"Laser":CRAFT_LASER, "Cargo":CRAFT_CARGO, "Plasma":CRAFT_PLASMA, "
 class Craft():
    def craft(ship, inv, item, amt):
       req = CRAFT_LIST.get(item)
-      print(" - You want to craft", amt, item + "(s).");
 
       for key in req:
            if (key not in inv):
-              print(" - Unable to craft", item + ". Missing '"+key+"'.\n");
-              return False
+              return (" - Unable to craft "+ str(item) + ". Missing '"+key+"'.\n")
            elif ((req[key] * amt) > inv[key]): 
-              print(" - Unable to craft", item + ". Need", ((req[key] * amt) - inv[key]),"'"+key+"'.\n");
-              return False
+              return (" - Unable to craft " + str(item) + ". Need " + str(((req[key] * amt) - inv[key])) + " '"+key+"'.\n")
 
       for key in req:
          inv[key] -= (req[key] * amt)
@@ -64,11 +61,10 @@ class Craft():
             ship.health = 100
       else:
          if item not in inv:
-            ship.cargo.update({item:amt});
+            ship.cargo.update({item:amt})
          else:
-            ship.cargo.update({item:inv[item]+amt});
-      print(" - You crafted", amt, item + "(s)!\n");
-      return True
+            ship.cargo.update({item:inv[item]+amt})
+      return (" - You crafted "+ str(amt) + " "+str(item) + "(s)!\n")
 
 if __name__ == '__main__':
    crafting = Craft()

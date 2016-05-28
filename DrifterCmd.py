@@ -384,8 +384,8 @@ class CmdLineGame():
             ############################################################# Craft:
             if cmd == "craft":
                 try:
-                    self.drifter.craft(int(cmdLine[1]),cmdLine[2])
-                    return ("The result is ???",GAME_ACTION)#TODO
+                    craftString = self.drifter.craft(int(cmdLine[1]),cmdLine[2])
+                    return (craftString,GAME_ACTION)
                 except (IndexError, ValueError):
                     return ("?\n\tUsage: 'craft n item'",GAME_CONTINUE)
 

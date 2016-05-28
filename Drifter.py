@@ -131,7 +131,7 @@ class TwitterGame():
             if not dispTop5:
                 self.gfx.txt = ( self.twitter.top5ToString(top5)
                                  + "\n\n" + self.command.listCargo()
-                                 + "\n\n" + self.command.commands() )
+                                 + "\n\nAvailable commands:\n\n" + self.command.commands() )
                 continue
 
             #Some commands require us to update the star chart, most do not
@@ -162,7 +162,7 @@ class TwitterGame():
                 self.gfx.txt = ( self.twitter.top5ToString(top5)
                                  + result
                                  + "\n\n" + self.command.listCargo()
-                                 + "\n\n" + self.command.commands() )
+                                 + "\n\nAvailable commands:\n\n" + self.command.commands() )
                 self.render("latest.png")
 
             if status != GAME_CONTINUE:  self.drifter.time += 1

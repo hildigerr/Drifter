@@ -33,7 +33,7 @@ class TwitterGame():
         self.gfx     = Graphics.Graphics(self.name,self.drifter,self.command.backstory()+"\n\n"+self.command.commands())
         self.starChart = None
         self.command.registerFun(self.wingame,self.losegame)
-        while run: self.main() ; pygame.quit()
+        while run: self.main()# ; pygame.quit()
 
     def commands(self):
         '''Enumerate available commands into a msg.'''

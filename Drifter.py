@@ -26,14 +26,16 @@ class TwitterGame():
     '''Implements a Twitter version of The Game.'''
     def __init__(self,name="Testing",run=True):
         self.name = name
-        self.drifter = Ship.Ship()
         self.twitter = twitter.Twitter(self.name)
-        self.command = CmdLineGame(False,self.drifter)
-        self.command.commands = self.commands #Overwrite the command list to build a better regex
-        self.gfx     = Graphics.Graphics(self.name,self.drifter,self.command.backstory()+"\n\n"+self.command.commands())
         self.starChart = None
-        self.command.registerFun(self.wingame,self.losegame)
-        while run: self.main() ; pygame.quit()
+        while run: 
+            self.drifter = Ship.Ship()
+            self.command = CmdLineGame(False,self.drifter)
+            self.command.commands = self.commands #Overwrite the command list to build a better regex
+            self.command.registerFun(self.wingame,self.losegame)
+            self.gfx = Graphics.Graphics(self.name,self.drifter,self.command.backstory()+"\n\n"+self.command.commands())
+            self.main()
+        pygame.quit()
 
     def commands(self):
         '''Enumerate available commands into a msg.'''

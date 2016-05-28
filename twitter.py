@@ -178,7 +178,7 @@ class Twitter(object):
             else:
                 rawVotes[t[1]] = 1
 
-        return sorted(rawVotes.items(), key=lambda t: t[1])[:5]
+        return sorted(rawVotes.items(), key=lambda t: t[1], reverse=True)[:5]
 
     def top5ToString(self, top5):
         msg = 'Top 5 Votes:\n\n'

@@ -32,7 +32,8 @@ class TwitterGame():
         self.command.commands = self.commands #Overwrite the command list to build a better regex
         self.gfx     = Graphics.Graphics(self.name,self.drifter,self.command.backstory()+"\n\n"+self.command.commands())
         self.starChart = None
-        if run: self.main() ; pygame.quit()
+        self.command.registerFun(self.wingame,self.losegame)
+        while run: self.main() ; pygame.quit()
 
     def commands(self):
         '''Enumerate available commands into a msg.'''
@@ -50,6 +51,16 @@ class TwitterGame():
         if self.drifter.sys.qt > 0:        msg += ", orbit"
         if   len(self.drifter.cargo) > 0:  msg += ", jettison"
         return msg
+        
+    def losegame(self):        
+        self.gfx.txt = self.command.backstory()+"\n\n"+self.command.commands()
+    def wingame(self):
+        self.gfx.txt = "Congratulations! You have made it home!\n\n" 
+                     + "The enemy appears--seemingly out of nowhere. "
+                     + "You are under attack!\n\n"
+                     + "Emergency!!   Emergency!!\n\n"
+                     + "All hands report to chryostasis immedetly!"
+        
     def render(self, filename):
         print("DEBUG... Rendering") #TODO: Ensuring no extra rendering occurs.
         self.imgFileName  = self.gfx.scene_gen(self.starChart,filename)
@@ -129,17 +140,24 @@ class TwitterGame():
             if cmd == "drift": #TODO Drifting while under attack is dangerous.
                 self.starChart = None
                 (result, status) = self.command.do(["drift"])
+                if status == GAME_TERMINATE: return self.wingame()
 
             ######################################################### Head Home:
             elif cmd == "home":
                 self.starChart = None
                 (result,status) = self.command.do(["head"])
+                if status == GAME_TERMINATE: return self.wingame()
 
             ################################################### Everything else:
             else:
                 (result,status) = self.command.do(cmdLine)
 
             ####################################################################
+            if status == GAME_TERMINATE:
+                self.gfx.txt = result + "\n\nGame will reset..."
+                self.render("latest.png")
+                self.twitter.sendTweet('', self.imgFileName)
+                return self.losegame()
             if result != None:
                 self.gfx.txt = ( self.twitter.top5ToString(top5)
                                  + result
@@ -147,7 +165,6 @@ class TwitterGame():
                                  + "\n\n" + self.command.commands() )
                 self.render("latest.png")
 
-            if status == GAME_TERMINATE: return
             if status != GAME_CONTINUE:  self.drifter.time += 1
 
 ########################################################################## MAIN:

@@ -103,9 +103,11 @@ def writeWeb(stasisYears, homeDelta, credit):
        </table>
 
     <a href="#" class="scrollToTop"><span class="glyphicon glyphicon-triangle-top" aria-hidden="true"></span></a>
-    </div> 
-    </footer>    
-    
+    </div>
+    <div class="emptyBot"></div>
+    <footer>
+        <h3>Twitter Bot---></h3>
+    </footer>
 </body>
 <script>
     $(document).ready(function(){
@@ -126,7 +128,7 @@ def writeWeb(stasisYears, homeDelta, credit):
         });
         
     });
-</script>    
+</script>
 </html>''')
 
     con.close()

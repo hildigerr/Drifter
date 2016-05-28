@@ -34,6 +34,8 @@ class TwitterGame():
             self.command.commands = self.commands #Overwrite the command list to build a better regex
             self.command.registerFun(self.wingame,self.losegame)
             self.gfx = Graphics.Graphics(self.name,self.drifter,self.command.backstory()+"\n\n"+self.command.commands())
+            if self.savedState:
+                (self.drifter.cargo,self.drifter.credit) = self.savedState
             self.main()
         pygame.quit()
 
@@ -65,7 +67,7 @@ class TwitterGame():
                      + "All hands report to chryostasis immedetly!" )
         self.render("latest.png")
         self.twitter.sendTweet('', self.imgFileName)
- 
+        self.savedState = (self.drifter.cargo,self.drifter.credit)
     def render(self, filename):
         print("DEBUG... Rendering") #TODO: Ensuring no extra rendering occurs.
         self.imgFileName  = self.gfx.scene_gen(self.starChart,filename)

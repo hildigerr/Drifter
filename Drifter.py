@@ -55,7 +55,6 @@ class TwitterGame():
             msg                                += ", harvest"
         if self.drifter.sys.qt > 0:        msg += ", orbit"
         if   len(self.drifter.cargo) > 0:  msg += ", jettison"
-        msg += ", win, lose"
         return msg
         
     def losegame(self):        
@@ -100,7 +99,7 @@ class TwitterGame():
                 dispTop5 = True
                 continue
 
-            x = 1.5
+            x = 5
             print("Sleeping for %.1f minutes...\n" % x)
             time.sleep(x * 60)
 
@@ -181,4 +180,4 @@ class TwitterGame():
             if status != GAME_CONTINUE:  self.drifter.time += 1
 
 ########################################################################## MAIN:
-if __name__ == '__main__': TwitterGame('zmcbot')
+if __name__ == '__main__': TwitterGame('DrifterGame')
